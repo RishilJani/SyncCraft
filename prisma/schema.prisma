@@ -1,0 +1,104 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Projects {
+  projectId   BigInt      @id @unique @default(autoincrement())
+  projectName String      @db.VarChar
+  description String?     @db.VarChar
+  createdBy   BigInt?
+  createdAt   DateTime?   @default(now()) @db.Timestamptz(6)
+  Users       Users?      @relation(fields: [createdBy], references: [userId], onDelete: NoAction, onUpdate: NoAction)
+  TaskLists   TaskLists[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model TaskComments {
+  commentId   BigInt    @id @unique @default(autoincrement())
+  taskId      BigInt
+  userId      BigInt?
+  commentText String    @db.VarChar
+  createdDate DateTime? @default(now()) @db.Timestamptz(6)
+  tasks       tasks     @relation(fields: [taskId], references: [taskId], onDelete: NoAction, onUpdate: NoAction)
+  Users       Users?    @relation(fields: [userId], references: [userId], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model TaskHistory {
+  historyId  BigInt    @id @unique @default(autoincrement())
+  taskId     BigInt
+  changedBy  BigInt?
+  changeType String    @db.VarChar
+  changeTime DateTime? @default(now()) @db.Timestamptz(6)
+  Users      Users?    @relation(fields: [changedBy], references: [userId], onDelete: NoAction, onUpdate: NoAction)
+  tasks      tasks     @relation(fields: [taskId], references: [taskId], onDelete: NoAction, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model TaskLists {
+  listId    BigInt   @id @unique @default(autoincrement())
+  projectId BigInt
+  listName  String   @db.VarChar
+  Projects  Projects @relation(fields: [projectId], references: [projectId], onDelete: NoAction, onUpdate: NoAction)
+  tasks     tasks[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model UserRoles {
+  userRoleId BigInt  @id @unique @default(autoincrement())
+  userId     BigInt
+  roleId     BigInt?
+  roles      roles?  @relation(fields: [roleId], references: [roleid], onDelete: Cascade, onUpdate: NoAction)
+  Users      Users   @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Users {
+  userId       BigInt         @id @unique @default(autoincrement())
+  userName     String         @unique @db.VarChar
+  email        String         @unique @db.VarChar
+  passwordHash String         @db.VarChar
+  createdAt    DateTime?      @default(now()) @db.Timestamptz(6)
+  Projects     Projects[]
+  TaskComments TaskComments[]
+  TaskHistory  TaskHistory[]
+  UserRoles    UserRoles[]
+  tasks        tasks[]
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model roles {
+  roleid    BigInt      @id
+  rolename  role_enum
+  UserRoles UserRoles[]
+}
+
+/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model tasks {
+  taskId       BigInt         @id @default(autoincrement())
+  listid       BigInt?
+  assignedto   BigInt?
+  title        String         @db.VarChar(100)
+  description  String?        @db.VarChar(255)
+  priority     String?        @db.VarChar(10)
+  status       String?        @db.VarChar(20)
+  dueDate      DateTime?      @db.Timestamptz(6)
+  createdAt    DateTime?      @default(now()) @db.Timestamptz(6)
+  TaskComments TaskComments[]
+  TaskHistory  TaskHistory[]
+  Users        Users?         @relation(fields: [assignedto], references: [userId], onDelete: NoAction, onUpdate: NoAction)
+  TaskLists    TaskLists?     @relation(fields: [listid], references: [listId], onDelete: NoAction, onUpdate: NoAction)
+}
+
+enum role_enum {
+  Admin
+  Member
+  Manager
+}
