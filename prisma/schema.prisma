@@ -25,7 +25,7 @@ model TaskComments {
   userId      BigInt?
   commentText String    @db.VarChar
   createdDate DateTime? @default(now()) @db.Timestamptz(6)
-  tasks       tasks     @relation(fields: [taskId], references: [taskId], onDelete: NoAction, onUpdate: NoAction)
+  tasks       Tasks     @relation(fields: [taskId], references: [taskId], onDelete: NoAction, onUpdate: NoAction)
   Users       Users?    @relation(fields: [userId], references: [userId], onDelete: NoAction, onUpdate: NoAction)
 }
 
@@ -37,7 +37,7 @@ model TaskHistory {
   changeType String    @db.VarChar
   changeTime DateTime? @default(now()) @db.Timestamptz(6)
   Users      Users?    @relation(fields: [changedBy], references: [userId], onDelete: NoAction, onUpdate: NoAction)
-  tasks      tasks     @relation(fields: [taskId], references: [taskId], onDelete: NoAction, onUpdate: NoAction)
+  tasks      Tasks     @relation(fields: [taskId], references: [taskId], onDelete: NoAction, onUpdate: NoAction)
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -46,7 +46,7 @@ model TaskLists {
   projectId BigInt
   listName  String   @db.VarChar
   Projects  Projects @relation(fields: [projectId], references: [projectId], onDelete: NoAction, onUpdate: NoAction)
-  tasks     tasks[]
+  Tasks     Tasks[]
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -54,7 +54,7 @@ model UserRoles {
   userRoleId BigInt  @id @unique @default(autoincrement())
   userId     BigInt
   roleId     BigInt?
-  roles      roles?  @relation(fields: [roleId], references: [roleid], onDelete: Cascade, onUpdate: NoAction)
+  roles      Roles?  @relation(fields: [roleId], references: [roleid], onDelete: Cascade, onUpdate: NoAction)
   Users      Users   @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: NoAction)
 }
 
@@ -68,21 +68,21 @@ model Users {
   Projects     Projects[]
   TaskComments TaskComments[]
   TaskHistory  TaskHistory[]
+  Tasks        Tasks[]
   UserRoles    UserRoles[]
-  tasks        tasks[]
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model roles {
-  roleid    BigInt      @id
+model Roles {
+  roleid    BigInt      @id(map: "roles_pkey")
   rolename  role_enum
   UserRoles UserRoles[]
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model tasks {
-  taskId       BigInt         @id @default(autoincrement())
+model Tasks {
+  taskId       BigInt         @id(map: "tasks_pkey") @default(autoincrement())
   listid       BigInt?
   assignedto   BigInt?
   title        String         @db.VarChar(100)
@@ -93,8 +93,8 @@ model tasks {
   createdAt    DateTime?      @default(now()) @db.Timestamptz(6)
   TaskComments TaskComments[]
   TaskHistory  TaskHistory[]
-  Users        Users?         @relation(fields: [assignedto], references: [userId], onDelete: NoAction, onUpdate: NoAction)
-  TaskLists    TaskLists?     @relation(fields: [listid], references: [listId], onDelete: NoAction, onUpdate: NoAction)
+  Users        Users?         @relation(fields: [assignedto], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "tasks_assignedto_fkey")
+  TaskLists    TaskLists?     @relation(fields: [listid], references: [listId], onDelete: NoAction, onUpdate: NoAction, map: "tasks_listid_fkey")
 }
 
 enum role_enum {

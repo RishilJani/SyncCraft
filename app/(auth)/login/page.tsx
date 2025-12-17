@@ -1,5 +1,4 @@
 'use client'
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@radix-ui/react-label";
@@ -53,7 +52,7 @@ function LoginPage() {
 
                         <div className="space-y-2">
                             <Label htmlFor="email" className="block text-sm"> Username</Label>
-                            <Input type="text" required name="email"id="email"/>
+                            <Input type="text" required name="email" id="email" />
                         </div>
 
                         <div className="space-y-2">
@@ -61,15 +60,15 @@ function LoginPage() {
                             <Input type="password" required name="pwd" id="pwd" className="input sz-md variant-mixed" />
                         </div>
 
-                        <Button className="w-full" onClick={()=>{ console.log("Login clicked"); }}>Continue</Button>
+                        <Button className="w-full" onClick={() => { console.log("Login clicked"); }}>Continue</Button>
                     </div>
                 </div>
 
                 <div className="bg-muted rounded-(--radius) border p-3">
                     <p className="text-accent-foreground text-center text-sm">
                         Have an account ?
-                        <Button asChild variant="link" className="px-2"> 
-                          <Link href="#">Sign In</Link>
+                        <Button asChild variant="link" className="px-2">
+                            <Link href="#">Sign In</Link>
                         </Button>
                     </p>
                 </div>
