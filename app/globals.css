@@ -123,3 +123,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Hide default password reveal button in Edge/Internet Explorer */
+input[type="password"]::-ms-reveal,
+input[type="password"]::-ms-clear {
+  display: none;
+}

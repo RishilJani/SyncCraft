@@ -2,20 +2,37 @@
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@radix-ui/react-label";
 import Link from "next/link";
 import { redirect, RedirectType } from "next/navigation";
 import React, { useState } from "react";
+import { Errors } from "../register/page";
 
 function LoginPage() {
     const [userName, setUserName] = useState("");
     const [password, setPassword] = useState("");
 
+    const [errors, setErrors] = useState<Errors>({});
+
+    const validateForm = () => {
+        const newError: Errors = {};
+        if (!userName.trim())
+            newError.name = "Name is Required";
+        if (!password.trim())
+            newError.password = "Password is Required";
+        setErrors(newError);
+
+        return Object.keys(newError).length == 0;
+    }
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         // validation here
+        if (validateForm()) {
+            // login successful
+            redirect("/admin");
+        }
 
-        redirect("/admin/dashboard");
     }
     return (
         <>
@@ -37,19 +54,21 @@ function LoginPage() {
                                     id="userName"
                                     value={userName}
                                     onChange={(e) => { setUserName(e.target.value); }} />
+                                {errors.name && <p className='text-red-500 text-sm'>{errors.name}</p>}
                             </div>
 
                             <div className="space-y-2">
 
                                 <Label htmlFor="pwd" className="text-title text-sm"> Password </Label>
-                                <Input
-                                    type="password" required
+                                <PasswordInput
+                                    required
                                     name="pwd"
                                     id="pwd"
                                     className="input sz-md variant-mixed"
                                     value={password}
                                     autoComplete='current-password'
                                     onChange={(e) => { setPassword(e.target.value); }} />
+                                {errors.password && <p className='text-red-500 text-sm'>{errors.password}</p>}
                             </div>
 
                             <Button className="w-full" onClick={(e) => { handleSubmit(e); }}>Sign Up</Button>
