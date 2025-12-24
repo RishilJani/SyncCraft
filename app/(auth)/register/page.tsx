@@ -2,6 +2,7 @@
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@radix-ui/react-label';
 import Link from 'next/link';
 import { useState } from 'react';
@@ -16,6 +17,7 @@ function SignUp() {
     const [userName, setUserName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
+    const [role, setRole] = useState("Admin");
     const [errors, setErrors] = useState<Errors>({});
 
     const validateForm = () => {
@@ -49,7 +51,7 @@ function SignUp() {
             console.log(userName);
             console.log(email);
             console.log(password);
-
+            console.log(role);
         }
     };
 
@@ -98,6 +100,24 @@ function SignUp() {
                                 autoComplete='current-password'
                                 onChange={(e) => { setPassword(e.target.value); }} />
                             {errors.password && <p className='text-red-500 text-sm'>{errors.password}</p>}
+                        </div>
+
+                        <div className="space-y-2">
+                            <Label className="text-title text-sm"> Role </Label>
+                            <RadioGroup value={role} onValueChange={setRole} className="flex flex-row space-x-4">
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="Admin" id="r-admin" />
+                                    <Label htmlFor="r-admin">Admin</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="Manager" id="r-manager" />
+                                    <Label htmlFor="r-manager">Manager</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value="Member" id="r-member" />
+                                    <Label htmlFor="r-member">Member</Label>
+                                </div>
+                            </RadioGroup>
                         </div>
 
                         <Button className="w-full" onClick={(e) => { handleSubmit(e); }}>Sign Up</Button>

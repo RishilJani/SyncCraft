@@ -49,7 +49,7 @@ export default function AdminDashboard() {
                 <div className="flex items-center justify-between">
                     <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
                     <Button asChild className="gap-2">
-                        <Link href="/admin/projects/add">
+                        <Link href="/admin/addProject">
                             <Plus className="h-4 w-4" />
                             Add Project
                         </Link>
