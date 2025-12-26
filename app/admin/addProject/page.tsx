@@ -96,7 +96,7 @@ export default function AddProjectPage() {
                 placeholder="Project goals and scope..."
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                className="min-h-[100px]"
+                className="min-h-25"
                 required
               />
             </div>
@@ -187,7 +187,7 @@ export default function AddProjectPage() {
             </div>
           </div>
         </div>
-        <div className="bg-muted rounded-b-[var(--radius)] border-t p-3">
+        <div className="bg-muted rounded-b-(--radius) border-t p-3">
           <p className="text-center text-sm">
             <Button asChild variant="link" className="px-2 text-muted-foreground">
               <Link href="/admin">Cancel</Link>

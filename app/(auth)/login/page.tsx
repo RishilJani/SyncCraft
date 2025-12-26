@@ -6,7 +6,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@radix-ui/react-label";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { redirect, RedirectType } from "next/navigation";
 import React, { useState } from "react";
 import { Errors } from "../register/page";
 
@@ -32,8 +32,7 @@ function LoginPage() {
         // validation here
         if (validateForm()) {
             // login successful
-            console.log("Login:", { userName, role }); // Debug log
-            redirect("/admin");
+            redirect(role.toLowerCase(), RedirectType.replace);
         }
     }
 
@@ -94,7 +93,7 @@ function LoginPage() {
                     </div>
                 </div>
 
-                <div className="bg-muted rounded-(--radius) border p-3">
+                <div className="bg-muted rounded-lg border p-3">
                     <p className="text-accent-foreground text-center text-sm">
                         Don't have an account ?
                         <Button asChild variant="link" className="px-2">

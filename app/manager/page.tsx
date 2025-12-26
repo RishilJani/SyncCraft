@@ -1,6 +1,6 @@
 import React from 'react'
 
-function Manage() {
+function ManageDashboard() {
   return (
     <div>
       Manager Screen here
@@ -8,4 +8,4 @@ function Manage() {
   )
 }
 
-export default Manage
+export default ManageDashboard

@@ -1,17 +1,11 @@
-
 "use client";
-
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Plus, ChevronDown, ChevronUp } from "lucide-react";
-import { useState } from "react";
+import { Plus, ChevronDown } from "lucide-react";
 
 export default function AdminDashboard() {
-    const [showAllCompleted, setShowAllCompleted] = useState(false);
-    const [showAllRunning, setShowAllRunning] = useState(false);
-    const [showAllUpcoming, setShowAllUpcoming] = useState(false);
-
+    const projectDetailRoute = "/admin/project/";
     const completedProjects = [
         { id: 1, title: "Website Redesign", description: "Revamped the corporate website with a fresh look." },
         { id: 2, title: "Mobile App Launch", description: "Released the MVP for both iOS and Android platforms." },
@@ -38,11 +32,6 @@ export default function AdminDashboard() {
         { id: 15, title: "Referral Program", description: "Designing a reward system for user invites." }
     ];
 
-    const height = 3;
-    const getDisplayedProjects = (projects: typeof completedProjects, showAll: boolean) => {
-        return showAll ? projects : projects.slice(0, height);
-    };
-
     return (
         <div className="flex min-h-screen w-full flex-col bg-muted/40 p-4 md:p-8">
             <div className="mx-auto w-full max-w-4xl space-y-8">
@@ -64,9 +53,9 @@ export default function AdminDashboard() {
                         </CardHeader>
                         <CardContent className="flex-1">
                             <ul className="space-y-2">
-                                {getDisplayedProjects(completedProjects, showAllCompleted).map((project) => (
+                                {completedProjects.slice(0, 3).map((project) => (
                                     <li key={project.id}>
-                                        <Link href={`/admin/projects/${project.id}`} className="block group p-1.5 rounded-lg hover:bg-accent hover:shadow-sm transition-all border border-transparent hover:border-border/50">
+                                        <Link href={`${projectDetailRoute}${project.id}`} className="block group p-1.5 rounded-lg hover:bg-accent hover:shadow-sm transition-all border border-transparent hover:border-border/50">
                                             <div className="flex items-start gap-2">
                                                 <div className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-green-500" />
                                                 <div>
@@ -79,18 +68,12 @@ export default function AdminDashboard() {
                                 ))}
                             </ul>
                         </CardContent>
-                        {completedProjects.length > height && (
+                        {completedProjects.length > 3 && (
                             <CardFooter>
-                                <Button
-                                    variant="ghost"
-                                    className="w-full gap-2 text-muted-foreground hover:text-foreground"
-                                    onClick={() => setShowAllCompleted(!showAllCompleted)}
-                                >
-                                    {showAllCompleted ? (
-                                        <>Show Less <ChevronUp className="h-4 w-4" /></>
-                                    ) : (
-                                        <>View All <ChevronDown className="h-4 w-4" /></>
-                                    )}
+                                <Button variant="ghost" className="w-full gap-2 text-muted-foreground hover:text-foreground" asChild >
+                                    <Link href="/admin/projects/completed">
+                                        View All <ChevronDown className="h-4 w-4 -rotate-90" />
+                                    </Link>
                                 </Button>
                             </CardFooter>
                         )}
@@ -103,9 +86,9 @@ export default function AdminDashboard() {
                         </CardHeader>
                         <CardContent className="flex-1">
                             <ul className="space-y-2">
-                                {getDisplayedProjects(runningProjects, showAllRunning).map((project) => (
+                                {runningProjects.slice(0, 3).map((project) => (
                                     <li key={project.id}>
-                                        <Link href={`/admin/projects/${project.id}`} className="block group p-1.5 rounded-lg hover:bg-accent hover:shadow-sm transition-all border border-transparent hover:border-border/50">
+                                        <Link href={`${projectDetailRoute}${project.id}`} className="block group p-1.5 rounded-lg hover:bg-accent hover:shadow-sm transition-all border border-transparent hover:border-border/50">
                                             <div className="flex items-start gap-2">
                                                 <div className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-blue-500 animate-pulse" />
                                                 <div>
@@ -118,18 +101,12 @@ export default function AdminDashboard() {
                                 ))}
                             </ul>
                         </CardContent>
-                        {runningProjects.length > height && (
+                        {runningProjects.length > 3 && (
                             <CardFooter>
-                                <Button
-                                    variant="ghost"
-                                    className="w-full gap-2 text-muted-foreground hover:text-foreground"
-                                    onClick={() => setShowAllRunning(!showAllRunning)}
-                                >
-                                    {showAllRunning ? (
-                                        <>Show Less <ChevronUp className="h-4 w-4" /></>
-                                    ) : (
-                                        <>View All <ChevronDown className="h-4 w-4" /></>
-                                    )}
+                                <Button variant="ghost" className="w-full gap-2 text-muted-foreground hover:text-foreground" asChild >
+                                    <Link href="/admin/projects/running">
+                                        View All <ChevronDown className="h-4 w-4 -rotate-90" />
+                                    </Link>
                                 </Button>
                             </CardFooter>
                         )}
@@ -142,9 +119,9 @@ export default function AdminDashboard() {
                         </CardHeader>
                         <CardContent className="flex-1">
                             <ul className="space-y-2">
-                                {getDisplayedProjects(upcomingProjects, showAllUpcoming).map((project) => (
+                                {upcomingProjects.slice(0, 3).map((project) => (
                                     <li key={project.id}>
-                                        <Link href={`/admin/projects/${project.id}`} className="block group p-1.5 rounded-lg hover:bg-accent hover:shadow-sm transition-all border border-transparent hover:border-border/50">
+                                        <Link href={`${projectDetailRoute}${project.id}`} className="block group p-1.5 rounded-lg hover:bg-accent hover:shadow-sm transition-all border border-transparent hover:border-border/50">
                                             <div className="flex items-start gap-2">
                                                 <div className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-orange-500" />
                                                 <div>
@@ -157,18 +134,12 @@ export default function AdminDashboard() {
                                 ))}
                             </ul>
                         </CardContent>
-                        {upcomingProjects.length > height && (
+                        {upcomingProjects.length > 3 && (
                             <CardFooter>
-                                <Button
-                                    variant="ghost"
-                                    className="w-full gap-2 text-muted-foreground hover:text-foreground"
-                                    onClick={() => setShowAllUpcoming(!showAllUpcoming)}
-                                >
-                                    {showAllUpcoming ? (
-                                        <>Show Less <ChevronUp className="h-4 w-4" /></>
-                                    ) : (
-                                        <>View All <ChevronDown className="h-4 w-4" /></>
-                                    )}
+                                <Button variant="ghost" className="w-full gap-2 text-muted-foreground hover:text-foreground" asChild >
+                                    <Link href="/admin/projects/upcoming">
+                                        View All <ChevronDown className="h-4 w-4 -rotate-90" />
+                                    </Link>
                                 </Button>
                             </CardFooter>
                         )}
@@ -178,3 +149,4 @@ export default function AdminDashboard() {
         </div>
     );
 }
+

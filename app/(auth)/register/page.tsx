@@ -5,6 +5,7 @@ import { PasswordInput } from '@/components/ui/password-input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@radix-ui/react-label';
 import Link from 'next/link';
+import { redirect, RedirectType } from 'next/navigation';
 import { useState } from 'react';
 
 type Errors = {
@@ -52,6 +53,9 @@ function SignUp() {
             console.log(email);
             console.log(password);
             console.log(role);
+
+            redirect(role.toLowerCase(), RedirectType.replace);
+            
         }
     };
 
@@ -124,7 +128,7 @@ function SignUp() {
                     </div>
                 </div>
 
-                <div className="bg-muted rounded-(--radius) border p-3">
+                <div className="bg-muted rounded-lg border p-3">
                     <p className="text-accent-foreground text-center text-sm">
                         Already have an account ?
                         <Button asChild variant="link" className="px-2">
