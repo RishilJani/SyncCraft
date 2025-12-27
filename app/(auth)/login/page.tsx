@@ -9,11 +9,12 @@ import Link from "next/link";
 import { redirect, RedirectType } from "next/navigation";
 import React, { useState } from "react";
 import { Errors } from "../register/page";
+import { Role } from "@/lib/utils";
 
 function LoginPage() {
     const [userName, setUserName] = useState("");
     const [password, setPassword] = useState("");
-    const [role, setRole] = useState("Admin");
+    const [role, setRole] = useState(Role.Admin);
     const [errors, setErrors] = useState<Errors>({});
 
     const validateForm = () => {
@@ -32,7 +33,14 @@ function LoginPage() {
         // validation here
         if (validateForm()) {
             // login successful
-            redirect(role.toLowerCase(), RedirectType.replace);
+            var data = {
+                userName,
+                password,
+                role
+            };
+            console.log(data);
+            
+            // redirect(role.toLowerCase(), RedirectType.replace);
         }
     }
 
@@ -73,17 +81,17 @@ function LoginPage() {
 
                         <div className="space-y-2">
                             <Label className="text-title text-sm"> Role </Label>
-                            <RadioGroup value={role} onValueChange={setRole} className="flex flex-row space-x-4">
+                            <RadioGroup value={role} onValueChange={(value)=> setRole(value as Role)} className="flex flex-row space-x-4">
                                 <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="Admin" id="r-admin" />
+                                    <RadioGroupItem value={Role.Admin} id="r-admin" />
                                     <Label htmlFor="r-admin">Admin</Label>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="Manager" id="r-manager" />
+                                    <RadioGroupItem value={Role.Manager} id="r-manager" />
                                     <Label htmlFor="r-manager">Manager</Label>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="Member" id="r-member" />
+                                    <RadioGroupItem value={Role.Member} id="r-member" />
                                     <Label htmlFor="r-member">Member</Label>
                                 </div>
                             </RadioGroup>

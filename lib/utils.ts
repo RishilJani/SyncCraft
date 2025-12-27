@@ -1,6 +1,3 @@
-import { clsx, type ClassValue } from "clsx"
-import { twMerge } from "tailwind-merge"
+enum Role{ Admin = "admin", Manager = "manager", Member= "member" }
 
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs))
-}
+export {Role};

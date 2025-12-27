@@ -17,7 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/tw_utils";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, X } from "lucide-react";
 import Link from "next/link";

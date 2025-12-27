@@ -3,10 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Role } from '@/lib/utils';
 import { Label } from '@radix-ui/react-label';
 import Link from 'next/link';
 import { redirect, RedirectType } from 'next/navigation';
 import { useState } from 'react';
+import { addUser, deleteUser } from '../auth';
 
 type Errors = {
     name?: String,
@@ -18,7 +20,7 @@ function SignUp() {
     const [userName, setUserName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [role, setRole] = useState("Admin");
+    const [role, setRole] = useState(Role.Admin);
     const [errors, setErrors] = useState<Errors>({});
 
     const validateForm = () => {
@@ -53,9 +55,10 @@ function SignUp() {
             console.log(email);
             console.log(password);
             console.log(role);
-
+            deleteUser(1);
+            addUser(userName as string, password as string, email as string, role);
             redirect(role.toLowerCase(), RedirectType.replace);
-            
+
         }
     };
 
@@ -95,30 +98,23 @@ function SignUp() {
                         <div className="space-y-2">
 
                             <Label htmlFor="pwd" className="text-title text-sm"> Password </Label>
-                            <PasswordInput
-                                required
-                                name="pwd"
-                                id="pwd"
-                                className="input sz-md variant-mixed"
-                                value={password}
-                                autoComplete='current-password'
-                                onChange={(e) => { setPassword(e.target.value); }} />
+                            <PasswordInput required name="pwd" id="pwd" className="input sz-md variant-mixed" value={password} autoComplete='current-password' onChange={(e) => { setPassword(e.target.value); }} />
                             {errors.password && <p className='text-red-500 text-sm'>{errors.password}</p>}
                         </div>
 
                         <div className="space-y-2">
                             <Label className="text-title text-sm"> Role </Label>
-                            <RadioGroup value={role} onValueChange={setRole} className="flex flex-row space-x-4">
+                            <RadioGroup value={role} onValueChange={(value) => setRole(value as Role)} className="flex flex-row space-x-4">
                                 <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="Admin" id="r-admin" />
+                                    <RadioGroupItem value={Role.Admin} id="r-admin" />
                                     <Label htmlFor="r-admin">Admin</Label>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="Manager" id="r-manager" />
+                                    <RadioGroupItem value={Role.Manager} id="r-manager" />
                                     <Label htmlFor="r-manager">Manager</Label>
                                 </div>
                                 <div className="flex items-center space-x-2">
-                                    <RadioGroupItem value="Member" id="r-member" />
+                                    <RadioGroupItem value={Role.Member} id="r-member" />
                                     <Label htmlFor="r-member">Member</Label>
                                 </div>
                             </RadioGroup>

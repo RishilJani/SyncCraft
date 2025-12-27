@@ -55,11 +55,10 @@ model TaskLists {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model UserRoles {
-  userRoleId BigInt  @id @unique @default(autoincrement())
+  userRoleId BigInt    @id @unique @default(autoincrement())
   userId     BigInt
-  roleId     BigInt?
-  roles      Roles?  @relation(fields: [roleId], references: [roleid], onDelete: Cascade, onUpdate: NoAction)
-  Users      Users   @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: NoAction)
+  roleName   role_enum @default(member)
+  Users      Users     @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: NoAction)
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -74,13 +73,6 @@ model Users {
   TaskHistory  TaskHistory[]
   Tasks        Tasks[]
   UserRoles    UserRoles[]
-}
-
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model Roles {
-  roleid    BigInt      @id(map: "roles_pkey")
-  rolename  String
-  UserRoles UserRoles[]
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
@@ -109,4 +101,10 @@ model Tags {
   tagName  String     @unique
   Projects Projects[]
   Tasks    Tasks[]
+}
+
+enum role_enum {
+  admin
+  manager
+  member
 }
