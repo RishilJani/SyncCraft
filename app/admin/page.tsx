@@ -2,7 +2,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
-import { Plus, ChevronDown } from "lucide-react";
+import { Plus, ChevronDown, Users } from "lucide-react";
 
 export default function AdminDashboard() {
     const projectDetailRoute = "/admin/project/";
@@ -36,13 +36,21 @@ export default function AdminDashboard() {
         <div className="flex min-h-screen w-full flex-col bg-muted/40 p-4 md:p-8">
             <div className="mx-auto w-full max-w-4xl space-y-8">
                 <div className="flex items-center justify-between">
-                    <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
-                    <Button asChild className="gap-2">
-                        <Link href="/admin/addProject">
-                            <Plus className="h-4 w-4" />
-                            Add Project
-                        </Link>
-                    </Button>
+                    <h1 className="text-4xl font-bold tracking-tight">Dashboard</h1>
+                    <div className="flex gap-2">
+                        <Button asChild variant="outline" className="gap-2">
+                            <Link href="/admin/employees">
+                                <Users className="h-4 w-4" />
+                                View All Employees
+                            </Link>
+                        </Button>
+                        <Button asChild className="gap-2">
+                            <Link href="/admin/addProject">
+                                <Plus className="h-4 w-4" />
+                                Add Project
+                            </Link>
+                        </Button>
+                    </div>
                 </div>
 
                 <div className="grid gap-2 md:grid-cols-3 items-start">
