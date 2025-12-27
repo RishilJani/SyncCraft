@@ -9,14 +9,17 @@ datasource db {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Projects {
-  projectId   BigInt      @id @unique @default(autoincrement())
-  projectName String      @db.VarChar
-  description String?     @db.VarChar
-  createdBy   BigInt?
-  createdAt   DateTime?   @default(now()) @db.Timestamptz(6)
-  dueDate     DateTime    @db.Timestamptz(6)
-  Users       Users?      @relation(fields: [createdBy], references: [userId], onDelete: NoAction, onUpdate: NoAction)
-  TaskLists   TaskLists[]
+  projectId      BigInt      @id @unique @default(autoincrement())
+  projectName    String      @db.VarChar
+  description    String?     @db.VarChar
+  createdBy      BigInt?
+  createdAt      DateTime?   @default(now()) @db.Timestamptz(6)
+  dueDate        DateTime    @db.Timestamptz(6)
+  status         BigInt
+  completionDate DateTime?   @db.Timestamptz(6)
+  Users          Users?      @relation(fields: [createdBy], references: [userId], onDelete: NoAction, onUpdate: NoAction)
+  Tags           Tags        @relation(fields: [status], references: [tagId], onDelete: NoAction, onUpdate: NoAction)
+  TaskLists      TaskLists[]
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -83,23 +86,27 @@ model Roles {
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Tasks {
-  taskId       BigInt         @id(map: "tasks_pkey") @default(autoincrement())
-  listid       BigInt?
-  assignedto   BigInt?
-  title        String         @db.VarChar(100)
-  description  String?        @db.VarChar(255)
-  priority     String?        @db.VarChar(10)
-  status       String?        @db.VarChar(20)
-  dueDate      DateTime?      @db.Timestamptz(6)
-  createdAt    DateTime?      @default(now()) @db.Timestamptz(6)
-  TaskComments TaskComments[]
-  TaskHistory  TaskHistory[]
-  Users        Users?         @relation(fields: [assignedto], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "tasks_assignedto_fkey")
-  TaskLists    TaskLists?     @relation(fields: [listid], references: [listId], onDelete: NoAction, onUpdate: NoAction, map: "tasks_listid_fkey")
+  taskId         BigInt         @id(map: "tasks_pkey") @default(autoincrement())
+  listid         BigInt?
+  assignedto     BigInt?
+  title          String         @db.VarChar(100)
+  description    String?        @db.VarChar(255)
+  priority       String?        @db.VarChar(10)
+  dueDate        DateTime?      @db.Timestamptz(6)
+  createdAt      DateTime?      @default(now()) @db.Timestamptz(6)
+  status         BigInt
+  completionDate DateTime?      @db.Timestamptz(6)
+  TaskComments   TaskComments[]
+  TaskHistory    TaskHistory[]
+  Tags           Tags           @relation(fields: [status], references: [tagId], onDelete: NoAction, onUpdate: NoAction)
+  Users          Users?         @relation(fields: [assignedto], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "tasks_assignedto_fkey")
+  TaskLists      TaskLists?     @relation(fields: [listid], references: [listId], onDelete: NoAction, onUpdate: NoAction, map: "tasks_listid_fkey")
 }
 
-enum role_enum {
-  Admin
-  Member
-  Manager
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model Tags {
+  tagId    BigInt     @id @unique @default(autoincrement())
+  tagName  String     @unique
+  Projects Projects[]
+  Tasks    Tasks[]
 }
