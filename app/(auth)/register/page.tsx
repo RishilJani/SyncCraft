@@ -13,7 +13,8 @@ import { addUser, deleteUser } from '../auth';
 type Errors = {
     name?: String,
     email?: String,
-    password?: String
+    password?: String,
+    credentials?: String,
 };
 
 function SignUp() {
@@ -48,15 +49,14 @@ function SignUp() {
         setErrors(newError);
         return Object.keys(newError).length == 0;
     }
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (validateForm()) {
             console.log(userName);
             console.log(email);
             console.log(password);
             console.log(role);
-            deleteUser(1);
-            addUser(userName as string, password as string, email as string, role);
+            await addUser(userName as string, password as string, email as string, role);
             redirect(role.toLowerCase(), RedirectType.replace);
 
         }

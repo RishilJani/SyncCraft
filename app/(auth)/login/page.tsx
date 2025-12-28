@@ -10,6 +10,7 @@ import { redirect, RedirectType } from "next/navigation";
 import React, { useState } from "react";
 import { Errors } from "../register/page";
 import { Role } from "@/lib/utils";
+import { checkLogin } from "../auth";
 
 function LoginPage() {
     const [userName, setUserName] = useState("");
@@ -28,7 +29,7 @@ function LoginPage() {
         return Object.keys(newError).length == 0;
     }
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         // validation here
         if (validateForm()) {
@@ -39,8 +40,13 @@ function LoginPage() {
                 role
             };
             console.log(data);
-            
-            // redirect(role.toLowerCase(), RedirectType.replace);
+            var result = await checkLogin(data);
+            if(result){
+                console.log("Login Successful");
+                redirect(role.toLowerCase(), RedirectType.replace);
+            }else{
+                setErrors({ credentials : "Invalid Credentials"});
+            }
         }
     }
 
@@ -53,7 +59,7 @@ function LoginPage() {
                         <p className="text-sm text-center">Log in to your account to get started</p>
                     </div>
                     <hr className="my-4 border-dashed" />
-
+                    {errors.credentials && <p className="text-red-500 text-sm">{errors.credentials}</p>}
                     <div className="space-y-5">
                         <div className="space-y-2">
                             <Label htmlFor="userName" className="block text-sm"> User Name </Label>

@@ -3,8 +3,35 @@
 import { prisma } from "@/lib/prisma";
 import { Role } from "@/lib/utils";
 
-async function checkLogin(data : { userName : string , password: string, role : "Admin" | "Manager" | "Member"}){
-    await prisma.users.findFirst({})
+async function checkLogin(data : { userName : string , password: string, role : Role}) : Promise<boolean> {
+    const us = await prisma.users.findUnique({
+        select :{
+            userName : true,
+            passwordHash: true,
+            userId: true,
+        },
+        where:{
+            userName : data.userName,
+        }
+    });
+    console.log("User = ", us);
+    
+    if(!us){
+        return false;
+    }
+    const role = await prisma.userRoles.findFirst({
+        where: {
+            AND : {
+                userId : us?.userId,
+                roleName : data.role,
+            }
+        }
+    });
+    console.log("role = ", role);
+    if(!role){
+        return false;
+    }
+    return true;
 }
 
 async function addUser(userName : string, password : string ,email: string , role : Role) {
