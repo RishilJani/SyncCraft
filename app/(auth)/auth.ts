@@ -2,8 +2,14 @@
 
 import { prisma } from "@/lib/prisma";
 import { Role } from "@/lib/utils";
+import bcrypt from 'bcryptjs';
 
-async function checkLogin(data : { userName : string , password: string, role : Role}) : Promise<boolean> {
+// Login Logic
+async function checkLogin( data : {userName : string ,password : string, role : Role}) : Promise<boolean> {
+    const {userName , password, role} = data;
+    // const password = formData.get("password") as string;
+    // const role = formData.get("role") as Role;
+
     const us = await prisma.users.findUnique({
         select :{
             userName : true,
@@ -11,7 +17,7 @@ async function checkLogin(data : { userName : string , password: string, role : 
             userId: true,
         },
         where:{
-            userName : data.userName,
+            userName : userName,
         }
     });
     console.log("User = ", us);
@@ -19,14 +25,20 @@ async function checkLogin(data : { userName : string , password: string, role : 
     if(!us){
         return false;
     }
-    const role = await prisma.userRoles.findFirst({
+    if(! await bcrypt.compare(password, us.passwordHash)){
+        console.log("password not matched");
+        return false;
+    }
+
+    const roleResult = await prisma.userRoles.findFirst({
         where: {
             AND : {
                 userId : us?.userId,
-                roleName : data.role,
+                roleName : role,
             }
         }
     });
+    
     console.log("role = ", role);
     if(!role){
         return false;
@@ -34,12 +46,13 @@ async function checkLogin(data : { userName : string , password: string, role : 
     return true;
 }
 
+// sign up Logic
 async function addUser(userName : string, password : string ,email: string , role : Role) {
 
     const us = await prisma.users.create({
         data : {
             userName : userName,
-            passwordHash : password,
+            passwordHash : bcrypt.hashSync(password,Number.parseInt(process.env.SALT!)),
             email : email,
             createdAt : new Date(),
         }
