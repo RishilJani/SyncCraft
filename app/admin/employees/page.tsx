@@ -6,7 +6,7 @@ import { ArrowLeft, Mail, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/tw_utils";
+import { cn } from "@/lib/utils";
 
 export default function EmployeesPage() {
     const [searchQuery, setSearchQuery] = useState("");

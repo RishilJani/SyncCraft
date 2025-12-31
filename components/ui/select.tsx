@@ -9,7 +9,7 @@ import {
 } from "lucide-react"
 import * as SelectPrimitive from "@radix-ui/react-select"
 
-import { cn } from "@/lib/tw_utils"
+import { cn } from "@/lib/utils"
 
 const Select = SelectPrimitive.Root
 

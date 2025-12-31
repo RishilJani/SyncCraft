@@ -7,10 +7,10 @@ import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@radix-ui/react-label";
 import Link from "next/link";
 import { redirect, RedirectType } from "next/navigation";
-import React, { useState } from "react";
+import React, { Activity, useState } from "react";
 import { Errors } from "../register/page";
-import { Role } from "@/lib/utils";
-import { checkLogin } from "../auth";
+import { Role } from "@/app/utils";
+import { checkLogin } from "../../actions/Users";
 import wait from 'wait';
 import { OrbitalLoader } from "@/components/ui/orbital-loader";
 
@@ -59,13 +59,14 @@ function LoginPage() {
     }
 
     return (
-        loading ?
-            <div className="flex justify-center items-center h-screen">
+            
+            <>
+            <Activity mode={loading?'visible':'hidden'} >
+            <div className={`flex justify-center items-center h-screen w-screen absolute bg-white/70 z-50`}>
                 <OrbitalLoader message="Please wait..." className="size-20" />
             </div>
-            :
-            <>
-                <section className="flex min-h-screen bg-zinc-50 px-4 py-16 md:py-32 dark:bg-transparent">
+                </Activity>
+                <section className="flex h-screen overflow-auto bg-zinc-50 px-4 py-16 md:py-32 dark:bg-transparent">
                     <form action="POST" className="bg-card m-auto h-fit w-full max-w-sm rounded-[calc(var(--radius)+.125rem)] border p-0.5 shadow-md dark:[--color-muted:var(--color-zinc-900)]">
                         <div className="p-8 pb-6">
                             <div>

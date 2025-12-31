@@ -3,12 +3,12 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Role } from '@/lib/utils';
+import { Role } from '@/app/utils';
 import { Label } from '@radix-ui/react-label';
 import Link from 'next/link';
 import { redirect, RedirectType } from 'next/navigation';
 import { useState } from 'react';
-import { addUser, deleteUser } from '../auth';
+import { addUser, deleteUser } from '../../actions/Users';
 import { OrbitalLoader } from '@/components/ui/orbital-loader';
 
 type Errors = {

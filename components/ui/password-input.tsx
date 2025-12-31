@@ -3,7 +3,7 @@
 import * as React from "react"
 import { Eye, EyeOff } from "lucide-react"
 
-import { cn } from "@/lib/tw_utils"
+import { cn } from "@/lib/utils"
 import { Input } from "@/components/ui/input"
 
 export interface PasswordInputProps
