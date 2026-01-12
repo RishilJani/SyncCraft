@@ -9,17 +9,17 @@ datasource db {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Projects {
-  projectId      BigInt      @id @unique @default(autoincrement())
-  projectName    String      @db.VarChar
-  description    String?     @db.VarChar
+  projectId      BigInt          @id @unique @default(autoincrement())
+  projectName    String          @db.VarChar
+  description    String?         @db.VarChar
   createdBy      BigInt?
-  createdAt      DateTime?   @default(now()) @db.Timestamptz(6)
-  dueDate        DateTime    @db.Timestamptz(6)
-  status         BigInt
-  completionDate DateTime?   @db.Timestamptz(6)
-  Users          Users?      @relation(fields: [createdBy], references: [userId], onDelete: NoAction, onUpdate: NoAction)
-  Tags           Tags        @relation(fields: [status], references: [tagId], onDelete: NoAction, onUpdate: NoAction)
+  createdAt      DateTime?       @default(now()) @db.Timestamptz(6)
+  dueDate        DateTime        @db.Timestamptz(6)
+  completionDate DateTime?       @db.Timestamptz(6)
+  status         status_enum     @default(todo)
+  Users          Users?          @relation(fields: [createdBy], references: [userId], onDelete: NoAction, onUpdate: NoAction)
   TaskLists      TaskLists[]
+  user_projects  user_projects[]
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -54,25 +54,18 @@ model TaskLists {
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model UserRoles {
-  userRoleId BigInt    @id @unique @default(autoincrement())
-  userId     BigInt
-  roleName   role_enum @default(member)
-  Users      Users     @relation(fields: [userId], references: [userId], onDelete: Cascade, onUpdate: NoAction)
-}
-
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Users {
-  userId       BigInt         @id @unique @default(autoincrement())
-  userName     String         @unique @db.VarChar
-  email        String         @unique @db.VarChar
-  passwordHash String         @db.VarChar
-  createdAt    DateTime?      @default(now()) @db.Timestamptz(6)
-  Projects     Projects[]
-  TaskComments TaskComments[]
-  TaskHistory  TaskHistory[]
-  Tasks        Tasks[]
-  UserRoles    UserRoles[]
+  userId        BigInt          @id @unique @default(autoincrement())
+  userName      String          @unique @db.VarChar
+  email         String          @unique @db.VarChar
+  passwordHash  String          @db.VarChar
+  createdAt     DateTime?       @default(now()) @db.Timestamptz(6)
+  role          role_enum       @default(member)
+  Projects      Projects[]
+  TaskComments  TaskComments[]
+  TaskHistory   TaskHistory[]
+  Tasks         Tasks[]
+  user_projects user_projects[]
 }
 
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
@@ -86,25 +79,32 @@ model Tasks {
   priority       String?        @db.VarChar(10)
   dueDate        DateTime?      @db.Timestamptz(6)
   createdAt      DateTime?      @default(now()) @db.Timestamptz(6)
-  status         BigInt
   completionDate DateTime?      @db.Timestamptz(6)
+  status         status_enum    @default(todo)
+  points         Int            @default(1)
   TaskComments   TaskComments[]
   TaskHistory    TaskHistory[]
-  Tags           Tags           @relation(fields: [status], references: [tagId], onDelete: NoAction, onUpdate: NoAction)
   Users          Users?         @relation(fields: [assignedto], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "tasks_assignedto_fkey")
   TaskLists      TaskLists?     @relation(fields: [listid], references: [listId], onDelete: NoAction, onUpdate: NoAction, map: "tasks_listid_fkey")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model Tags {
-  tagId    BigInt     @id @unique @default(autoincrement())
-  tagName  String     @unique
-  Projects Projects[]
-  Tasks    Tasks[]
+model user_projects {
+  up_id     BigInt    @id @default(autoincrement())
+  userid    BigInt?
+  projectid BigInt?
+  Projects  Projects? @relation(fields: [projectid], references: [projectId], onDelete: Cascade, onUpdate: NoAction)
+  Users     Users?    @relation(fields: [userid], references: [userId], onDelete: Cascade, onUpdate: NoAction)
 }
 
 enum role_enum {
   admin
   manager
   member
+}
+
+enum status_enum {
+  todo
+  pending
+  completed
 }

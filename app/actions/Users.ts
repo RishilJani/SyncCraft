@@ -82,4 +82,9 @@ async function deleteUser(userId: number) {
     console.log("data = ", allusers);
 }
 
+
+
+async function getAllUsers(){
+    
+}
 export { checkLogin, addUser, deleteUser }
