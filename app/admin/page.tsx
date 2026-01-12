@@ -1,12 +1,55 @@
-"use client";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/card";
 import { Plus, ChevronDown, Users } from "lucide-react";
+import { getUser } from "../actions/users/Users";
 
-export default function AdminDashboard() {
-    const projectDetailRoute = "/admin/project/";
-    // const completedProjects = [
+export default async function AdminDashboard() {
+    // const projectDetailRoute = "/admin/project/";
+    const data = await getUser();
+    console.log(data);
+    /**
+     * <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="size-6">
+      <path strokeLinecap="round" strokeLinejoin="round" d="M17.982 18.725A7.488 7.488 0 0 0 12 15.75a7.488 7.488 0 0 0-5.982 2.975m11.963 0a9 9 0 1 0-11.963 0m11.963 0A8.966 8.966 0 0 1 12 21a8.966 8.966 0 0 1-5.982-2.275M15 9.75a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+    </svg>
+    
+     */
+    return (
+        <>
+            <div className="flex items-center justify-between">
+                <h1 className="text-4xl font-bold tracking-tight">Dashboard</h1>
+                <div className="flex gap-2">
+
+                    <Button asChild variant="ghost" className="gap-2">
+                        <Link href="/admin/employees">
+                            <Users className="h-4 w-4" />
+                            View All Employees
+                        </Link>
+                    </Button>
+                    <Button asChild variant="outline" className="gap-2">
+                        <Link href="/admin/projects">
+                            <Users className="h-4 w-4" />
+                            View All Projects
+                        </Link>
+                    </Button>
+                    <Button asChild className="gap-2">
+                        <Link href="/admin/addProject">
+                            <Plus className="h-4 w-4" />
+                            Add Project
+                        </Link>
+                    </Button>
+                    <Button asChild variant="ghost" className="gap-2">
+                        <Link href={`/admin/${data?.id}`}>
+                            <Users className="h-6 w-6" />
+                        </Link>
+                    </Button>
+                </div>
+            </div>
+        </>
+    );
+}
+
+/*
+// const completedProjects = [
     //     { id: 1, title: "Website Redesign", description: "Revamped the corporate website with a fresh look." },
     //     { id: 2, title: "Mobile App Launch", description: "Released the MVP for both iOS and Android platforms." },
     //     { id: 3, title: "Database Migration", description: "Transferred legacy data to the new cloud cluster." },
@@ -31,38 +74,7 @@ export default function AdminDashboard() {
     //     { id: 14, title: "Email Marketing Tool", description: "Integrating a drag-and-drop email builder." },
     //     { id: 15, title: "Referral Program", description: "Designing a reward system for user invites." }
     // ];
-
-    return (
-        <>
-            <div className="flex items-center justify-between">
-                <h1 className="text-4xl font-bold tracking-tight">Dashboard</h1>
-                <div className="flex gap-2">
-                    <Button asChild variant="ghost" className="gap-2">
-                        <Link href="/admin/employees">
-                            <Users className="h-4 w-4" />
-                            View All Employees
-                        </Link>
-                    </Button>
-                    <Button asChild variant="outline" className="gap-2">
-                        <Link href="/admin/projects">
-                            <Users className="h-4 w-4" />
-                            View All Projects
-                        </Link>
-                    </Button>
-                    <Button asChild className="gap-2">
-                        <Link href="/admin/addProject">
-                            <Plus className="h-4 w-4" />
-                            Add Project
-                        </Link>
-                    </Button>
-                </div>
-            </div>
-        </>
-    );
-}
-
-
-/*
+    
 
                 <div className="grid gap-2 md:grid-cols-3 items-start">
 

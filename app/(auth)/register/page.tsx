@@ -7,8 +7,8 @@ import { Role } from '@/app/utils';
 import { Label } from '@radix-ui/react-label';
 import Link from 'next/link';
 import { redirect, RedirectType } from 'next/navigation';
-import { useState } from 'react';
-import { addUser, deleteUser } from '../../actions/Users';
+import { Activity, useState } from 'react';
+import { addUser, deleteUser } from '../../actions/users/Users';
 import { OrbitalLoader } from '@/components/ui/orbital-loader';
 
 type Errors = {
@@ -61,17 +61,20 @@ function SignUp() {
             console.log(role);
             await addUser(userName as string, password as string, email as string, role);
             setIsLoading(false);
-            redirect(role.toLowerCase(), RedirectType.replace);
-
+            redirect(role.toLowerCase(), RedirectType.replace); 
+        }else{
+            setIsLoading(false);
         }
     };
 
     return (
-        isLoading ?
-            <div className="flex justify-center items-center h-screen">
+            <>
+            <Activity mode={isLoading ? 'visible' : 'hidden'}>
+            <div className="flex justify-center items-center h-screen w-screen bg-white/70 z-50">
                 <OrbitalLoader message="Please wait..." className="size-20" />
-            </div> :
-            <section className="flex min-h-screen bg-zinc-50 px-4 py-16 md:py-32 dark:bg-transparent">
+            </div> 
+            </Activity>
+            <section className="flex min-h-screen overflow-auto bg-zinc-50 px-4 py-16 md:py-32 dark:bg-transparent">
                 <form action="POST" className="bg-card m-auto h-fit w-full max-w-sm rounded-[calc(var(--radius)+.125rem)] border p-0.5 shadow-md dark:[--color-muted:var(--color-zinc-900)]">
                     <div className="p-8 pb-6">
                         <div>
@@ -142,6 +145,7 @@ function SignUp() {
                     </div>
                 </form>
             </section>
+            </>
     )
 }
 

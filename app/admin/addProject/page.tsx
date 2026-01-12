@@ -1,5 +1,6 @@
 "use client";
 
+import { addProject } from "@/app/actions/admin/Admin";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
@@ -20,9 +21,10 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, X } from "lucide-react";
+import { number } from "motion/react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import React, { useState } from "react";
+import React, { memo, useState } from "react";
 
 const MANAGERS = [
   { id: "m1", name: "Alice Johnson" },
@@ -31,44 +33,56 @@ const MANAGERS = [
 ];
 
 const TEAM_MEMBERS = [
-  { id: "t1", name: "David Wilson" },
-  { id: "t2", name: "Eva Brown" },
-  { id: "t3", name: "Frank Miller" },
-  { id: "t4", name: "Grace Lee" },
-  { id: "t5", name: "Hannah White" },
+  { id: 1001, name: "David Wilson" },
+  { id: 1002, name: "Eva Brown" },
+  { id: 1003, name: "Frank Miller" },
+  { id: 1004, name: "Grace Lee" },
+  { id: 1005, name: "Hannah White" },
 ];
 
 export default function AddProjectPage() {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [date, setDate] = useState<Date>();
+  const [dueDate, setDueDate] = useState<Date>();
   const [manager, setManager] = useState("");
-  const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
+  const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     console.log({
       title,
       description,
-      date,
+      dueDate,
       manager,
       members: selectedMembers
     });
+    const adminId = localStorage.getItem("adminId") ;
+    const project = await addProject({
+      projectName : title,
+      description,
+      dueDate : dueDate!,
+      createdBy : number.parse(adminId!),
+      managerId: number.parse(manager),
+      memberIds : selectedMembers
+    })
+
     redirect("/admin");
   }
 
   const addMember = (memberId: string) => {
-    if (!selectedMembers.includes(memberId)) {
-      setSelectedMembers([...selectedMembers, memberId]);
+    const mem = number.parse(memberId);
+    if (!selectedMembers.includes(mem)) {
+      setSelectedMembers([...selectedMembers, mem]);
     }
   };
 
-  const removeMember = (memberId: string) => {
+  const removeMember = (memberId: number) => {
     setSelectedMembers(selectedMembers.filter(id => id !== memberId));
   };
 
   return (
-    <section className="flex min-h-screen bg-zinc-50 px-4 py-14 md:py-14 dark:bg-transparent">
+    <>
+    <div className="w-full flex-col">     
       <form onSubmit={handleSubmit} className="bg-card m-auto h-fit w-full max-w-lg rounded-[calc(var(--radius)+.125rem)] border p-0.5 shadow-md dark:[--color-muted:var(--color-zinc-900)]">
         <div className="p-8 pb-6">
           <div>
@@ -110,20 +124,14 @@ export default function AddProjectPage() {
                       variant={"outline"}
                       className={cn(
                         "w-full justify-start text-left font-normal",
-                        !date && "text-muted-foreground"
+                        !dueDate && "text-muted-foreground"
                       )}
                     >
-                      <CalendarIcon className="mr-2 h-4 w-4" />
-                      {date ? format(date, "PPP") : <span>Pick a date</span>}
+                      <CalendarIcon className="mr-2 h-4 w-4" /> {dueDate ? format(dueDate, "PPP") : <span>Pick a date</span>}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0" align="start">
-                    <Calendar
-                      mode="single"
-                      selected={date}
-                      onSelect={setDate}
-                      initialFocus
-                    />
+                    <Calendar mode="single" selected={dueDate} onSelect={setDueDate} initialFocus />
                   </PopoverContent>
                 </Popover>
               </div>
@@ -151,13 +159,7 @@ export default function AddProjectPage() {
                 </SelectTrigger>
                 <SelectContent>
                   {TEAM_MEMBERS.map((m) => (
-                    <SelectItem
-                      key={m.id}
-                      value={m.id}
-                      disabled={selectedMembers.includes(m.id)}
-                    >
-                      {m.name}
-                    </SelectItem>
+                    <SelectItem key={m.id} value={m.id + ""} disabled={selectedMembers.includes(m.id)}> {m.name} </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
@@ -169,10 +171,7 @@ export default function AddProjectPage() {
                     return (
                       <div key={memberId} className="flex items-center gap-1 bg-secondary text-secondary-foreground px-2 py-1 rounded-md text-[14px]">
                         <span>{member?.name}</span>
-                        <button
-                          type="button"
-                          onClick={() => removeMember(memberId)}
-                          className="text-muted-foreground hover:text-foreground">
+                        <button type="button" onClick={() => removeMember(memberId)} className="text-muted-foreground hover:text-foreground">
                           <X className="h-4 w-4" />
                         </button>
                       </div>
@@ -195,6 +194,8 @@ export default function AddProjectPage() {
           </p>
         </div>
       </form>
-    </section>
+      </div>
+    </>
+    
   );
 }

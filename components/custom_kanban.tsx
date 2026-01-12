@@ -18,6 +18,7 @@ import { Users, Plus } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 import { Priority, Role, Status, Task } from "@/app/utils";
+import { allTasks } from "@/app/actions/tasks/task";
 
 type KanbanTask = Task & { id: string };
 
@@ -44,54 +45,6 @@ const mockUsers: Record<number, string> = {
 
 export default function MyKanbanBoard({ role, projectId }: { role: boolean, projectId: number }) {
 
-    const allTasks: Task[] = [
-        {
-            taskId: "1", title: "Review Q1 Goals", description: "Analyze the performance reports for the first quarter.",
-            status: Status.Todo,
-            priority: Priority.Low,
-            assignedTo: 101, // Alice
-            dueDate: new Date(),
-            createdDae: null,
-            complitionDate: null,
-        },
-        {
-            taskId: "2", title: "Team Meeting", description: "Scheduled weekly sync with the development team.",
-            status: Status.Todo,
-            priority: Priority.Medium,
-            assignedTo: 102, // Bob
-            dueDate: new Date(),
-            createdDae: null,
-            complitionDate: null,
-        },
-        {
-            taskId: "3", title: "Onboard New Hire", description: "Prepare onboarding documents for the new frontend dev.",
-            status: Status.Todo,
-            priority: Priority.High,
-            assignedTo: 103, // Charlie
-            dueDate: new Date(),
-            createdDae: null,
-            complitionDate: null,
-        },
-        {
-            taskId: "4", title: "Task 4", description: "Prepare onboarding documents for the new frontend dev.",
-            status: Status.Pending,
-            priority: Priority.Medium,
-            assignedTo: 104, // Diana
-            dueDate: new Date(),
-            createdDae: null,
-            complitionDate: null,
-        },
-        {
-            taskId: "5",
-            title: "Task 5", description: "Prepare onboarding documents for the new frontend dev.",
-            status: Status.Completed,
-            priority: Priority.Medium,
-            assignedTo: 105, // Ethan
-            dueDate: new Date(),
-            createdDae: null,
-            complitionDate: null,
-        }
-    ];
     const kanbanTasks: KanbanTask[] = allTasks.map(task => ({ ...task, id: task.taskId }));
 
     const todosTasks = kanbanTasks.filter((task) => task.status === Status.Todo);
