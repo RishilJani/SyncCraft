@@ -9,10 +9,10 @@ datasource db {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Projects {
-  projectId      BigInt          @id @unique @default(autoincrement())
+  projectId      Int             @id @unique @default(autoincrement())
   projectName    String          @db.VarChar
   description    String?         @db.VarChar
-  createdBy      BigInt?
+  createdBy      Int?
   createdAt      DateTime?       @default(now()) @db.Timestamptz(6)
   dueDate        DateTime        @db.Timestamptz(6)
   completionDate DateTime?       @db.Timestamptz(6)
@@ -24,9 +24,9 @@ model Projects {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model TaskComments {
-  commentId   BigInt    @id @unique @default(autoincrement())
-  taskId      BigInt
-  userId      BigInt?
+  commentId   Int       @id @unique @default(autoincrement())
+  taskId      Int
+  userId      Int?
   commentText String    @db.VarChar
   createdDate DateTime? @default(now()) @db.Timestamptz(6)
   tasks       Tasks     @relation(fields: [taskId], references: [taskId], onDelete: NoAction, onUpdate: NoAction)
@@ -35,9 +35,9 @@ model TaskComments {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model TaskHistory {
-  historyId  BigInt    @id @unique @default(autoincrement())
-  taskId     BigInt
-  changedBy  BigInt?
+  historyId  Int       @id @unique @default(autoincrement())
+  taskId     Int
+  changedBy  Int?
   changeType String    @db.VarChar
   changeTime DateTime? @default(now()) @db.Timestamptz(6)
   Users      Users?    @relation(fields: [changedBy], references: [userId], onDelete: NoAction, onUpdate: NoAction)
@@ -46,8 +46,8 @@ model TaskHistory {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model TaskLists {
-  listId    BigInt   @id @unique @default(autoincrement())
-  projectId BigInt
+  listId    Int      @id @unique @default(autoincrement())
+  projectId Int
   listName  String   @db.VarChar
   Projects  Projects @relation(fields: [projectId], references: [projectId], onDelete: NoAction, onUpdate: NoAction)
   Tasks     Tasks[]
@@ -55,7 +55,7 @@ model TaskLists {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Users {
-  userId        BigInt          @id @unique @default(autoincrement())
+  userId        Int             @id @unique @default(autoincrement())
   userName      String          @unique @db.VarChar
   email         String          @unique @db.VarChar
   passwordHash  String          @db.VarChar
@@ -71,9 +71,9 @@ model Users {
 /// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Tasks {
-  taskId         BigInt         @id(map: "tasks_pkey") @default(autoincrement())
-  listid         BigInt?
-  assignedto     BigInt?
+  taskId         Int            @id(map: "tasks_pkey") @default(autoincrement())
+  listid         Int?
+  assignedto     Int?
   title          String         @db.VarChar(100)
   description    String?        @db.VarChar(255)
   priority       String?        @db.VarChar(10)
@@ -81,7 +81,7 @@ model Tasks {
   createdAt      DateTime?      @default(now()) @db.Timestamptz(6)
   completionDate DateTime?      @db.Timestamptz(6)
   status         status_enum    @default(todo)
-  points         Int            @default(1)
+  points         Int            @default(0)
   TaskComments   TaskComments[]
   TaskHistory    TaskHistory[]
   Users          Users?         @relation(fields: [assignedto], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "tasks_assignedto_fkey")
@@ -90,9 +90,9 @@ model Tasks {
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model user_projects {
-  up_id     BigInt    @id @default(autoincrement())
-  userid    BigInt?
-  projectid BigInt?
+  up_id     Int       @id @default(autoincrement())
+  userid    Int?
+  projectid Int?
   Projects  Projects? @relation(fields: [projectid], references: [projectId], onDelete: Cascade, onUpdate: NoAction)
   Users     Users?    @relation(fields: [userid], references: [userId], onDelete: Cascade, onUpdate: NoAction)
 }
