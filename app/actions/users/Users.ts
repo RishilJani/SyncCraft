@@ -4,102 +4,172 @@ import { prisma } from "@/lib/prisma";
 import { Role } from "@/app/utils";
 import bcrypt from 'bcryptjs';
 import { cookies } from "next/headers";
+import { role_enum } from "@/app/generated/prisma/enums";
+
+type Users = {
+    userId?: number | bigint,
+    userName?: string,
+    email?: string,
+    passwordHash?: string | undefined,
+    role?: role_enum,
+    createdAt?: Date
+}
+
+// Cookie consts
+const USER_ID = "userId";
+const USER_NAME = "userName";
+const EMAIL = "email";
+const ROLE = "role";
+const CREATED_AT = "createdAt";
 
 // Login Logic
 async function checkLogin(data: { userName: string, password: string, role: Role }): Promise<boolean> {
     const { userName, password, role } = data;
 
-    const user = await prisma.users.findUnique({
-        select: {
-            userName: true,
-            passwordHash: true,
-            role : true,
-            userId: true,
-        },
-        where: {
-            userName: userName,
-            role: role 
-        }
-    });
-    console.log("User = ", user);
+    try {
+        const user = await prisma.users.findFirst({
+            where: {
+                userName: userName,
+                role: role
+            }
+        });
+        console.log("User found during login:", user ? user.userName : "None");
 
-    if (!user) {
+        if (!user) {
+            return false;
+        }
+
+        const isMatch = await bcrypt.compare(password, user.passwordHash);
+        if (!isMatch) {
+            console.log("Password mismatch");
+            return false;
+        }
+
+        await putUserCookie(user);
+        return true;
+    } catch (error) {
+        console.error("Login error:", error);
         return false;
     }
-    if (! await bcrypt.compare(password, user.passwordHash)) {
-        console.log("password not matched");
-        return false;
-    }
-    console.log("role = ", role);
-    const cookie = await cookies();  
-    cookie.set("id",user.userId+"");
-    cookie.set("userName",user.userName);
-    cookie.set("role",user.role);
-    return true;
 }
 
 // sign up Logic
 async function addUser(userName: string, password: string, email: string, role: Role) {
-
     try {
+        const salt = process.env.SALT ? Number.parseInt(process.env.SALT) : 10;
+        const hashedPassword = bcrypt.hashSync(password, salt);
+
         const user = await prisma.users.create({
             data: {
                 userName: userName,
-                passwordHash: bcrypt.hashSync(password, Number.parseInt(process.env.SALT!)),
+                passwordHash: hashedPassword,
                 email: email,
                 createdAt: new Date(),
-                role : role
+                role: role
             }
         });
-        console.log("user Id ", user);
-        const cookie = await cookies();  
-        cookie.set("id",user.userId+"");
-        cookie.set("userName",user.userName);
-        cookie.set("role",user.role);
+        console.log("User created:", user.userId);
+        
+        await putUserCookie(user);
+        return true;
     } catch (err) {
-        console.log("Some Error Occured in add User ");
-        console.log(err);
+        console.error("Error creating user:", err);
+        return false;
     }
+}
+
+// Logout Logic
+async function logout() {
+    const cookie = await cookies();
+    cookie.delete(USER_ID);
+    cookie.delete(USER_NAME);
+    cookie.delete(EMAIL);
+    cookie.delete(ROLE);
+    cookie.delete(CREATED_AT);
 }
 
 // to delete a user
 async function deleteUser(userId: number) {
-    const us = await prisma.users.delete({
-        where: {
-            userId: userId
-        }
-    });
-
-    const allusers = await prisma.users.findMany();
-    console.log("data = ", allusers);
+    try {
+        await prisma.users.delete({
+            where: {
+                userId: userId
+            }
+        });
+    } catch (error) {
+        console.error("Error deleting user:", error);
+    }
 }
 
-
-
-async function getAllUsers(){
-    
+async function getAllUsers() {
+    try {
+        const users = await prisma.users.findMany({
+            select: {
+                userId: true,
+                userName: true,
+                email: true,
+                role: true,
+            }
+        });
+        console.log("GetAllUsers = " , users);
+        
+        return users;
+    } catch (err) {
+        console.error('Error fetching all users:', err);
+        return [];
+    }
 }
 
 async function getUser() {
     try {
-        const cookie = await cookies();
-        const id = cookie.get("id")?.value;
-        const name = cookie.get("userName")?.value;
-        const role = cookie.get("role")?.value;
-        console.log("GetUser = ");
-        console.log(id,name,role);
-        if(id && name && role){
-            return {
-                id,
-                name,
-                role
-            };
-        }else{
-            throw Error("User Not Found");
-        }
+        const user = await getUserCookie();
+        return user;
     } catch (err) {
-        console.log("Some Error Occured in get User ");
-        console.log(err);
+        console.error("Error getting current user:", err);
+        return null; // Return null instead of throwing to handle UI gracefully
     }
 }
-export { checkLogin, addUser, deleteUser, getUser }
+
+async function putUserCookie(user: any) {
+    const cookieStore = await cookies();
+    const oneDay = 24 * 60 * 60 * 1000;
+    const expires = Date.now() + oneDay;
+
+    const options = {
+        path: '/',
+        expires: expires,
+    };
+
+    cookieStore.set(USER_ID, user.userId.toString(), options);
+    cookieStore.set(USER_NAME, user.userName, options);
+    cookieStore.set(EMAIL, user.email, options);
+    cookieStore.set(ROLE, user.role, options);
+    if (user.createdAt) {
+        cookieStore.set(CREATED_AT, user.createdAt.toString(), options);
+    }
+}
+
+async function getUserCookie() {
+    try {
+        const cookieStore = await cookies();
+        
+        const userIdVal = cookieStore.get(USER_ID)?.value;
+        if (!userIdVal) return null;
+
+        const user: Users = {
+            userId: BigInt(userIdVal), // Keep as BigInt to match Prisma
+            userName: cookieStore.get(USER_NAME)?.value,
+            email: cookieStore.get(EMAIL)?.value,
+            role: cookieStore.get(ROLE)?.value as Role,
+            createdAt: cookieStore.get(CREATED_AT)?.value ? new Date(cookieStore.get(CREATED_AT)?.value!) : undefined,
+        };
+        
+        return user;
+    } catch (err) {
+        console.error('Error reading user cookie:', err);
+        return null;
+    }
+}
+
+export { checkLogin, addUser, deleteUser, getUser, getAllUsers, logout };
+export type { Users };

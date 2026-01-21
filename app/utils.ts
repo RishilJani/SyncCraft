@@ -15,6 +15,5 @@ type Task = {
   status: Status;
 };
 
-
 export {Role , Priority, Status};
 export type {Task};

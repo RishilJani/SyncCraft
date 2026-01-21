@@ -70,7 +70,7 @@ function SignUp() {
     return (
             <>
             <Activity mode={isLoading ? 'visible' : 'hidden'}>
-            <div className="flex justify-center items-center h-screen w-screen bg-white/70 z-50">
+            <div className="flex justify-center items-center h-screen w-screen absolute bg-white/70 z-50">
                 <OrbitalLoader message="Please wait..." className="size-20" />
             </div> 
             </Activity>

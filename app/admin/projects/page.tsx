@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
-import { Search, Filter, Plus } from "lucide-react";
+import { Search, Filter, Plus, ArrowLeft } from "lucide-react";
 
 // Mock Data
 const allProjects = [
@@ -36,10 +36,14 @@ export default function ProjectsList() {
     return (
         <>
 
-            <div className="flex items-center justify-between">
-                <div>
+            <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div className="flex items-center gap-4">
+                    <Button variant="outline" size="icon" asChild>
+                        <Link href="/admin">
+                            <ArrowLeft className="h-4 w-4" />
+                        </Link>
+                    </Button>
                     <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
-                    <p className="text-muted-foreground mt-1">Manage and track all ongoing projects.</p>
                 </div>
             </div>
 

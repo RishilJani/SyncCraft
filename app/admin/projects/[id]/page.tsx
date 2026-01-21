@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {useRouter} from "next/navigation";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, Calendar, Flag, CheckCircle2 } from "lucide-react";
 import MyKanbanBoard from "@/components/custom_kanban";
 import { Button } from "@/components/ui/button";
@@ -17,7 +17,7 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
     // Mock Data Lookup (In a real app, fetch this from API/DB)
     const project = getProjectById(Number(id));
 
-    const handleBack =()=>{ router.back(); };
+    const handleBack = () => { router.back(); };
 
     if (!project) {
         return (
@@ -31,74 +31,79 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
     }
 
     return (
-        <div className="flex min-h-screen w-full flex-col bg-muted/40 p-4 md:p-8">
-            <div className="w-full space-y-8 mx-auto max-w-6xl">
-                {/* Header Section */}
-                <div className="flex items-center gap-4">
-                    <Button variant="outline" size="icon" asChild onClick={handleBack}>
-                        <ArrowLeft className="h-2 w-auto" />
-                    </Button>
-                    <div className="flex-1">
-                        <div className="flex items-center gap-3">
-                            <h1 className="text-3xl font-bold tracking-tight">{project.title}</h1>
-                            <StatusBadge status={project.status} className="text-md" />
-                        </div>
+
+        <>
+            {/* <div className="flex min-h-screen w-full flex-col bg-muted/40 p-4 md:p-8">
+            <div className="w-full space-y-8 mx-auto max-w-6xl"> */}
+            {/* Header Section */}
+            <div className="flex items-center gap-4">
+                <Button variant="outline" size="icon" asChild>
+                    <Link href="/admin/projects">
+                        <ArrowLeft className="h-4 w-4" />
+                    </Link>
+                </Button>
+                <div className="flex-1">
+                    <div className="flex items-center gap-3">
+                        <h1 className="text-2xl font-bold tracking-tight">{project.title}</h1>
+                        <StatusBadge status={project.status} className="text-md" />
                     </div>
-                </div>
-
-                <div className="grid gap-6">
-                    {/* Main Details Card */}
-                    <Card>
-                        <CardHeader>
-                            <CardTitle>Project Overview</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-6">
-                            <div>
-                                <h3 className="font-semibold mb-2 text-sm text-muted-foreground uppercase tracking-wider">Description</h3>
-                                <p className="text-base leading-relaxed">{project.description}</p>
-                            </div>
-
-                            <Separator />
-
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div className="space-y-1">
-                                    <div className="flex items-center gap-2 text-muted-foreground">
-                                        <Calendar className="h-4 w-4" />
-                                        <span className="text-sm font-medium">Created At</span>
-                                    </div>
-                                    <p className="pl-6 font-medium">{project.createdAt}</p>
-                                </div>
-
-                                <div className="space-y-1">
-                                    <div className="flex items-center gap-2 text-muted-foreground">
-                                        <Flag className="h-4 w-4" />
-                                        <span className="text-sm font-medium">Due Date</span>
-                                    </div>
-                                    <p className="pl-6 font-medium">{project.dueDate}</p>
-                                </div>
-
-                                {project.completedAt && (
-                                    <div className="space-y-1">
-                                        <div className="flex items-center gap-2 text-muted-foreground">
-                                            <CheckCircle2 className="h-4 w-4" />
-                                            <span className="text-sm font-medium">Completed At</span>
-                                        </div>
-                                        <p className="pl-6 font-medium text-green-600">{project.completedAt}</p>
-                                    </div>
-                                )}
-                            </div>
-                        </CardContent>
-                    </Card>
-
-
-                    {/* Task List Section - Replaced by Kanban */}
-                    <div className="flex-1 w-full mx-auto">
-                        <MyKanbanBoard role={false} projectId={Number(id)} />
-                    </div>
-
                 </div>
             </div>
-        </div>
+
+            <div className="grid gap-6">
+                {/* Main Details Card */}
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Project Overview</CardTitle>
+                    </CardHeader>
+                    <CardContent className="space-y-6">
+                        <div>
+                            <h3 className="font-semibold mb-2 text-sm text-muted-foreground uppercase tracking-wider">Description</h3>
+                            <p className="text-base leading-relaxed">{project.description}</p>
+                        </div>
+
+                        <Separator />
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                            <div className="space-y-1">
+                                <div className="flex items-center gap-2 text-muted-foreground">
+                                    <Calendar className="h-4 w-4" />
+                                    <span className="text-sm font-medium">Created At</span>
+                                </div>
+                                <p className="pl-6 font-medium">{project.createdAt}</p>
+                            </div>
+
+                            <div className="space-y-1">
+                                <div className="flex items-center gap-2 text-muted-foreground">
+                                    <Flag className="h-4 w-4" />
+                                    <span className="text-sm font-medium">Due Date</span>
+                                </div>
+                                <p className="pl-6 font-medium">{project.dueDate}</p>
+                            </div>
+
+                            {project.completedAt && (
+                                <div className="space-y-1">
+                                    <div className="flex items-center gap-2 text-muted-foreground">
+                                        <CheckCircle2 className="h-4 w-4" />
+                                        <span className="text-sm font-medium">Completed At</span>
+                                    </div>
+                                    <p className="pl-6 font-medium text-green-600">{project.completedAt}</p>
+                                </div>
+                            )}
+                        </div>
+                    </CardContent>
+                </Card>
+
+
+                {/* Task List Section - Replaced by Kanban */}
+                <div className="flex-1 w-full mx-auto">
+                    <MyKanbanBoard role={false} projectId={Number(id)} />
+                </div>
+
+            </div>
+            {/* </div>
+        </div> */}
+        </>
     );
 }
 

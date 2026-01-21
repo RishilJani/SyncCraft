@@ -13,7 +13,7 @@ async function MemberDashboard() {
         <h1 className="text-4xl font-bold tracking-tight">Member Dashboard</h1>
         <div className="flex gap-2">
           <Button asChild variant="ghost" className="gap-2">
-            <Link href={`/member/${user.id}`}>
+            <Link href={`/member/${user?.userId}`}>
               <Users className="h-4 w-4" />
               Profile
             </Link>

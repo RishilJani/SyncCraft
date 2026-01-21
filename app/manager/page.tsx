@@ -14,7 +14,7 @@ export default async function ManageDashboard() {
           <h1 className="text-4xl font-bold tracking-tight">Dashboard</h1>
           <div className="flex gap-2">
             <Button asChild variant="ghost" className="gap-2">
-              <Link href={`/manager/${user?.id}`}>
+              <Link href={`/manager/${user?.userId}`}>
                 <Users className="h-4 w-4" />
               </Link>
             </Button>
