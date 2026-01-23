@@ -12,51 +12,12 @@ import { Role } from "@/app/utils";
 export default function EmployeesPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [filter, setFilter] = useState("All");
-    const [employees, setEmployee] = useState<any>([
-        {
-            userId: 1,
-            userName: "Alice Johnson",
-            role: Role.Manager,
-            email: "alice.j@synccraft.com",
-            phone: "+1 (555) 123-4567",
-        },
-        {
-            userId: 2,
-            userName: "Bob Smith",
-            role: Role.Member,
-            email: "bob.smith@synccraft.com",
-            phone: "+1 (555) 987-6543",
-        },
-        {
-            userId: 3,
-            userName: "Charlie Brown",
-            role: Role.Member,
-            email: "charlie.b@synccraft.com",
-        },
-        {
-            userId: 4,
-            userName: "Diana Prince",
-            role: Role.Manager,
-            email: "diana.p@synccraft.com",
-        },
-        {
-            userId: 5,
-            userName: "Evan Wright",
-            role: Role.Member,
-            email: "evan.w@synccraft.com",
-        },
-        {
-            userId: 6,
-            userName: "Fiona Gallagher",
-            role: Role.Member,
-            email: "fiona.g@synccraft.com",
-        }
-    ]);
+    const [employees, setEmployee] = useState<any>([]);
 
     useEffect(()=>{
         // Cookie Logic Here
         getAllUsers().then((res)=>{ 
-            // res.filter((emp)=> emp.userId != 1);
+            res = res.filter((emp)=> emp.userId != 3);
             setEmployee(res);
         });
     },[]);
@@ -147,6 +108,43 @@ export default function EmployeesPage() {
 }
 /*
  // const employees = [
-        
+  {
+            userId: 1,
+            userName: "Alice Johnson",
+            role: Role.Manager,
+            email: "alice.j@synccraft.com",
+            phone: "+1 (555) 123-4567",
+        },
+        {
+            userId: 2,
+            userName: "Bob Smith",
+            role: Role.Member,
+            email: "bob.smith@synccraft.com",
+            phone: "+1 (555) 987-6543",
+        },
+        {
+            userId: 3,
+            userName: "Charlie Brown",
+            role: Role.Member,
+            email: "charlie.b@synccraft.com",
+        },
+        {
+            userId: 4,
+            userName: "Diana Prince",
+            role: Role.Manager,
+            email: "diana.p@synccraft.com",
+        },
+        {
+            userId: 5,
+            userName: "Evan Wright",
+            role: Role.Member,
+            email: "evan.w@synccraft.com",
+        },
+        {
+            userId: 6,
+            userName: "Fiona Gallagher",
+            role: Role.Member,
+            email: "fiona.g@synccraft.com",
+        }      
     // ];
 */

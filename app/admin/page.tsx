@@ -1,11 +1,11 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Plus, ChevronDown, Users } from "lucide-react";
+import { Plus, ChevronDown, Users, User } from "lucide-react";
 import { checkLogin, getUser } from "../actions/users/Users";
 
 export default async function AdminDashboard() {
     const data = await getUser();
-    console.log("Admin Page = ", data);
+    // console.log("Admin Page = ", data);
 
     return (
         <>
@@ -32,8 +32,8 @@ export default async function AdminDashboard() {
                         </Link>
                     </Button>
                     <Button asChild variant="ghost" className="gap-2">
-                        <Link href={`/admin/${1}`}>
-                            <Users className="h-6 w-6" />
+                        <Link href={`/admin/${1}`}> {/* TODO */}
+                            <User className="h-6 w-6" />
                         </Link>
                     </Button>
                 </div>

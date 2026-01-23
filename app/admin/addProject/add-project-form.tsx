@@ -27,17 +27,21 @@ export default function AddProjectForm({ managers, members }: AddProjectFormProp
     const [dueDate, setDueDate] = useState<Date>();
     const [manager, setManager] = useState("");
     const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
-
+    
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        console.log({
-            title,
-            description,
-            dueDate,
-            manager,
-            members: selectedMembers
-        });
+        console.log("Handle Submit Functin\n");
+        
         const adminId = (await getUser())?.userId;
+        // console.log({
+        //     title,
+        //     description,
+        //     createdBy : adminId,
+        //     dueDate : dueDate,
+        //     manager,
+        //     members: selectedMembers
+        // });
+        
         const project = await addProject({
             projectName: title,
             description,
@@ -45,11 +49,13 @@ export default function AddProjectForm({ managers, members }: AddProjectFormProp
             createdBy: Number(adminId!),
             managerId: Number(manager),
             memberIds: selectedMembers
-        })
-
+        }).then(()=>{
+            console.log("Project Created");
+            redirect("/admin");
+        });
+        
         // [TODO] revalidate logic here
 
-        redirect("/admin");
     }
 
     const addMember = (memberId: string) => {
@@ -62,6 +68,7 @@ export default function AddProjectForm({ managers, members }: AddProjectFormProp
     const removeMember = (memberId: number) => {
         setSelectedMembers(selectedMembers.filter(id => id !== memberId));
     };
+
 
     return (
         <div className="w-full flex-col">
@@ -89,11 +96,8 @@ export default function AddProjectForm({ managers, members }: AddProjectFormProp
                                 <Label className="block text-sm font-medium">Due Date</Label>
                                 <Popover>
                                     <PopoverTrigger asChild>
-                                        <Button
-                                            variant={"outline"}
-                                            className={cn("w-full justify-start text-left font-normal", !dueDate && "text-muted-foreground")}
-                                        >
-                                            <CalendarIcon className="mr-2 h-4 w-4" /> {dueDate ? format(dueDate, "PPP") : <span>Pick a date</span>}
+                                        <Button variant={"outline"} className={cn("w-full justify-start text-left font-normal", !dueDate && "text-muted-foreground")} >
+                                            <CalendarIcon className="mr-2 h-4 w-4"  /> {dueDate ? format(dueDate, "PPP") : <span>Pick a date</span>}
                                         </Button>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-auto p-0" align="start">
@@ -148,7 +152,7 @@ export default function AddProjectForm({ managers, members }: AddProjectFormProp
                         </div>
 
                         <div className="pt-4">
-                            <Button type="submit" className="w-full text-lg">Create Project</Button>
+                            <Button type="submit" className="w-full text-lg" onClick={async (e)=>{await handleSubmit(e);}}>Create Project</Button>
                         </div>
                     </div>
                 </div>

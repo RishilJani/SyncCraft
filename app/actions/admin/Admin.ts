@@ -21,8 +21,9 @@ async function addProject({ projectName, description,  createdBy,  dueDate ,mana
     managerId : number,
     memberIds: number[]
 }) {
-    const createdAt = Date();
+    const createdAt = new Date();
     try {
+        console.log("Createing Project");
         const project = await prisma.projects.create({
             data: {
                 projectName,
@@ -33,7 +34,7 @@ async function addProject({ projectName, description,  createdBy,  dueDate ,mana
                 status: Status.Todo,
             }
         });
-        console.log(project);
+        console.log(`Project = ${project}`);
         const userProject = await prisma.user_projects.create({
             data:{
                 userid: managerId,
@@ -59,7 +60,5 @@ async function addProject({ projectName, description,  createdBy,  dueDate ,mana
         return false;
     }
 }
-
-
 
 export { addProject, getAllProject };
