@@ -7,7 +7,7 @@ import { cookies } from "next/headers";
 import { role_enum } from "@/app/generated/prisma/enums";
 
 type Users = {
-    userId?: number | bigint,
+    userId?: number,
     userName?: string,
     email?: string,
     passwordHash?: string | undefined,
@@ -23,33 +23,32 @@ const ROLE = "role";
 const CREATED_AT = "createdAt";
 
 // Login Logic
-async function checkLogin(data: { userName: string, password: string, role: Role }): Promise<boolean> {
-    const { userName, password, role } = data;
+async function checkLogin(data: { userName: string, password: string, /*role: Role*/ }): Promise<role_enum | null> {
+    const { userName, password/*, role*/ } = data;
 
     try {
         const user = await prisma.users.findFirst({
             where: {
                 userName: userName,
-                role: role
             }
         });
         console.log("User found during login:", user ? user.userName : "None");
 
         if (!user) {
-            return false;
+            return null;
         }
 
         const isMatch = await bcrypt.compare(password, user.passwordHash);
         if (!isMatch) {
             console.log("Password mismatch");
-            return false;
+            return null;
         }
 
         await putUserCookie(user);
-        return true;
+        return user.role;
     } catch (error) {
         console.error("Login error:", error);
-        return false;
+        return null;
     }
 }
 
@@ -69,7 +68,7 @@ async function addUser(userName: string, password: string, email: string, role: 
             }
         });
         console.log("User created:", user.userId);
-        
+
         await putUserCookie(user);
         return true;
     } catch (err) {
@@ -111,8 +110,7 @@ async function getAllUsers() {
                 role: true,
             }
         });
-        console.log("GetAllUsers = " , users);
-        
+
         return users;
     } catch (err) {
         console.error('Error fetching all users:', err);
@@ -152,18 +150,18 @@ async function putUserCookie(user: any) {
 async function getUserCookie() {
     try {
         const cookieStore = await cookies();
-        
+
         const userIdVal = cookieStore.get(USER_ID)?.value;
         if (!userIdVal) return null;
 
         const user: Users = {
-            userId: BigInt(userIdVal), // Keep as BigInt to match Prisma
+            userId: Number(userIdVal), // Keep as BigInt to match Prisma
             userName: cookieStore.get(USER_NAME)?.value,
             email: cookieStore.get(EMAIL)?.value,
             role: cookieStore.get(ROLE)?.value as Role,
             createdAt: cookieStore.get(CREATED_AT)?.value ? new Date(cookieStore.get(CREATED_AT)?.value!) : undefined,
         };
-        
+
         return user;
     } catch (err) {
         console.error('Error reading user cookie:', err);

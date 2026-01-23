@@ -115,11 +115,7 @@ function SignUp() {
 
                             <div className="space-y-2">
                                 <Label className="text-title text-sm"> Role </Label>
-                                <RadioGroup value={role} onValueChange={(value) => setRole(value as Role)} className="flex flex-row space-x-4">
-                                    <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value={Role.Admin} id="r-admin" />
-                                        <Label htmlFor="r-admin">Admin</Label>
-                                    </div>
+                                <RadioGroup value={role} onValueChange={(value) => setRole(value as Role)} className="flex flex-row justify-center space-x-4">
                                     <div className="flex items-center space-x-2">
                                         <RadioGroupItem value={Role.Manager} id="r-manager" />
                                         <Label htmlFor="r-manager">Manager</Label>

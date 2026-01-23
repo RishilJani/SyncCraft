@@ -17,7 +17,7 @@ import { OrbitalLoader } from "@/components/ui/orbital-loader";
 function LoginPage() {
     const [userName, setUserName] = useState("");
     const [password, setPassword] = useState("");
-    const [role, setRole] = useState(Role.Admin);
+    // const [role, setRole] = useState(Role.Admin);
     const [errors, setErrors] = useState<Errors>({});
     const [loading, setLoading] = useState(false);
 
@@ -39,16 +39,15 @@ function LoginPage() {
             // login successful
             var data = {
                 userName,
-                password,
-                role
+                password,            
             };
             console.log(data);
             setLoading(true);
             var result = await checkLogin(data);
-            if (result) {
+            if (result != null) {
                 console.log("Login Successful");
                 setLoading(false);
-                redirect(role.toLowerCase(), RedirectType.replace);
+                redirect(result.toLowerCase(), RedirectType.replace);
 
             } else {
                 setLoading(false);
@@ -79,12 +78,7 @@ function LoginPage() {
                         <div className="space-y-5">
                             <div className="space-y-2">
                                 <Label htmlFor="userName" className="block text-sm"> User Name </Label>
-                                <Input
-                                    type="text" required
-                                    name="userName"
-                                    id="userName"
-                                    value={userName}
-                                    onChange={(e) => { setUserName(e.target.value); }} />
+                                <Input type="text" required name="userName" id="userName" value={userName} onChange={(e) => { setUserName(e.target.value); }} />
                                 {errors.name && <p className='text-red-500 text-sm'>{errors.name}</p>}
                             </div>
 
@@ -94,7 +88,7 @@ function LoginPage() {
                                 <Link href="#" className="text-sm text-sky-600">Forget Password ?</Link>
                                 {errors.password && <p className='text-red-500 text-sm'>{errors.password}</p>}
                             </div>
-
+{/*
                             <div className="space-y-2">
                                 <Label className="text-title text-sm"> Role </Label>
                                 <RadioGroup value={role} onValueChange={(value) => setRole(value as Role)} className="flex flex-row space-x-4">
@@ -112,7 +106,7 @@ function LoginPage() {
                                     </div>
                                 </RadioGroup>
                             </div>
-
+*/}
                             <Button className="w-full" onClick={(e) => { handleSubmit(e); }}>Sign Up</Button>
                         </div>
                     </div>

@@ -1,6 +1,6 @@
 import MyKanbanBoard from "@/components/custom_kanban";
 import { Button } from "@/components/ui/button";
-import { Users } from "lucide-react";
+import { LogOut, User, Users } from "lucide-react";
 import Link from "next/link";
 import { getUser } from "../actions/users/Users";
 
@@ -13,15 +13,16 @@ export default async function ManageDashboard() {
         <div className="flex items-center justify-between mb-8 mx-auto w-full max-w-7xl">
           <h1 className="text-4xl font-bold tracking-tight">Dashboard</h1>
           <div className="flex gap-2">
-            <Button asChild variant="ghost" className="gap-2">
-              <Link href={`/manager/${user?.userId}`}>
-                <Users className="h-4 w-4" />
-              </Link>
-            </Button>
             <Button asChild variant="outline" className="gap-2">
               <Link href="/manager/members">
                 <Users className="h-4 w-4" />
                 View Project Members
+              </Link>
+            </Button>
+            <Button asChild variant="ghost" className="gap-2">
+              <Link href={`/manager/${user?.userId}`}>
+                <User className="h-6 w-6"/>
+                
               </Link>
             </Button>
           </div>

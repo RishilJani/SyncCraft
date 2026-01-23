@@ -20,6 +20,7 @@ import {
     Trophy,
     Edit,
     Loader2,
+    LogOut,
 } from "lucide-react";
 import { Role, Task } from "@/app/utils";
 import { OrbitalLoader } from "./ui/orbital-loader";
