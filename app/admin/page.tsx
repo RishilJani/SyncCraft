@@ -5,7 +5,7 @@ import { getUser } from "../actions/users/Users";
 
 export default async function AdminDashboard() {
     const data = await getUser();
-    // console.log("Admin Page = ", data);
+    console.log("Admin Page = ", process.env.BASE_URL);
 
     return (
         <>

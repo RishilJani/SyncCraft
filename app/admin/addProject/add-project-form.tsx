@@ -1,7 +1,7 @@
 "use client";
 
-import { addProject } from "@/app/actions/admin/Admin";
-import { getUser, Users } from "@/app/actions/users/Users";
+import { getUser } from "@/app/actions/users/Users";
+import { myHeaders, Users } from "@/app/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
@@ -13,7 +13,7 @@ import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, X } from "lucide-react";
 import Link from "next/link";
-import { redirect } from "next/navigation";
+import { redirect, RedirectType } from "next/navigation";
 import React, { useState } from "react";
 
 interface AddProjectFormProps {
@@ -27,34 +27,31 @@ export default function AddProjectForm({ managers, members }: AddProjectFormProp
     const [dueDate, setDueDate] = useState<Date>();
     const [manager, setManager] = useState("");
     const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
-    
+    // [Todo] add validation
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         console.log("Handle Submit Functin\n");
         
         const adminId = (await getUser())?.userId;
-        // console.log({
-        //     title,
-        //     description,
-        //     createdBy : adminId,
-        //     dueDate : dueDate,
-        //     manager,
-        //     members: selectedMembers
-        // });
+    
+        var res = await(await fetch("/api/projects",{
+            method : "POST",
+            headers : myHeaders,
+            body : JSON.stringify({
+                projectName : title,
+                description : description,
+                createdBy : Number(adminId),
+                dueDate : dueDate,
+                managerId : Number(manager),
+                memberIds: selectedMembers
+            }),
+        })).json();
+        console.log("Res = ", res);
         
-        const project = await addProject({
-            projectName: title,
-            description,
-            dueDate: dueDate!,
-            createdBy: Number(adminId!),
-            managerId: Number(manager),
-            memberIds: selectedMembers
-        }).then(()=>{
-            console.log("Project Created");
-            redirect("/admin");
-        });
-        
-        // [TODO] revalidate logic here
+        if(!res.error){
+            console.log("Project added");
+            redirect("/admin",RedirectType.replace);
+        }
 
     }
 

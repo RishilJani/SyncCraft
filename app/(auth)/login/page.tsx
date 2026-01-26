@@ -89,7 +89,7 @@ function LoginPage() {
                                 {errors.password && <p className='text-red-500 text-sm'>{errors.password}</p>}
                             </div>
                             
-                            <Button className="w-full" onClick={(e) => { handleSubmit(e); }}>Sign Up</Button>
+                            <Button className="w-full" onClick={(e) => { handleSubmit(e); }}>Log in</Button>
                         </div>
                     </div>
 

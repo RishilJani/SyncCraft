@@ -25,7 +25,7 @@ export type Users = {
     createdAt?: Date
 }
 
-export function MyResponse(error: boolean, message: string, data: any, {status} : {status : number}){
+export function MyResponse(error: boolean, message: string, data: any, {status = 200} : {status : number}){
     return Response.json({ error, data, message }, {status : status});
 }
 export function ErrorResponse(data: any){
