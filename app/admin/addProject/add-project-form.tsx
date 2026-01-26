@@ -101,7 +101,7 @@ export default function AddProjectForm({ managers, members }: AddProjectFormProp
                                         </Button>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-auto p-0" align="start">
-                                        <Calendar mode="single" selected={dueDate} onSelect={setDueDate} initialFocus />
+                                        <Calendar fromDate={new Date()} mode="single" selected={dueDate}  onSelect={setDueDate} initialFocus />
                                     </PopoverContent>
                                 </Popover>
                             </div>

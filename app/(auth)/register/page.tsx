@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Role } from '@/app/utils';
+import { myHeaders, Role } from '@/app/utils';
 import { Label } from '@radix-ui/react-label';
 import Link from 'next/link';
 import { redirect, RedirectType } from 'next/navigation';
@@ -55,13 +55,26 @@ function SignUp() {
         e.preventDefault();
         setIsLoading(true);
         if (validateForm()) {
-            console.log(userName);
-            console.log(email);
-            console.log(password);
-            console.log(role);
-            await addUser(userName as string, password as string, email as string, role);
+            const data = { userName, password, email, role };
+            console.log("Data = " , data);
+
+            setIsLoading(true);
+            var res = await (await fetch("/api/register",{
+                method : "POST",
+                headers : myHeaders,
+                body : JSON.stringify(data),
+            })).json();
+
             setIsLoading(false);
-            redirect(role.toLowerCase(), RedirectType.replace); 
+            if(!res.error){
+                console.log("Register Successful");
+                setIsLoading(false);
+                redirect(res.data.role.toLowerCase(),RedirectType.replace);
+            }else{
+                setIsLoading(false);
+                setErrors({credentials : res.message});
+            }
+            
         }else{
             setIsLoading(false);
         }

@@ -1,19 +1,10 @@
 "use server";
 
 import { prisma } from "@/lib/prisma";
-import { Role } from "@/app/utils";
+import { Role, Users } from "@/app/utils";
 import bcrypt from 'bcryptjs';
 import { cookies } from "next/headers";
-import { role_enum } from "@/app/generated/prisma/enums";
 
-type Users = {
-    userId?: number,
-    userName?: string,
-    email?: string,
-    passwordHash?: string | undefined,
-    role?: role_enum,
-    createdAt?: Date
-}
 
 // Cookie consts
 const USER_ID = "userId";
@@ -22,38 +13,9 @@ const EMAIL = "email";
 const ROLE = "role";
 const CREATED_AT = "createdAt";
 
-// Login Logic
-async function checkLogin(data: { userName: string, password: string, /*role: Role*/ }): Promise<role_enum | null> {
-    const { userName, password/*, role*/ } = data;
-
-    try {
-        const user = await prisma.users.findFirst({
-            where: {
-                userName: userName,
-            }
-        });
-        console.log("User found during login:", user ? user.userName : "None");
-
-        if (!user) {
-            return null;
-        }
-
-        const isMatch = await bcrypt.compare(password, user.passwordHash);
-        if (!isMatch) {
-            console.log("Password mismatch");
-            return null;
-        }
-
-        await putUserCookie(user);
-        return user.role;
-    } catch (error) {
-        console.error("Login error:", error);
-        return null;
-    }
-}
 
 // sign up Logic
-async function addUser(userName: string, password: string, email: string, role: Role) {
+export async function addUser(userName: string, password: string, email: string, role: Role) {
     try {
         const salt = process.env.SALT ? Number.parseInt(process.env.SALT) : 10;
         const hashedPassword = bcrypt.hashSync(password, salt);
@@ -78,7 +40,7 @@ async function addUser(userName: string, password: string, email: string, role: 
 }
 
 // Logout Logic
-async function logout() {
+export async function logout() {
     const cookie = await cookies();
     cookie.delete(USER_ID);
     cookie.delete(USER_NAME);
@@ -88,7 +50,7 @@ async function logout() {
 }
 
 // to delete a user
-async function deleteUser(userId: number) {
+export async function deleteUser(userId: number) {
     try {
         await prisma.users.delete({
             where: {
@@ -100,7 +62,7 @@ async function deleteUser(userId: number) {
     }
 }
 
-async function getAllUsers() {
+export async function getAllUsers() {
     try {
         const users = await prisma.users.findMany({
             select: {
@@ -118,7 +80,7 @@ async function getAllUsers() {
     }
 }
 
-async function getUser() {
+export async function getUser() {
     try {
         const user = await getUserCookie();
         return user;
@@ -128,7 +90,28 @@ async function getUser() {
     }
 }
 
-async function putUserCookie(user: any) {
+export async function getUserCookie() {
+    try {
+        const cookieStore = await cookies();
+        const userIdVal = cookieStore.get(USER_ID)?.value;
+        if (!userIdVal) return null;
+
+        const user: Users = {
+            userId: Number(userIdVal),
+            userName: cookieStore.get(USER_NAME)?.value,
+            email: cookieStore.get(EMAIL)?.value,
+            role: cookieStore.get(ROLE)?.value as Role,
+            createdAt: cookieStore.get(CREATED_AT)?.value ? new Date(cookieStore.get(CREATED_AT)?.value!) : undefined,
+        };
+
+        return user;
+    } catch (err) {
+        console.error('Error reading user cookie:', err);
+        return null;
+    }
+}
+
+export async function putUserCookie(user: any) {
     const cookieStore = await cookies();
     const oneDay = 24 * 60 * 60 * 1000;
     const expires = Date.now() + oneDay;
@@ -147,27 +130,3 @@ async function putUserCookie(user: any) {
     }
 }
 
-async function getUserCookie() {
-    try {
-        const cookieStore = await cookies();
-
-        const userIdVal = cookieStore.get(USER_ID)?.value;
-        if (!userIdVal) return null;
-
-        const user: Users = {
-            userId: Number(userIdVal), // Keep as BigInt to match Prisma
-            userName: cookieStore.get(USER_NAME)?.value,
-            email: cookieStore.get(EMAIL)?.value,
-            role: cookieStore.get(ROLE)?.value as Role,
-            createdAt: cookieStore.get(CREATED_AT)?.value ? new Date(cookieStore.get(CREATED_AT)?.value!) : undefined,
-        };
-
-        return user;
-    } catch (err) {
-        console.error('Error reading user cookie:', err);
-        return null;
-    }
-}
-
-export { checkLogin, addUser, deleteUser, getUser, getAllUsers, logout };
-export type { Users };

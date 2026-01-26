@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import {
     Card,
     CardContent,
@@ -24,8 +24,19 @@ import {
 } from "lucide-react";
 import { Role, Task } from "@/app/utils";
 import { OrbitalLoader } from "./ui/orbital-loader";
-import { title } from "process";
 import { allTasks } from "@/app/actions/tasks/task";
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogFooter,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogClose,
+} from "@/components/ui/dialog";
+import { logout } from "@/app/actions/users/Users";
+import { redirect, RedirectType, useRouter } from "next/navigation";
 
 interface UserProfile {
     id: string;
@@ -57,6 +68,12 @@ const fetchUserData = async (id: string | number): Promise<UserProfile> => {
 export default function UserProfilePage({ id, viewerRole }: { id: string | number; viewerRole?: Role; }) {
     const [user, setUser] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
+    const router = useRouter();
+
+    const handleLogout = async () => {
+        await logout();
+        redirect("/login",RedirectType.replace);
+    };
 
     useEffect(() => {
         const loadData = async () => {
@@ -112,20 +129,21 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
                                                 : user.role === "manager"
                                                     ? "default"
                                                     : "secondary"
-                                        }
-                                        className="capitalize"
-                                    >
+                                        } className="capitalize" >
                                         {user.role}
                                     </Badge>
                                 </div>
                             </div>
                         </div>
-                        {viewerRole === Role.Admin && (
-                            <Button variant="outline" size="sm" className="gap-2">
-                                <Edit className="h-4 w-4" />
-                                Edit Profile
-                            </Button>
-                        )}
+                        <div className="flex flex-col gap-2 md:flex-row md:items-center">
+                            {viewerRole === Role.Admin && (
+                                <Button variant="outline" size="sm" className="gap-2">
+                                    <Edit className="h-4 w-4" />
+                                    Edit Profile
+                                </Button>
+                            )}
+                            <MyDialog />
+                        </div>
                     </div>
                 </CardHeader>
                 <CardContent className="mt-6 grid gap-6">
@@ -186,4 +204,31 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
             </Card>
         </div>
     );
+    function MyDialog() {
+        return (
+            <Dialog>
+                <DialogTrigger asChild>
+                    <Button variant="destructive" size="sm" className="gap-2">
+                        <LogOut className="h-4 w-4" />
+                        {/* Logout */}
+                    </Button>
+                </DialogTrigger>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Are you sure you want to logout?</DialogTitle>
+                        <DialogDescription>
+                            You will be signed out of your account.
+                        </DialogDescription>
+                    </DialogHeader>
+                    <DialogFooter className="gap-2 sm:gap-0">
+                        <DialogClose asChild className="mr-2">
+                            <Button variant="outline">Cancel</Button>
+                        </DialogClose>
+                        <Button variant="destructive" onClick={handleLogout} className="ml-2">
+                            Logout
+                        </Button>
+                    </DialogFooter>
+                </DialogContent>
+            </Dialog>);
+    }
 }

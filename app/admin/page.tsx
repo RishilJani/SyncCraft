@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Plus, ChevronDown, Users, User } from "lucide-react";
-import { checkLogin, getUser } from "../actions/users/Users";
+import { getUser } from "../actions/users/Users";
 
 export default async function AdminDashboard() {
     const data = await getUser();

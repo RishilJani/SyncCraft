@@ -3,21 +3,18 @@
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { PasswordInput } from "@/components/ui/password-input";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Label } from "@radix-ui/react-label";
 import Link from "next/link";
 import { redirect, RedirectType } from "next/navigation";
 import React, { Activity, useState } from "react";
 import { Errors } from "../register/page";
-import { Role } from "@/app/utils";
-import { checkLogin } from "../../actions/users/Users";
 import wait from 'wait';
 import { OrbitalLoader } from "@/components/ui/orbital-loader";
+import { myHeaders } from "@/app/utils";
 
 function LoginPage() {
     const [userName, setUserName] = useState("");
     const [password, setPassword] = useState("");
-    // const [role, setRole] = useState(Role.Admin);
     const [errors, setErrors] = useState<Errors>({});
     const [loading, setLoading] = useState(false);
 
@@ -36,22 +33,25 @@ function LoginPage() {
         e.preventDefault();
         // validation here
         if (validateForm()) {
-            // login successful
-            var data = {
-                userName,
-                password,            
-            };
-            console.log(data);
             setLoading(true);
-            var result = await checkLogin(data);
-            if (result != null) {
+            var result = await (await fetch("/api/login",{
+                    method: "POST",
+                    headers: myHeaders,
+                    body: JSON.stringify({
+                        'userName': userName,
+                        'password': password
+                    }),
+                })).json();
+            console.log("Result = ", result);
+            
+            if (!result.error) {
                 console.log("Login Successful");
                 setLoading(false);
-                redirect(result.toLowerCase(), RedirectType.replace);
+                redirect(result.data.role.toLowerCase(), RedirectType.replace);
 
             } else {
                 setLoading(false);
-                setErrors({ credentials: "Invalid Credentials" });
+                setErrors({ credentials: result.message });
             }
         } else {
             setLoading(false);
@@ -88,25 +88,7 @@ function LoginPage() {
                                 <Link href="#" className="text-sm text-sky-600">Forget Password ?</Link>
                                 {errors.password && <p className='text-red-500 text-sm'>{errors.password}</p>}
                             </div>
-{/*
-                            <div className="space-y-2">
-                                <Label className="text-title text-sm"> Role </Label>
-                                <RadioGroup value={role} onValueChange={(value) => setRole(value as Role)} className="flex flex-row space-x-4">
-                                    <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value={Role.Admin} id="r-admin" />
-                                        <Label htmlFor="r-admin">Admin</Label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value={Role.Manager} id="r-manager" />
-                                        <Label htmlFor="r-manager">Manager</Label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value={Role.Member} id="r-member" />
-                                        <Label htmlFor="r-member">Member</Label>
-                                    </div>
-                                </RadioGroup>
-                            </div>
-*/}
+                            
                             <Button className="w-full" onClick={(e) => { handleSubmit(e); }}>Sign Up</Button>
                         </div>
                     </div>
