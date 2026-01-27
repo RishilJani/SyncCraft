@@ -3,7 +3,6 @@ import { ErrorResponse, MyResponse } from "@/app/utils";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { NextRequest } from "next/server";
-import { error } from "node:console";
 
 export async function POST(request: NextRequest) {
     try {

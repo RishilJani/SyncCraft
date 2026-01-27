@@ -5,8 +5,6 @@ import { getUser } from "../actions/users/Users";
 
 export default async function AdminDashboard() {
     const data = await getUser();
-    console.log("Admin Page = ", process.env.BASE_URL);
-
     return (
         <>
             <div className="flex items-center justify-between">

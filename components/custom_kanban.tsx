@@ -12,12 +12,10 @@ import {
     KanbanBoardColumnTitle,
     KanbanBoardProvider,
 } from "@/components/kanban";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Users, Plus } from "lucide-react";
-import Link from "next/link";
+import { User, Users } from "lucide-react";
 import { useState } from "react";
-import { Priority, Role, Status, Task } from "@/app/utils";
+import { Priority, Status, Task } from "@/app/utils";
 import { allTasks } from "@/app/actions/tasks/task";
 
 type KanbanTask = Task & { id: string };
@@ -111,15 +109,19 @@ export default function MyKanbanBoard({ role, projectId }: { role: boolean, proj
         );
     };
 
+    const project = {
+        projectName : "Project Name Here",
+        description : "Description Here",
+    }
 
     return (
         <div className="container">
 
             <div className="flex min-h-screen w-full flex-col bg-muted/40 p-4 md:p-8">
                 <div className="mx-auto w-full space-y-6">
-                    <div className="flex flex-col items-start mx-auto w-full gap-2">
-                        <h1 className="text-2xl font-bold tracking-tight">Website Redesign</h1>
-                        <p className="text-muted-foreground text-lg">Revamping the company website to improve user experience and SEO.</p>
+                    <div className="flex flex-col items-start mx-auto w-full gap-2 ml-3">
+                        <h1 className="text-2xl font-bold tracking-tight">{project.projectName}</h1>
+                        <p className="text-muted-foreground text-lg">{project.description}</p>
                     </div>
 
                     <div className="flex items-center justify-start overflow-hidden h-full mx-auto w-full">
