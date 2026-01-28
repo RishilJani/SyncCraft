@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, Calendar, Flag, CheckCircle2, NotepadText } from "lucide-react";
+import { ArrowLeft, Calendar, Flag, CheckCircle2, NotepadText, Edit } from "lucide-react";
 import MyKanbanBoard from "@/components/custom_kanban";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -10,14 +10,15 @@ import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useEffect, useState } from "react";
 import CustomLoader from "@/components/custom_loader";
+import { role_enum } from "@/app/generated/prisma/enums";
+import EditProjectForm from "../../editProject/[id]/edit-project-form";
 
 export default function ProjectDetail({ params }: { params: Promise<{ id: string }> }) {
-
+    const role = role_enum.admin;
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [project, setProject] = useState(Object);
     const [id, setId] = useState(-1);
-    // const project = await getProjectById(Number(id));
 
     useEffect(() => {
         setLoading(true);
@@ -74,6 +75,18 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
                         <StatusBadge status={project.status} className="text-md" />
                     </div>
                 </div>
+                {role == role_enum.admin &&
+                    <div className="flex justify-end">
+                        <div className="flex items-end gap-2">
+                            {/* <EditProjectForm projectId={project.projectId} projectName={project.projectName} description={project.description} dueDate={project.dueDate} managerId={project.managerId} membersList={project.membersList} managers={project.managers} members={project.members}> */}
+                            <Button variant="outline" size="sm" className="gap-2">
+                                <Edit className="h-5 w-5" />
+                                Edit Project
+                            </Button>
+                            {/* </EditProjectForm> */}
+                        </div>
+                    </div>
+                }
             </div>
 
             <div className="grid gap-6">
@@ -85,7 +98,7 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
                     <CardContent className="space-y-6">
                         <div>
                             <div className="flex items-center gap-2 text-muted-foreground">
-                                <NotepadText className="h-4 w-4"/>
+                                <NotepadText className="h-4 w-4" />
                                 <span className="text-sm font-medium uppercase">Description</span>
                             </div>
                             <p className="pl-6 font-medium">{project.description}</p>
@@ -110,13 +123,13 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
                                 <p className="pl-6 font-medium">{project.dueDate}</p>
                             </div>
 
-                            {project.completedAt && (
+                            {project.completionDate && (
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-2 text-muted-foreground">
                                         <CheckCircle2 className="h-4 w-4" />
                                         <span className="text-sm font-medium">Completed At</span>
                                     </div>
-                                    <p className="pl-6 font-medium text-green-600">{project.completedAt}</p>
+                                    <p className="pl-6 font-medium text-green-600">{project.completionDate}</p>
                                 </div>
                             )}
                         </div>
@@ -124,9 +137,9 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
                 </Card>
 
 
-                {/* Task List Section - Replaced by Kanban */}
+                {/* Task List Section - Kanban */}
                 <div className="flex-1 w-full mx-auto">
-                    <MyKanbanBoard role={true} projectId={Number(id)} />
+                    <MyKanbanBoard role={role == role_enum.admin || role == role_enum.manager} projectId={Number(id)} />
                 </div>
 
             </div>

@@ -22,7 +22,6 @@ import {
     Loader2,
     LogOut,
 } from "lucide-react";
-import { Role, Task } from "@/app/utils";
 import { OrbitalLoader } from "./ui/orbital-loader";
 import { allTasks } from "@/app/actions/tasks/task";
 import {
@@ -37,12 +36,14 @@ import {
 } from "@/components/ui/dialog";
 import { logout } from "@/app/actions/users/Users";
 import { redirect, RedirectType, useRouter } from "next/navigation";
+import { role_enum } from "@/app/generated/prisma/enums";
+import { Task } from "@/app/(types)/myTypes";
 
 interface UserProfile {
     id: string;
     name: string;
     email: string;
-    role: Role;
+    role: role_enum;
     createdAt: string;
     assignedTask?: Task[];
     points: number;
@@ -58,14 +59,14 @@ const fetchUserData = async (id: string | number): Promise<UserProfile> => {
         id: String(id),
         name: "Alex Johnson",
         email: "alex.johnson@example.com",
-        role: Role.Admin,
+        role: role_enum.admin,
         createdAt: "2023-01-15",
         assignedTask: assignedTasks,
         points: 1250,
     };
 };
 
-export default function UserProfilePage({ id, viewerRole }: { id: string | number; viewerRole?: Role; }) {
+export default function UserProfilePage({ id, viewerRole }: { id: string | number; viewerRole?: role_enum; }) {
     const [user, setUser] = useState<UserProfile | null>(null);
     const [loading, setLoading] = useState(true);
     const router = useRouter();
@@ -124,7 +125,7 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
                                 <div className="mt-2 flex justify-center gap-2 md:justify-start">
                                     <Badge
                                         variant={
-                                            user.role === Role.Admin
+                                            user.role === role_enum.admin
                                                 ? "destructive"
                                                 : user.role === "manager"
                                                     ? "default"
@@ -136,7 +137,7 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
                             </div>
                         </div>
                         <div className="flex flex-col gap-2 md:flex-row md:items-center">
-                            {viewerRole === Role.Admin && (
+                            {viewerRole === role_enum.admin && (
                                 <Button variant="outline" size="sm" className="gap-2">
                                     <Edit className="h-4 w-4" />
                                     Edit Profile
@@ -179,7 +180,7 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
                             </div>
                         </div>
 
-                        {user.role == Role.Member &&
+                        {user.role == role_enum.member &&
                             <>
                                 <div className="text-md flex items-center justify-center gap-2 md:justify-start mx-2">Assigned Tasks</div>
                                 {user.assignedTask!.map((task) => {

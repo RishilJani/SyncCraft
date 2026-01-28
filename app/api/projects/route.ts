@@ -1,4 +1,5 @@
-import { ErrorResponse, MyResponse, Status } from "@/app/utils";
+import { Status } from "@/app/(types)/myTypes";
+import { ErrorResponse, MyResponse } from "@/app/utils";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 

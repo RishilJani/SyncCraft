@@ -3,13 +3,14 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { myHeaders, Role } from '@/app/utils';
+import { myHeaders } from '@/app/utils';
 import { Label } from '@radix-ui/react-label';
 import Link from 'next/link';
 import { redirect, RedirectType } from 'next/navigation';
 import { Activity, useState } from 'react';
 import { addUser, deleteUser } from '../../actions/users/Users';
 import { OrbitalLoader } from '@/components/ui/orbital-loader';
+import { role_enum } from '@/app/generated/prisma/enums';
 
 type Errors = {
     name?: String,
@@ -22,7 +23,7 @@ function SignUp() {
     const [userName, setUserName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [role, setRole] = useState(Role.Admin);
+    const [role, setRole] = useState<role_enum>(role_enum.admin);
     const [errors, setErrors] = useState<Errors>({});
     const [isLoading, setIsLoading] = useState(false);
 
@@ -128,13 +129,13 @@ function SignUp() {
 
                             <div className="space-y-2">
                                 <Label className="text-title text-sm"> Role </Label>
-                                <RadioGroup value={role} onValueChange={(value) => setRole(value as Role)} className="flex flex-row justify-center space-x-4">
+                                <RadioGroup value={role} onValueChange={(value) => setRole(value as role_enum)} className="flex flex-row justify-center space-x-4">
                                     <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value={Role.Manager} id="r-manager" />
+                                        <RadioGroupItem value={role_enum.manager} id="r-manager" />
                                         <Label htmlFor="r-manager">Manager</Label>
                                     </div>
                                     <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value={Role.Member} id="r-member" />
+                                        <RadioGroupItem value={role_enum.member} id="r-member" />
                                         <Label htmlFor="r-member">Member</Label>
                                     </div>
                                 </RadioGroup>

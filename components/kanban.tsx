@@ -690,7 +690,7 @@ export function KanbanBoardColumnButton({
 Card
 */
 
-export type KanbanBoardCardProps<T extends { id: string } = { id: string }> = {
+export type KanbanBoardCardProps<T extends { id: number } = { id: number }> = {
   /**
    * A string representing the data to add to the DataTransfer.
    * @see https://developer.mozilla.org/en-US/docs/Web/API/DataTransfer/setData#data
@@ -739,7 +739,7 @@ export function KanbanBoardCard({
         // Remove outline from the card when dragging.
         event.currentTarget.blur();
 
-        onDragStart(data.id);
+        onDragStart(data.id +"");
       }}
       onDragEnd={() => {
         setIsDragging(false);

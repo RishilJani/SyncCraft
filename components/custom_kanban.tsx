@@ -13,12 +13,13 @@ import {
     KanbanBoardProvider,
 } from "@/components/kanban";
 import { Badge } from "@/components/ui/badge";
-import { User, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import { useState } from "react";
-import { Priority, Status, Task } from "@/app/utils";
-import { allTasks } from "@/app/actions/tasks/task";
 
-type KanbanTask = Task & { id: string };
+import { allTasks } from "@/app/actions/tasks/task";
+import { Task, Status, Priority } from "@/app/(types)/myTypes";
+
+type KanbanTask = Task & { id: number };
 
 type Column = {
     id: string;
@@ -69,7 +70,7 @@ export default function MyKanbanBoard({ role, projectId }: { role: boolean, proj
         },
     ]);
 
-    const removeCard = (taskId: string) => {
+    const removeCard = (taskId: number) => {
         setColumns((prev) =>
             prev.map((col) => ({
                 ...col,
@@ -93,7 +94,7 @@ export default function MyKanbanBoard({ role, projectId }: { role: boolean, proj
     const handleDropOverListItem = (
         dataTransferData: string,
         dropDirection: "top" | "bottom",
-        targetCardId: string
+        targetCardId: number
     ) => {
         const droppedCard: KanbanTask = JSON.parse(dataTransferData);
         removeCard(droppedCard.taskId);
@@ -110,8 +111,8 @@ export default function MyKanbanBoard({ role, projectId }: { role: boolean, proj
     };
 
     const project = {
-        projectName : "Project Name Here",
-        description : "Description Here",
+        projectName: "Project Name Here",
+        description: "Description Here",
     }
 
     return (
@@ -143,7 +144,7 @@ export default function MyKanbanBoard({ role, projectId }: { role: boolean, proj
                                             {column.cards.map((card) => (
                                                 <KanbanBoardColumnListItem
                                                     key={card.id}
-                                                    cardId={card.id}
+                                                    cardId={card.id +""}
                                                     onDropOverListItem={role ? (data, dir) => {
                                                         if (dir === "top" || dir === "bottom")
                                                             handleDropOverListItem(data, dir, card.id);

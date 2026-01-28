@@ -1,7 +1,8 @@
 "use client";
 
+import { User } from "@/app/(types)/myTypes";
 import { getUser } from "@/app/actions/users/Users";
-import { myHeaders, Users } from "@/app/utils";
+import { myHeaders } from "@/app/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";
@@ -17,11 +18,11 @@ import { redirect, RedirectType } from "next/navigation";
 import React, { useState } from "react";
 
 interface AddProjectFormProps {
-    managers: Users[];
-    members: Users[];
+    managers: User[];
+    members: User[];
 }
 
-export default function AddProjectForm({ managers, members }: AddProjectFormProps) {
+export default function AddProjectForm({managers, members }: AddProjectFormProps) {
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [dueDate, setDueDate] = useState<Date>();
