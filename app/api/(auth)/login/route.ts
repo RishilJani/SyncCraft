@@ -14,7 +14,6 @@ export async function POST(request: NextRequest) {
             }
         });
 
-        console.log("User found : ", user?.userId, " name = ", user?.userName);
         if (!user) {
             return MyResponse(true, "User not found" , null, {status : 404});
         }

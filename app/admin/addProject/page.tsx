@@ -1,11 +1,12 @@
 import { getAllUsers } from "@/app/actions/users/Users";
-import { Role } from "@/app/utils";
+
 import AddProjectForm from "./add-project-form";
+import { role_enum } from "@/app/generated/prisma/enums";
 
 export default async function AddProjectPage() {
   const users = await getAllUsers();
-  const managers = users.filter((user) => user.role === Role.Manager);
-  const members = users.filter((user) => user.role === Role.Member);
+  const managers = users.filter((user) => user.role === role_enum.manager);
+  const members = users.filter((user) => user.role === role_enum.member);
 
   return (
     <>

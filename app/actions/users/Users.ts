@@ -1,7 +1,8 @@
 "use server";
 
+import { User } from "@/app/(types)/myTypes";
+import { role_enum } from "@/app/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
-import { Role, Users } from "@/app/utils";
 import bcrypt from 'bcryptjs';
 import { cookies } from "next/headers";
 
@@ -13,9 +14,8 @@ const EMAIL = "email";
 const ROLE = "role";
 const CREATED_AT = "createdAt";
 
-
 // sign up Logic
-export async function addUser(userName: string, password: string, email: string, role: Role) {
+export async function addUser(userName: string, password: string, email: string, role: role_enum) {
     try {
         const salt = process.env.SALT ? Number.parseInt(process.env.SALT) : 10;
         const hashedPassword = bcrypt.hashSync(password, salt);
@@ -72,7 +72,6 @@ export async function getAllUsers() {
                 role: true,
             }
         });
-
         return users;
     } catch (err) {
         console.error('Error fetching all users:', err);
@@ -86,7 +85,7 @@ export async function getUser() {
         return user;
     } catch (err) {
         console.error("Error getting current user:", err);
-        return null; // Return null instead of throwing to handle UI gracefully
+        return null;
     }
 }
 
@@ -96,11 +95,11 @@ export async function getUserCookie() {
         const userIdVal = cookieStore.get(USER_ID)?.value;
         if (!userIdVal) return null;
 
-        const user: Users = {
+        const user: User = {
             userId: Number(userIdVal),
             userName: cookieStore.get(USER_NAME)?.value,
             email: cookieStore.get(EMAIL)?.value,
-            role: cookieStore.get(ROLE)?.value as Role,
+            role: cookieStore.get(ROLE)?.value as role_enum,
             createdAt: cookieStore.get(CREATED_AT)?.value ? new Date(cookieStore.get(CREATED_AT)?.value!) : undefined,
         };
 

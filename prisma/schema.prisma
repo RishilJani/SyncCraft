@@ -18,7 +18,7 @@ model Projects {
   completionDate DateTime?       @db.Timestamptz(6)
   status         status_enum     @default(todo)
   Users          Users?          @relation(fields: [createdBy], references: [userId], onDelete: NoAction, onUpdate: NoAction)
-  TaskLists      TaskLists[]
+  Tasks          Tasks[]
   user_projects  user_projects[]
 }
 
@@ -45,15 +45,6 @@ model TaskHistory {
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model TaskLists {
-  listId    Int      @id @unique @default(autoincrement())
-  projectId Int
-  listName  String   @db.VarChar
-  Projects  Projects @relation(fields: [projectId], references: [projectId], onDelete: NoAction, onUpdate: NoAction)
-  Tasks     Tasks[]
-}
-
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Users {
   userId        Int             @id @unique @default(autoincrement())
   userName      String          @unique @db.VarChar
@@ -72,20 +63,20 @@ model Users {
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model Tasks {
   taskId         Int            @id(map: "tasks_pkey") @default(autoincrement())
-  listid         Int?
   assignedto     Int?
   title          String         @db.VarChar(100)
   description    String?        @db.VarChar(255)
-  priority       String?        @db.VarChar(10)
   dueDate        DateTime?      @db.Timestamptz(6)
   createdAt      DateTime?      @default(now()) @db.Timestamptz(6)
   completionDate DateTime?      @db.Timestamptz(6)
   status         status_enum    @default(todo)
   points         Int            @default(0)
+  projectId      Int
+  priority       priority_enum  @default(Low)
   TaskComments   TaskComments[]
   TaskHistory    TaskHistory[]
+  Projects       Projects       @relation(fields: [projectId], references: [projectId], onDelete: Cascade)
   Users          Users?         @relation(fields: [assignedto], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "tasks_assignedto_fkey")
-  TaskLists      TaskLists?     @relation(fields: [listid], references: [listId], onDelete: NoAction, onUpdate: NoAction, map: "tasks_listid_fkey")
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -107,4 +98,10 @@ enum status_enum {
   todo
   pending
   completed
+}
+
+enum priority_enum {
+  Low
+  High
+  Medium
 }

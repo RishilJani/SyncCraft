@@ -8,7 +8,6 @@ import Link from "next/link";
 import { redirect, RedirectType } from "next/navigation";
 import React, { Activity, useState } from "react";
 import { Errors } from "../register/page";
-import wait from 'wait';
 import { OrbitalLoader } from "@/components/ui/orbital-loader";
 import { myHeaders } from "@/app/utils";
 
@@ -34,18 +33,16 @@ function LoginPage() {
         // validation here
         if (validateForm()) {
             setLoading(true);
-            var result = await (await fetch("/api/login",{
-                    method: "POST",
-                    headers: myHeaders,
-                    body: JSON.stringify({
-                        'userName': userName,
-                        'password': password
-                    }),
-                })).json();
-            console.log("Result = ", result);
-            
+            var result = await (await fetch("/api/login", {
+                method: "POST",
+                headers: myHeaders,
+                body: JSON.stringify({
+                    'userName': userName,
+                    'password': password
+                }),
+            })).json();
+
             if (!result.error) {
-                console.log("Login Successful");
                 setLoading(false);
                 redirect(result.data.role.toLowerCase(), RedirectType.replace);
 
@@ -88,7 +85,7 @@ function LoginPage() {
                                 <Link href="#" className="text-sm text-sky-600">Forget Password ?</Link>
                                 {errors.password && <p className='text-red-500 text-sm'>{errors.password}</p>}
                             </div>
-                            
+
                             <Button className="w-full" onClick={(e) => { handleSubmit(e); }}>Log in</Button>
                         </div>
                     </div>
