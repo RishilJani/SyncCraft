@@ -22,7 +22,7 @@ export async function GET(
     }
 }
 
-export async function PATCH(
+export async function PUT(
     request: Request,
     { params }: { params: Promise<{ id: string }> }
 ) {

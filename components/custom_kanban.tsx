@@ -15,9 +15,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Users } from "lucide-react";
 import { useState } from "react";
-
-import { allTasks } from "@/app/actions/tasks/task";
-import { Task, Status, Priority } from "@/app/(types)/myTypes";
+import { Task, Status, Priority, Project } from "@/app/(types)/myTypes";
 
 type KanbanTask = Task & { id: number };
 
@@ -42,8 +40,17 @@ const mockUsers: Record<number, string> = {
     105: "Ethan Hunt"
 };
 
-export default function MyKanbanBoard({ role, projectId }: { role: boolean, projectId: number }) {
-
+export default function MyKanbanBoard({ role, project }: { role: boolean, project: Project }) {
+    const allTasks = project.tasks;
+    if (allTasks == undefined) {
+        return (
+            <>
+                <div>
+                    No Task for this Project
+                </div>
+            </>
+        );
+    }
     const kanbanTasks: KanbanTask[] = allTasks.map(task => ({ ...task, id: task.taskId }));
 
     const todosTasks = kanbanTasks.filter((task) => task.status === Status.Todo);
@@ -82,20 +89,21 @@ export default function MyKanbanBoard({ role, projectId }: { role: boolean, proj
     const handleDropOverColumn = (dataTransferData: string, targetColumnId: string) => {
         const droppedCard: KanbanTask = JSON.parse(dataTransferData);
         removeCard(droppedCard.taskId);
+       
         setColumns((prev) =>
-            prev.map((col) =>
-                col.id === targetColumnId
-                    ? { ...col, cards: [...col.cards, { ...droppedCard, status: targetColumnId as Status }] }
-                    : col
+            prev.map((col) =>{
+                    if(col.id === targetColumnId){
+                        updateStatus(droppedCard.taskId, col.id as Status);
+                        return { ...col, cards: [...col.cards, { ...droppedCard, status: targetColumnId as Status }] }
+                    }
+                    return col;
+                }  
             )
         );
+        console.log("HandleDropOverColumn droppped Card = ", droppedCard);
     };
 
-    const handleDropOverListItem = (
-        dataTransferData: string,
-        dropDirection: "top" | "bottom",
-        targetCardId: number
-    ) => {
+    const handleDropOverListItem = ( dataTransferData: string, dropDirection: "top" | "bottom", targetCardId: number ) => {
         const droppedCard: KanbanTask = JSON.parse(dataTransferData);
         removeCard(droppedCard.taskId);
         setColumns((prev) =>
@@ -105,14 +113,21 @@ export default function MyKanbanBoard({ role, projectId }: { role: boolean, proj
                 const newCards = [...col.cards];
                 const insertIndex = dropDirection === "top" ? targetIndex : targetIndex + 1;
                 newCards.splice(insertIndex, 0, { ...droppedCard, status: col.id as Status });
+                
+                console.log("HandleDropOverListItem droppped Card = ", newCards);
+                updateStatus(droppedCard.taskId, col.id as Status);
                 return { ...col, cards: newCards };
             })
         );
     };
 
-    const project = {
-        projectName: "Project Name Here",
-        description: "Description Here",
+    const assignedName = (aId : number)=>{
+        var mem = project.members?.filter((val)=>val.userId == aId);
+        if(!mem){
+            return "Unknown";
+        }
+        const name = mem[0].userName;
+        return name;
     }
 
     return (
@@ -129,11 +144,7 @@ export default function MyKanbanBoard({ role, projectId }: { role: boolean, proj
                         <KanbanBoardProvider>
                             <KanbanBoard className="h-full gap-4">
                                 {columns.map((column) => (
-                                    <KanbanBoardColumn
-                                        key={column.id}
-                                        columnId={column.id}
-                                        onDropOverColumn={role ? (data) => handleDropOverColumn(data, column.id) : undefined}
-                                        className={`backdrop-blur-sm border mx-2 rounded-xl ${statusColors[column.status]}`} >
+                                    <KanbanBoardColumn key={column.id} columnId={column.id} onDropOverColumn={role ? (data) => handleDropOverColumn(data, column.id) : undefined} className={`backdrop-blur-sm border mx-2 rounded-xl ${statusColors[column.status]}`} >
                                         <KanbanBoardColumnHeader>
                                             <KanbanBoardColumnTitle columnId={column.id} className="text-lg font-semibold px-2">
                                                 {column.title}
@@ -144,7 +155,7 @@ export default function MyKanbanBoard({ role, projectId }: { role: boolean, proj
                                             {column.cards.map((card) => (
                                                 <KanbanBoardColumnListItem
                                                     key={card.id}
-                                                    cardId={card.id +""}
+                                                    cardId={card.id + ""}
                                                     onDropOverListItem={role ? (data, dir) => {
                                                         if (dir === "top" || dir === "bottom")
                                                             handleDropOverListItem(data, dir, card.id);
@@ -165,7 +176,7 @@ export default function MyKanbanBoard({ role, projectId }: { role: boolean, proj
                                                             {card.assignedTo && (
                                                                 <div className="flex items-center gap-1 font-medium text-primary/80 bg-background/50 px-2 py-1 rounded-md shadow-sm border border-border/20">
                                                                     <Users className="h-3 w-3" />
-                                                                    {mockUsers[card.assignedTo] || "Unknown"}
+                                                                    {assignedName(card.assignedTo) || "Unknown"}
                                                                 </div>
                                                             )}
                                                         </div>
@@ -182,4 +193,46 @@ export default function MyKanbanBoard({ role, projectId }: { role: boolean, proj
             </div>
         </div>
     );
+}
+const demoTasks = () => {
+    var demo: Task[] = [];
+    for (let i = 1; i <= 10; i++) {
+        demo.push(
+            {
+                taskId: i,
+                title: `Title ${i}`,
+                description: `Description ${i}`,
+                assignedTo: i,
+                priority: Priority.Medium,
+                status: Status.Pending,
+                points: (i + 5),
+                createdAt: new Date(),
+            }
+        );
+
+    }
+    console.log("data = ", demo);
+    return demo;
+}
+const updateStatus=  async (taskId : number, status : Status)=>{
+    try{
+        const data = JSON.stringify({
+            status,
+        });
+        console.log("Updating Data :::: ");
+        const res = await (await fetch("/api/tasks/"+taskId , {
+            method : "PUT",
+            body : data
+        }) ).json();
+
+        if(res.error){
+            console.log("Res Errro = ", res.message);
+        }
+        console.log("res = " , res);
+    }catch(err){
+    
+        console.log('Some Error Occured at Custom_KanBan');
+        console.log(err)
+    }
+    
 }

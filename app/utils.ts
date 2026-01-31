@@ -7,3 +7,11 @@ export function ErrorResponse(data: any){
 }
 
 export const myHeaders = { "Content-Type": "application/json" };
+
+export function formateDate(date : Date | null | undefined){
+    if(date == null || date == undefined){
+        return "00/00/0000";
+    }
+    const formatedDate =( new Date(date)).toLocaleDateString("en-GB");
+    return formatedDate;
+}

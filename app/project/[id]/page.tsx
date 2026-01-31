@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { ArrowLeft, Calendar, Flag, CheckCircle2, NotepadText, Edit } from "lucide-react";
+import { redirect, useRouter } from "next/navigation";
+import { ArrowLeft, Calendar, Flag, CheckCircle2, NotepadText, Edit, Trash2 } from "lucide-react";
 import MyKanbanBoard from "@/components/custom_kanban";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -12,20 +12,26 @@ import { useEffect, useState } from "react";
 import CustomLoader from "@/components/custom_loader";
 import { role_enum } from "@/app/generated/prisma/enums";
 import EditProjectForm from "../../admin/editProject/[id]/edit-project-form";
+// import { revalidatePath } from "next/cache";
+import { Project, Status } from "@/app/(types)/myTypes";
+import { getUser } from "@/app/actions/users/Users";
+import { formateDate } from "@/app/utils";
 
 export default function ProjectDetail({ params }: { params: Promise<{ id: string }> }) {
-    const role = role_enum.admin;
     const router = useRouter();
     const [loading, setLoading] = useState(true);
-    const [project, setProject] = useState(Object);
+    const [project, setProject] = useState<Project>();
     const [id, setId] = useState(-1);
-
+    const [role, setRole] = useState<role_enum>();
     useEffect(() => {
         setLoading(true);
         params.then((val) => {
             var temp = Number(val.id);
             setId(temp);
             if (temp != -1) {
+                getUser().then((val) => {
+                    setRole(val?.role);
+                });
                 getProjectById(temp).then(
                     (res) => {
                         if (res == null) {
@@ -71,18 +77,23 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
                         <div className="flex-1">
                             <div className="flex items-center gap-3">
                                 <h1 className="text-2xl font-bold">{project.projectName}</h1>
-                                <StatusBadge status={project.status} className="text-md" />
+                                <StatusBadge status={project.status ?? Status.Todo} className="text-md" />
                             </div>
                         </div>
                         {role == role_enum.admin &&
                             <div className="flex justify-end">
-                                <div className="flex items-end gap-2">
+                                <div className="flex items-end gap-2 mx-2">
                                     <EditProjectForm data={project} >
                                         <Button variant="outline" size="sm" className="gap-2">
                                             <Edit className="h-5 w-5" />
-                                            Edit Project
+                                            Edit Projectō
                                         </Button>
                                     </EditProjectForm>
+                                </div>
+                                <div className="flex items-end gap-2 mx-2">
+                                    <Button variant="destructive" size="sm" className="gap-2" >
+                                        <Trash2 className="h-5 w-5" />
+                                    </Button>
                                 </div>
                             </div>
                         }
@@ -111,7 +122,7 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
                                             <Calendar className="h-4 w-4" />
                                             <span className="text-sm font-medium">Created At</span>
                                         </div>
-                                        <p className="pl-6 font-medium">{project.createdAt}</p>
+                                        <p className="pl-6 font-medium">{formateDate(project.createdAt)}</p>
                                     </div>
 
                                     <div className="space-y-1">
@@ -119,7 +130,7 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
                                             <Flag className="h-4 w-4" />
                                             <span className="text-sm font-medium">Due Date</span>
                                         </div>
-                                        <p className="pl-6 font-medium">{project.dueDate}</p>
+                                        <p className="pl-6 font-medium">{formateDate(project.dueDate)}</p>
                                     </div>
 
                                     {project.completionDate && (
@@ -128,7 +139,7 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
                                                 <CheckCircle2 className="h-4 w-4" />
                                                 <span className="text-sm font-medium">Completed At</span>
                                             </div>
-                                            <p className="pl-6 font-medium text-green-600">{project.completionDate}</p>
+                                            <p className="pl-6 font-medium text-green-600">{formateDate(project.completionDate)}</p>
                                         </div>
                                     )}
                                 </div>
@@ -138,7 +149,11 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
 
                         {/* Task List Section - Kanban */}
                         <div className="flex-1 w-full mx-auto">
-                            <MyKanbanBoard role={role == role_enum.admin || role == role_enum.manager} projectId={Number(id)} />
+                            {
+                                project.tasks != undefined 
+                                ?  <MyKanbanBoard role={role == role_enum.admin || role == role_enum.manager} project={project} /> 
+                                : <div> Tasks Not Found</div>
+                            }
                         </div>
 
                     </div>
@@ -148,7 +163,7 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
     );
 }
 
-function StatusBadge({ status, className }: { status: string; className?: string }) {
+function StatusBadge({ status, className }: { status: Status; className?: string }) {
     const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
         Completed: "default",
         Running: "secondary",
@@ -160,14 +175,14 @@ function StatusBadge({ status, className }: { status: string; className?: string
 
     let colorClass = "";
     // Project Status Colors
-    if (status === "Completed") colorClass = "bg-green-500 hover:bg-green-600 border-transparent";
-    if (status === "Running") colorClass = "bg-blue-500 hover:bg-blue-600 text-white border-transparent";
-    if (status === "Upcoming") colorClass = "text-orange-600 border-orange-200 bg-orange-50";
+    if (status == Status.Completed) colorClass = "bg-green-500 hover:bg-green-600 border-transparent";
+    if (status == Status.Pending) colorClass = "bg-blue-500 hover:bg-blue-600 text-white border-transparent";
+    if (status == Status.Todo) colorClass = "text-orange-600 border-orange-200 bg-orange-50";
 
     // Task Status Colors
-    if (status === "Done") colorClass = "bg-green-100 text-green-700 hover:bg-green-200 border-transparent";
-    if (status === "In Progress") colorClass = "bg-blue-100 text-blue-700 hover:bg-blue-200 border-transparent";
-    if (status === "Todo") colorClass = "bg-slate-100 text-slate-700 hover:bg-slate-200 border-transparent";
+    // if (status === "Done") colorClass = "bg-green-100 text-green-700 hover:bg-green-200 border-transparent";
+    // if (status === "In Progress") colorClass = "bg-blue-100 text-blue-700 hover:bg-blue-200 border-transparent";
+    // if (status === "Todo") colorClass = "bg-slate-100 text-slate-700 hover:bg-slate-200 border-transparent";
 
     return (
         <Badge variant={variants[status] || "outline"} className={colorClass + " " + className}>
@@ -184,3 +199,15 @@ async function getProjectById(id: number) {
     return project.data;
 }
 
+async function deleteProject(id: number) {
+    console.log("Project Deleting");
+    const project = await (await fetch(`/api/projects/${id}`, {
+        method: "DELETE",
+    })).json();
+    if (project.error) {
+        return null;
+    }
+    console.log("Project Deleted");
+    // revalidatePath("/admin/projects");
+    redirect("/admin/projects");
+}

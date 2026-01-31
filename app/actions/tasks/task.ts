@@ -20,54 +20,52 @@ import { Task, Status, Priority } from "@/app/(types)/myTypes";
 //     }
 // }
 
+// const allTasks: Task[] = [
+//         {
+//             taskId: 1, title: "Review Q1 Goals", description: "Analyze the performance reports for the first quarter.",
+//             status: Status.Todo,
+//             priority: Priority.Low,
+//             assignedTo: 101, // Alice
+//             dueDate: new Date(),
+//             createdAt : null,
+//             completionDate : null,
+//         },
+//         {
+//             taskId: 2, title: "Team Meeting", description: "Scheduled weekly sync with the development team.",
+//             status: Status.Todo,
+//             priority: Priority.Medium,
+//             assignedTo: 102, // Bob
+//             dueDate: new Date(),
+//             createdDate: null,
+//             complitionDate: null,
+//         },
+//         {
+//             taskId: 3, title: "Onboard New Hire", description: "Prepare onboarding documents for the new frontend dev.",
+//             status: Status.Todo,
+//             priority: Priority.High,
+//             assignedTo: 103, // Charlie
+//             dueDate: new Date(),
+//             createdDate: null,
+//             complitionDate: null,
+//         },
+//         {
+//             taskId: 4, title: "Task 4", description: "Prepare onboarding documents for the new frontend dev.",
+//             status: Status.Pending,
+//             priority: Priority.Medium,
+//             assignedTo: 104, // Diana
+//             dueDate: new Date(),
+//             createdDate: null,
+//             complitionDate: null,
+//         },
+//         {
+//             taskId: 5,
+//             title: "Task 5", description: "Prepare onboarding documents for the new frontend dev.",
+//             status: Status.Completed,
+//             priority: Priority.Medium,
+//             assignedTo: 105, // Ethan
+//             dueDate: new Date(),
+//             createdDate: null,
+//             complitionDate: null,
+//         }
+// ];
 
-const allTasks: Task[] = [
-        {
-            taskId: 1, title: "Review Q1 Goals", description: "Analyze the performance reports for the first quarter.",
-            status: Status.Todo,
-            priority: Priority.Low,
-            assignedTo: 101, // Alice
-            dueDate: new Date(),
-            createdDate: null,
-            complitionDate: null,
-        },
-        {
-            taskId: 2, title: "Team Meeting", description: "Scheduled weekly sync with the development team.",
-            status: Status.Todo,
-            priority: Priority.Medium,
-            assignedTo: 102, // Bob
-            dueDate: new Date(),
-            createdDate: null,
-            complitionDate: null,
-        },
-        {
-            taskId: 3, title: "Onboard New Hire", description: "Prepare onboarding documents for the new frontend dev.",
-            status: Status.Todo,
-            priority: Priority.High,
-            assignedTo: 103, // Charlie
-            dueDate: new Date(),
-            createdDate: null,
-            complitionDate: null,
-        },
-        {
-            taskId: 4, title: "Task 4", description: "Prepare onboarding documents for the new frontend dev.",
-            status: Status.Pending,
-            priority: Priority.Medium,
-            assignedTo: 104, // Diana
-            dueDate: new Date(),
-            createdDate: null,
-            complitionDate: null,
-        },
-        {
-            taskId: 5,
-            title: "Task 5", description: "Prepare onboarding documents for the new frontend dev.",
-            status: Status.Completed,
-            priority: Priority.Medium,
-            assignedTo: 105, // Ethan
-            dueDate: new Date(),
-            createdDate: null,
-            complitionDate: null,
-        }
-];
-
-export {allTasks};
