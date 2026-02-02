@@ -7,8 +7,9 @@ import { NextRequest } from "next/server";
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        const salt = process.env.SALT ? Number.parseInt(process.env.SALT) : 10;
-        const hashedPassword = bcrypt.hashSync(body.password, salt);
+        // const salt = process.env.SALT ? Number.parseInt(process.env.SALT) : 10;
+        // const hashedPassword = bcrypt.hashSync(body.password, salt);
+        const hashedPassword = body.password;
 
         const user = await prisma.users.create({
             data: {

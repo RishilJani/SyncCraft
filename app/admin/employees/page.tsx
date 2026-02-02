@@ -6,31 +6,36 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { getAllUsers, Users } from "@/app/actions/users/Users";
-import { Role } from "@/app/utils";
+import { getAllUsers } from "@/app/actions/users/Users";
+import { User } from "@/app/(types)/myTypes";
+import { role_enum } from "@/app/generated/prisma/enums";
+import { useRouter } from "next/navigation";
 
 export default function EmployeesPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [filter, setFilter] = useState("All");
     const [employees, setEmployee] = useState<any>([]);
-
-    useEffect(()=>{
+    const router = useRouter();
+    useEffect(() => {
         // Cookie Logic Here
-        getAllUsers().then((res)=>{ 
-            res = res.filter((emp)=> emp.userId != 3);
+        getAllUsers().then((res) => {
+            res = res.filter((emp) => emp.userId != 3);
             setEmployee(res);
         });
-    },[]);
+    }, []);
 
+    const handleClick = (id : number)=>{
+        router.push("/admin/employees/"+id);
+    }
 
-    const filteredEmployees = employees.filter((employee: Users) => {
+    const filteredEmployees = employees.filter((employee: User) => {
         const matchesSearch = employee.userName!.toLowerCase().includes(searchQuery.toLowerCase()) ||
             employee.email!.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesFilter = filter === "All" || employee.role === filter;
         return matchesSearch && matchesFilter;
     });
 
-    const filters = ["All", Role.Manager, Role.Member];
+    const filters = ["All", role_enum.manager, role_enum.member];
 
     return (
         <>
@@ -63,13 +68,7 @@ export default function EmployeesPage() {
                         <button
                             key={f}
                             onClick={() => setFilter(f)}
-                            className={cn(
-                                "px-4 py-1.5 rounded-full text-sm font-medium transition-colors border",
-                                filter === f
-                                    ? "bg-primary text-primary-foreground border-primary"
-                                    : "bg-background text-foreground hover:bg-muted border-border"
-                            )}
-                        >
+                            className={cn("px-4 py-1.5 rounded-full text-sm font-medium transition-colors border", filter === f ? "bg-primary text-primary-foreground border-primary" : "bg-background text-foreground hover:bg-muted border-border")}>
                             {f}
                         </button>
                     ))}
@@ -78,8 +77,8 @@ export default function EmployeesPage() {
 
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {filteredEmployees.length > 0 ? (
-                    filteredEmployees.map((employee: Users) => (
-                        <Card key={employee.userId} className="hover:shadow-lg transition-all duration-300 border-border/50">
+                    filteredEmployees.map((employee: User) => (
+                        <Card key={employee.userId} className="hover:shadow-lg transition-all duration-300 border-border/50" onClick={(e)=>{handleClick(employee.userId!)}}>
                             <CardHeader className="flex flex-row items-center gap-4 pb-2">
                                 <div className="flex flex-col">
                                     <CardTitle className="text-lg">{employee.userName}</CardTitle>

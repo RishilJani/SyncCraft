@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Plus, Users, User } from "lucide-react";
+import { Plus, Users, User, Kanban } from "lucide-react";
 import { getUser } from "../actions/users/Users";
 
 export default async function AdminDashboard() {
@@ -13,24 +13,24 @@ export default async function AdminDashboard() {
 
                     <Button asChild variant="ghost" className="gap-2">
                         <Link href="/admin/employees">
-                            <Users className="h-4 w-4" />
+                            <Users className="h-5 w-5" />
                             View All Employees
                         </Link>
                     </Button>
                     <Button asChild variant="outline" className="gap-2">
                         <Link href="/admin/projects">
-                            <Users className="h-4 w-4" />
+                            <Kanban className='h-5 w-5' />
                             View All Projects
                         </Link>
                     </Button>
-                    <Button asChild className="gap-2">
+                    {/* <Button asChild className="gap-2">
                         <Link href="/admin/addProject">
                             <Plus className="h-4 w-4" />
                             Add Project
                         </Link>
-                    </Button>
+                    </Button> */}
                     <Button asChild variant="ghost" className="gap-2">
-                        <Link href={`/admin/${1}`}> {/* TODO */}
+                        <Link href={`/admin/${data?.userId}`}>
                             <User className="h-6 w-6" />
                         </Link>
                     </Button>

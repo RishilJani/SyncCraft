@@ -27,7 +27,7 @@ export type Task = {
 
 export type Project = {
     projectId?: number,
-    projectName?: string,
+    projectName: string,
     description?: string | null,
     createdBy?: number | null,
     createdAt?: Date | null,

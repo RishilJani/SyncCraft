@@ -12,7 +12,6 @@ import { useEffect, useState } from "react";
 import CustomLoader from "@/components/custom_loader";
 import { role_enum } from "@/app/generated/prisma/enums";
 import EditProjectForm from "../../admin/editProject/[id]/edit-project-form";
-// import { revalidatePath } from "next/cache";
 import { Project, Status } from "@/app/(types)/myTypes";
 import { getUser } from "@/app/actions/users/Users";
 import { formateDate } from "@/app/utils";
@@ -21,13 +20,12 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
     const router = useRouter();
     const [loading, setLoading] = useState(true);
     const [project, setProject] = useState<Project>();
-    const [id, setId] = useState(-1);
+    const [refreshKey, setRefreshKey] = useState(0);
     const [role, setRole] = useState<role_enum>();
     useEffect(() => {
         setLoading(true);
         params.then((val) => {
             var temp = Number(val.id);
-            setId(temp);
             if (temp != -1) {
                 getUser().then((val) => {
                     setRole(val?.role);
@@ -44,7 +42,10 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
                 );
             }
         })
-    }, []);
+        console.log("Main UseEffect");
+        
+    }, [refreshKey]);
+
     const handleBack = () => { router.back(); };
 
     if (loading) {
@@ -86,7 +87,7 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
                                     <EditProjectForm data={project} >
                                         <Button variant="outline" size="sm" className="gap-2">
                                             <Edit className="h-5 w-5" />
-                                            Edit Projectō
+                                            Edit Project
                                         </Button>
                                     </EditProjectForm>
                                 </div>
@@ -151,7 +152,7 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
                         <div className="flex-1 w-full mx-auto">
                             {
                                 project.tasks != undefined 
-                                ?  <MyKanbanBoard role={role == role_enum.admin || role == role_enum.manager} project={project} /> 
+                                ?  <MyKanbanBoard role={role == role_enum.admin || role == role_enum.manager} project={project}  onAddTask={ ()=>{ console.log("On Add Task"); setRefreshKey(refreshKey+1); }}/> 
                                 : <div> Tasks Not Found</div>
                             }
                         </div>

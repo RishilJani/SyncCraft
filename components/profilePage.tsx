@@ -23,7 +23,6 @@ import {
     LogOut,
 } from "lucide-react";
 import { OrbitalLoader } from "./ui/orbital-loader";
-import { allTasks } from "@/app/actions/tasks/task";
 import {
     Dialog,
     DialogContent,
@@ -34,19 +33,21 @@ import {
     DialogTrigger,
     DialogClose,
 } from "@/components/ui/dialog";
-import { logout } from "@/app/actions/users/Users";
+import { getUser, logout } from "@/app/actions/users/Users";
 import { redirect, RedirectType, useRouter } from "next/navigation";
 import { role_enum } from "@/app/generated/prisma/enums";
 import { Task } from "@/app/(types)/myTypes";
+import { allTasks } from "@/app/actions/tasks/task";
 
 interface UserProfile {
-    id: string;
+    id: number;
     name: string;
     email: string;
     role: role_enum;
     createdAt: string;
     assignedTask?: Task[];
     points: number;
+    uId?: number
 }
 
 // Mock data fetching function
@@ -55,14 +56,19 @@ const fetchUserData = async (id: string | number): Promise<UserProfile> => {
     await new Promise((resolve) => setTimeout(resolve, 1000));
     const assignedTasks = allTasks;
     // Mock data based on ID for demonstration
+    const uId = await getUser();
+    console.log("uId = ", uId?.userId);
+    console.log("id = ", id);
+
     return {
-        id: String(id),
+        id: Number(id),
         name: "Alex Johnson",
         email: "alex.johnson@example.com",
         role: role_enum.admin,
         createdAt: "2023-01-15",
         assignedTask: assignedTasks,
         points: 1250,
+        uId: uId?.userId,
     };
 };
 
@@ -73,10 +79,10 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
 
     const handleLogout = async () => {
         await logout();
-        redirect("/login",RedirectType.replace);
+        redirect("/login", RedirectType.replace);
     };
-
     useEffect(() => {
+
         const loadData = async () => {
             setLoading(true);
             try {
@@ -205,14 +211,16 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
             </Card>
         </div>
     );
+
     function MyDialog() {
         return (
             <Dialog>
                 <DialogTrigger asChild>
-                    <Button variant="destructive" size="sm" className="gap-2">
-                        <LogOut className="h-4 w-4" />
-                        {/* Logout */}
-                    </Button>
+                    {user?.uId == Number(id) &&
+                        <Button variant="destructive" size="sm" className="gap-2">
+                            <LogOut className="h-4 w-4" />
+                        </Button>
+                    }
                 </DialogTrigger>
                 <DialogContent>
                     <DialogHeader>

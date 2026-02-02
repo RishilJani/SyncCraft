@@ -4,16 +4,17 @@ import { Button } from '@/components/ui/button';
 import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
-import { ArrowLeft, Search } from 'lucide-react';
+import { ArrowLeft, Plus, Search } from 'lucide-react';
 import { useEffect, useState } from 'react'
 import CustomLoader from '@/components/custom_loader';
+import { Project, Status } from '@/app/(types)/myTypes';
 
 const filters = ["All", "Completed", "Pending", "Todo"];
 
 function ProjectsList() {
     const [searchQuery, setSearchQuery] = useState("");
     const [activeFilter, setActiveFilter] = useState("All");
-    const [allProjects,setAllProjects] = useState<any[]>([null]);
+    const [allProjects,setAllProjects] = useState<Project[]>([]);
     const [loading,setLoading] = useState(false);
 
     useEffect(()=>{
@@ -30,12 +31,12 @@ function ProjectsList() {
             }
         });
     },[]);
-    
+
     if(loading){
         return <CustomLoader/>;
     }
 
-    if(allProjects[0] == null){
+    if(allProjects.length == 0){
         return (
             <>
                 <h2>Some Error Occured</h2>
@@ -45,8 +46,8 @@ function ProjectsList() {
 
     const filteredProjects = allProjects.filter((project) => {
         const matchesSearch = project.projectName.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesDescSearch = project.description.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesFilter = activeFilter === "All" || project.status.toLowerCase() === activeFilter.toLowerCase();
+        const matchesDescSearch = project.description ?? "".toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesFilter = activeFilter === "All" || (project.status?? Status.Todo).toLowerCase() === activeFilter.toLowerCase();
         return matchesSearch || matchesDescSearch && matchesFilter;
     });
 
@@ -60,6 +61,14 @@ function ProjectsList() {
                         </Link>
                     </Button>
                     <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
+                </div>
+                <div className='flex justify-end'>
+                    <Button asChild className="gap-2">
+                        <Link href="/admin/addProject">
+                            <Plus className="h-4 w-4" />
+                            Add Project
+                        </Link>
+                    </Button>
                 </div>
             </div>
 
@@ -92,7 +101,7 @@ function ProjectsList() {
                                     <CardTitle className="text-xl group-hover:text-primary transition-colors">
                                         {project.projectName}
                                     </CardTitle>
-                                    <StatusBadge status={project.status} />
+                                    <StatusBadge status={project.status as Status} />
                                 </div>
                                 <CardDescription className="line-clamp-2 mt-2">
                                     {project.description}
@@ -100,7 +109,7 @@ function ProjectsList() {
                             </CardHeader>
                             <CardContent>
                                 <div className="text-sm text-muted-foreground">
-                                    Due: {new Date(project.dueDate).toLocaleDateString()}
+                                    Due: {new Date(project.dueDate!).toLocaleDateString()}
                                 </div>
                             </CardContent>
                         </Card>

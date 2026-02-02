@@ -95,7 +95,7 @@ export default function EditProjectForm({
 
             if (!res.error) {
                 setOpen(false);
-                router.push("/admin/projects");
+                router.push("/project/"+data.projectId);
                 router.refresh();
             } else {
                 alert("Error: " + res.message);

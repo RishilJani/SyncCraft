@@ -23,7 +23,7 @@ function SignUp() {
     const [userName, setUserName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-    const [role, setRole] = useState<role_enum>(role_enum.admin);
+    const [role, setRole] = useState<role_enum>(role_enum.manager);
     const [errors, setErrors] = useState<Errors>({});
     const [isLoading, setIsLoading] = useState(false);
 
