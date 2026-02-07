@@ -17,10 +17,10 @@ import {
     Calendar,
     Briefcase,
     Trophy,
-    Edit,
     LogOut,
+    ArrowLeft,
+    Pencil,
 } from "lucide-react";
-import { OrbitalLoader } from "./ui/orbital-loader";
 import {
     Dialog,
     DialogContent,
@@ -31,15 +31,12 @@ import {
     DialogTrigger,
     DialogClose,
 } from "@/components/ui/dialog";
-import { getUser, logout } from "@/app/actions/users/Users";
-import { redirect, RedirectType, useRouter } from "next/navigation";
+import { logout } from "@/app/actions/users/Users";
+import { useRouter } from "next/navigation";
 import { role_enum } from "@/app/generated/prisma/enums";
 import { User } from "@/app/(types)/myTypes";
 import { useMyContext } from "@/app/(utils)/myContext";
-
-type UserProfile = User & {
-    uId?: number
-}
+import EditUserDialog from "./dialogs/editUserDialog";
 
 // Data fetching function for a specific user ID
 const fetchUserData = async (id: string | number) => {
@@ -70,24 +67,28 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
         router.replace("/login");
     };
 
-    useEffect(() => {
-        const loadData = async () => {
-            setLocalLoading(true);
-            try {
-                const data = await fetchUserData(id);
-                setProfileUser(data);
-            } catch (error) {
-                console.error("Failed to load user data", error);
-            } finally {
-                setLocalLoading(false);
-            }
-        };
+    const loadData = async () => {
+        setLocalLoading(true);
+        try {
+            const data = await fetchUserData(id);
+            setProfileUser(data);
+        } catch (error) {
+            console.error("Failed to load user data", error);
+        } finally {
+            setLocalLoading(false);
+        }
+    };
 
+    useEffect(() => {
         loadData();
     }, [id]);
 
+    const handleBack = () => {
+        router.back();
+    };
+
     if (globalLoading || localLoading) {
-        return null; // Global loader handles initial state, local handling if needed
+        return null; // Global loader handles initial state
     }
 
     if (!profileUser) {
@@ -102,6 +103,22 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
         <div className="container mx-auto max-w-3xl py-10">
             <Card className="w-full shadow-lg">
                 <CardHeader className="relative pb-0">
+                    <div className="flex justify-between items-center mb-6">
+                        <Button variant="outline" size="icon" onClick={handleBack}>
+                            <ArrowLeft className="h-5 w-5" />
+                        </Button>
+                        <div className="flex gap-2">
+                            {viewerRole == role_enum.admin && (
+                                <EditUserDialog user={profileUser} onSuccess={() => { refreshData(); loadData(); }} >
+                                    <Button variant="outline" size="sm" className="gap-2">
+                                        <Pencil className="h-5 w-5" />
+                                        Edit
+                                    </Button>
+                                </EditUserDialog>
+                            )}
+                            <MyDialog />
+                        </div>
+                    </div>
                     <div className="flex flex-col items-center gap-4 md:flex-row md:items-start md:justify-between">
                         <div className="flex flex-col items-center gap-4 md:flex-row">
                             <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 text-4xl font-bold text-primary ring-4 ring-background">
@@ -125,15 +142,6 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
                                     </Badge>
                                 </div>
                             </div>
-                        </div>
-                        <div className="flex flex-col gap-2 md:flex-row md:items-center">
-                            {viewerRole === role_enum.admin && (
-                                <Button variant="outline" size="sm" className="gap-2">
-                                    <Edit className="h-4 w-4" />
-                                    Edit Profile
-                                </Button>
-                            )}
-                            <MyDialog />
                         </div>
                     </div>
                 </CardHeader>
@@ -169,24 +177,6 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
                                 {/* <p className="font-medium">{user.points} pts</p> */}
                             </div>
                         </div>
-
-                        {/* {user.role == role_enum.member &&
-                            <>
-                                <div className="text-md flex items-center justify-center gap-2 md:justify-start mx-2">Assigned Tasks</div>
-                                {user.assignedTask!.map((task) => {
-                                    return (
-                                        <div className="col-span-1 flex items-start gap-3 rounded-lg border p-4 md:col-span-2">
-                                            <div className="rounded-md bg-purple-100 text-purple-600 dark:bg-purple-900/20 dark:text-purple-400">
-                                                <Briefcase className="h-5 w-5" />
-                                            </div>
-                                            <div className="w-full flex items-start ">
-                                                <p className="font-medium">{task.title}</p>
-                                            </div>
-                                        </div>
-                                    );
-                                })}
-                            </>
-                        } */}
                     </div>
                 </CardContent>
                 <CardFooter className="bg-muted/50 p-4 text-center text-xs text-muted-foreground">
