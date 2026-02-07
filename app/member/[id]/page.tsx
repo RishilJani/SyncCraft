@@ -1,4 +1,4 @@
-import { Role } from '@/app/utils'
+import { Role } from '@/app/(utils)/utils'
 import UserProfilePage from '@/components/profilePage'
 
 async function ProfilePage({ params }: { params: Promise<{ id: string }> }) {

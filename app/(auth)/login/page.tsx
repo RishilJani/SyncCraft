@@ -8,10 +8,12 @@ import Link from "next/link";
 import { redirect, RedirectType } from "next/navigation";
 import React, { Activity, useState } from "react";
 import { Errors } from "../register/page";
-import { OrbitalLoader } from "@/components/ui/orbital-loader";
-import { myHeaders } from "@/app/utils";
+import CustomLoader from "@/components/custom_loader";
+import { myHeaders } from "@/app/(utils)/utils";
+import { useMyContext } from "@/app/(utils)/myContext";
 
 function LoginPage() {
+    const { refreshData } = useMyContext();
     const [userName, setUserName] = useState("");
     const [password, setPassword] = useState("");
     const [errors, setErrors] = useState<Errors>({});
@@ -44,6 +46,7 @@ function LoginPage() {
 
             if (!result.error) {
                 setLoading(false);
+                await refreshData();
                 redirect(result.data.role.toLowerCase(), RedirectType.replace);
 
             } else {
@@ -58,11 +61,7 @@ function LoginPage() {
     return (
 
         <>
-            <Activity mode={loading ? 'visible' : 'hidden'} >
-                <div className={`flex justify-center items-center h-screen w-screen absolute bg-white/70 z-50`}>
-                    <OrbitalLoader message="Please wait..." className="size-20" />
-                </div>
-            </Activity>
+            {loading && <CustomLoader message="Authenticating..." />}
             <section className="flex h-screen overflow-auto bg-zinc-50 px-4 py-16 md:py-32 dark:bg-transparent">
                 <form action="POST" className="bg-card m-auto h-fit w-full max-w-sm rounded-[calc(var(--radius)+.125rem)] border p-0.5 shadow-md dark:[--color-muted:var(--color-zinc-900)]">
                     <div className="p-8 pb-6">

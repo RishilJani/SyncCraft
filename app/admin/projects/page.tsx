@@ -8,35 +8,37 @@ import { ArrowLeft, Plus, Search } from 'lucide-react';
 import { useEffect, useState } from 'react'
 import CustomLoader from '@/components/custom_loader';
 import { Project, Status } from '@/app/(types)/myTypes';
+import { useMyContext } from '@/app/(utils)/myContext';
 
 const filters = ["All", "Completed", "Pending", "Todo"];
 
 function ProjectsList() {
+    const { user, loading: globalLoading } = useMyContext();
     const [searchQuery, setSearchQuery] = useState("");
     const [activeFilter, setActiveFilter] = useState("All");
-    const [allProjects,setAllProjects] = useState<Project[]>([]);
-    const [loading,setLoading] = useState(false);
+    const [allProjects, setAllProjects] = useState<Project[]>([]);
+    const [localLoading, setLocalLoading] = useState(false);
 
-    useEffect(()=>{
-        setLoading(true);
-        fetch("/api/projects", { method: "GET" }).then((res)=> res.json()).then((res)=>{
-            if(res.error){
+    useEffect(() => {
+        setLocalLoading(true);
+        fetch("/api/projects", { method: "GET" }).then((res) => res.json()).then((res) => {
+            if (res.error) {
                 console.log("Error");
                 console.log(res.message);
-                setLoading(false);
-            }else{
-                console.log("data fetched = ",res.data);
+                setLocalLoading(false);
+            } else {
+                console.log("data fetched = ", res.data);
                 setAllProjects(res.data);
-                setLoading(false);
+                setLocalLoading(false);
             }
         });
-    },[]);
+    }, []);
 
-    if(loading){
-        return <CustomLoader/>;
+    if (globalLoading || localLoading) {
+        return null; // Global Loader is already shown by ClientLayout
     }
 
-    if(allProjects.length == 0){
+    if (allProjects.length == 0) {
         return (
             <>
                 <h2>Some Error Occured</h2>
@@ -47,7 +49,7 @@ function ProjectsList() {
     const filteredProjects = allProjects.filter((project) => {
         const matchesSearch = project.projectName.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesDescSearch = project.description ?? "".toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesFilter = activeFilter === "All" || (project.status?? Status.Todo).toLowerCase() === activeFilter.toLowerCase();
+        const matchesFilter = activeFilter === "All" || (project.status ?? Status.Todo).toLowerCase() === activeFilter.toLowerCase();
         return matchesSearch || matchesDescSearch && matchesFilter;
     });
 

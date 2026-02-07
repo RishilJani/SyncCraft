@@ -1,14 +1,26 @@
 import React from 'react'
 import { OrbitalLoader } from './ui/orbital-loader'
 
-function CustomLoader() {
+interface CustomLoaderProps {
+    message?: string;
+    className?: string;
+    isFixed?: boolean;
+}
+
+function CustomLoader({
+    message = "Please wait...",
+    className = "size-20",
+    isFixed = true
+}: CustomLoaderProps) {
+    const containerClasses = isFixed
+        ? "flex justify-center items-center h-screen w-screen fixed inset-0 bg-background/80 backdrop-blur-sm z-[100]"
+        : "flex justify-center items-center h-full w-full p-4";
+
     return (
-        <>
-            <div className={`flex justify-center items-center h-screen w-screen absolute bg-white/70 z-50`}>
-                <OrbitalLoader message="Please wait..." className="size-20" />
-            </div>
-        </>
-    )
+        <div className={containerClasses}>
+            <OrbitalLoader message={message} className={className} />
+        </div>
+    );
 }
 
 export default CustomLoader

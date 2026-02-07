@@ -1,5 +1,5 @@
 import { putUserCookie } from "@/app/actions/users/Users";
-import { ErrorResponse, MyResponse } from "@/app/utils";
+import { ErrorResponse, MyResponse } from "@/app/(utils)/utils";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
 import { NextRequest } from "next/server";

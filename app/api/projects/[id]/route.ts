@@ -1,6 +1,6 @@
 import { Priority, Project, Status, Task, User } from "@/app/(types)/myTypes";
 import { role_enum } from "@/app/generated/prisma/enums";
-import { ErrorResponse, MyResponse } from "@/app/utils";
+import { ErrorResponse, MyResponse } from "@/app/(utils)/utils";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 

@@ -9,7 +9,7 @@ export type User = {
     passwordHash?: string | undefined,
     createdAt?: Date | null, 
     role?: role_enum,
-    points?: number,
+    // points?: number,
 }
 
 export type Task = {

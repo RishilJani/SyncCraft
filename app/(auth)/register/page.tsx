@@ -3,13 +3,13 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { PasswordInput } from '@/components/ui/password-input';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { myHeaders } from '@/app/utils';
+import { myHeaders } from '@/app/(utils)/utils';
 import { Label } from '@radix-ui/react-label';
 import Link from 'next/link';
 import { redirect, RedirectType } from 'next/navigation';
 import { Activity, useState } from 'react';
 import { addUser, deleteUser } from '../../actions/users/Users';
-import { OrbitalLoader } from '@/components/ui/orbital-loader';
+import CustomLoader from '@/components/custom_loader';
 import { role_enum } from '@/app/generated/prisma/enums';
 
 type Errors = {
@@ -19,7 +19,10 @@ type Errors = {
     credentials?: String,
 };
 
+import { useMyContext } from '@/app/(utils)/myContext';
+
 function SignUp() {
+    const { refreshData } = useMyContext();
     const [userName, setUserName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
@@ -57,37 +60,34 @@ function SignUp() {
         setIsLoading(true);
         if (validateForm()) {
             const data = { userName, password, email, role };
-            console.log("Data = " , data);
+            console.log("Data = ", data);
 
             setIsLoading(true);
-            var res = await (await fetch("/api/register",{
-                method : "POST",
-                headers : myHeaders,
-                body : JSON.stringify(data),
+            var res = await (await fetch("/api/register", {
+                method: "POST",
+                headers: myHeaders,
+                body: JSON.stringify(data),
             })).json();
 
             setIsLoading(false);
-            if(!res.error){
+            if (!res.error) {
                 console.log("Register Successful");
                 setIsLoading(false);
-                redirect(res.data.role.toLowerCase(),RedirectType.replace);
-            }else{
+                await refreshData();
+                redirect(res.data.role.toLowerCase(), RedirectType.replace);
+            } else {
                 setIsLoading(false);
-                setErrors({credentials : res.message});
+                setErrors({ credentials: res.message });
             }
-            
-        }else{
+
+        } else {
             setIsLoading(false);
         }
     };
 
     return (
-            <>
-            <Activity mode={isLoading ? 'visible' : 'hidden'}>
-            <div className="flex justify-center items-center h-screen w-screen absolute bg-white/70 z-50">
-                <OrbitalLoader message="Please wait..." className="size-20" />
-            </div> 
-            </Activity>
+        <>
+            {isLoading && <CustomLoader message="Creating your account..." />}
             <section className="flex min-h-screen overflow-auto bg-zinc-50 px-4 py-16 md:py-32 dark:bg-transparent">
                 <form action="POST" className="bg-card m-auto h-fit w-full max-w-sm rounded-[calc(var(--radius)+.125rem)] border p-0.5 shadow-md dark:[--color-muted:var(--color-zinc-900)]">
                     <div className="p-8 pb-6">
@@ -155,7 +155,7 @@ function SignUp() {
                     </div>
                 </form>
             </section>
-            </>
+        </>
     )
 }
 

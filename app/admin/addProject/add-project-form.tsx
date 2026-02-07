@@ -2,7 +2,7 @@
 
 import { User } from "@/app/(types)/myTypes";
 import { getUser } from "@/app/actions/users/Users";
-import { myHeaders } from "@/app/utils";
+import { myHeaders } from "@/app/(utils)/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Input } from "@/components/ui/input";

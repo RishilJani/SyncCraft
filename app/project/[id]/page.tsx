@@ -13,43 +13,38 @@ import CustomLoader from "@/components/custom_loader";
 import { role_enum } from "@/app/generated/prisma/enums";
 import EditProjectForm from "../../admin/editProject/[id]/edit-project-form";
 import { Project, Status } from "@/app/(types)/myTypes";
-import { getUser } from "@/app/actions/users/Users";
-import { formateDate } from "@/app/utils";
+import { useMyContext } from "@/app/(utils)/myContext";
+import { formateDate } from "@/app/(utils)/utils";
 
 export default function ProjectDetail({ params }: { params: Promise<{ id: string }> }) {
+    const { user: currentUser, loading: globalLoading } = useMyContext();
     const router = useRouter();
-    const [loading, setLoading] = useState(true);
+    const [localLoading, setLocalLoading] = useState(true);
     const [project, setProject] = useState<Project>();
     const [refreshKey, setRefreshKey] = useState(0);
-    const [role, setRole] = useState<role_enum>();
     useEffect(() => {
-        setLoading(true);
+        setLocalLoading(true);
         params.then((val) => {
             var temp = Number(val.id);
             if (temp != -1) {
-                getUser().then((val) => {
-                    setRole(val?.role);
-                });
                 getProjectById(temp).then(
                     (res) => {
                         if (res == null) {
-                            setLoading(false);
+                            setLocalLoading(false);
                             setProject(undefined);
                         }
                         setProject(res);
-                        setLoading(false);
+                        setLocalLoading(false);
                     }
                 );
             }
         })
-        console.log("Main UseEffect");
-        
     }, [refreshKey]);
 
     const handleBack = () => { router.back(); };
 
-    if (loading) {
-        return (<CustomLoader />);
+    if (globalLoading || localLoading) {
+        return null; // Global Loader is already shown
     }
 
     if (project == undefined) {
@@ -81,7 +76,7 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
                                 <StatusBadge status={project.status ?? Status.Todo} className="text-md" />
                             </div>
                         </div>
-                        {role == role_enum.admin &&
+                        {currentUser?.role == role_enum.admin &&
                             <div className="flex justify-end">
                                 <div className="flex items-end gap-2 mx-2">
                                     <EditProjectForm data={project} >
@@ -151,9 +146,9 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
                         {/* Task List Section - Kanban */}
                         <div className="flex-1 w-full mx-auto">
                             {
-                                project.tasks != undefined 
-                                ?  <MyKanbanBoard role={role == role_enum.admin || role == role_enum.manager} project={project}  onAddTask={ ()=>{ console.log("On Add Task"); setRefreshKey(refreshKey+1); }}/> 
-                                : <div> Tasks Not Found</div>
+                                project.tasks != undefined
+                                    ? <MyKanbanBoard role={currentUser?.role == role_enum.admin || currentUser?.role == role_enum.manager} project={project} onAddTask={() => { console.log("On Add Task"); setRefreshKey(refreshKey + 1); }} />
+                                    : <div> Tasks Not Found</div>
                             }
                         </div>
 

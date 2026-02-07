@@ -35,64 +35,62 @@ import { getUser, logout } from "@/app/actions/users/Users";
 import { redirect, RedirectType, useRouter } from "next/navigation";
 import { role_enum } from "@/app/generated/prisma/enums";
 import { User } from "@/app/(types)/myTypes";
+import { useMyContext } from "@/app/(utils)/myContext";
 
 type UserProfile = User & {
     uId?: number
 }
 
-// Mock data fetching function
+// Data fetching function for a specific user ID
 const fetchUserData = async (id: string | number) => {
-    // Simulate network delay
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    const res = await fetch(`/api/user/${id}`);
-    const data = await res.json();
-    console.log("data = ", data);
+    try {
+        const res = await fetch(`/api/user/${id}`);
+        const data = await res.json();
 
-    if (data.error) {
-        console.log("Error = ", data.message);
-        alert("Something went wrong");
+        if (data.error) {
+            console.error("Error fetching user:", data.message);
+            return null;
+        }
+        return data.data;
+    } catch (error) {
+        console.error("fetchUserData failed:", error);
         return null;
     }
-    const uId = await getUser();
-    return { ...data.data, uId: uId?.userId };
 };
 
 export default function UserProfilePage({ id, viewerRole }: { id: string | number; viewerRole?: role_enum; }) {
-    const [user, setUser] = useState<UserProfile | null>(null);
-    const [loading, setLoading] = useState(true);
+    const { user: currentUser, loading: globalLoading, refreshData } = useMyContext();
+    const [profileUser, setProfileUser] = useState<User | null>(null);
+    const [localLoading, setLocalLoading] = useState(true);
     const router = useRouter();
 
     const handleLogout = async () => {
         await logout();
-        redirect("/login", RedirectType.replace);
+        await refreshData();
+        router.replace("/login");
     };
 
     useEffect(() => {
-
         const loadData = async () => {
-            setLoading(true);
+            setLocalLoading(true);
             try {
                 const data = await fetchUserData(id);
-                setUser(data);
+                setProfileUser(data);
             } catch (error) {
                 console.error("Failed to load user data", error);
             } finally {
-                setLoading(false);
+                setLocalLoading(false);
             }
         };
 
         loadData();
     }, [id]);
 
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center h-screen w-full ">
-                <OrbitalLoader message="Please wait..." className="size-20" />
-            </div>
-        );
+    if (globalLoading || localLoading) {
+        return null; // Global loader handles initial state, local handling if needed
     }
 
-    if (!user) {
+    if (!profileUser) {
         return (
             <div className="flex h-full w-full items-center justify-center p-10 text-muted-foreground">
                 User not found.
@@ -107,23 +105,23 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
                     <div className="flex flex-col items-center gap-4 md:flex-row md:items-start md:justify-between">
                         <div className="flex flex-col items-center gap-4 md:flex-row">
                             <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 text-4xl font-bold text-primary ring-4 ring-background">
-                                {user.userName!.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)}
+                                {profileUser.userName!.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)}
                             </div>
                             <div className="text-center md:text-left">
-                                <CardTitle className="text-2xl font-bold">{user.userName}</CardTitle>
+                                <CardTitle className="text-2xl font-bold">{profileUser.userName}</CardTitle>
                                 <CardDescription className="text-md flex items-center justify-center gap-2 md:justify-start">
-                                    <Mail className="h-4 w-4" /> {user.email}
+                                    <Mail className="h-4 w-4" /> {profileUser.email}
                                 </CardDescription>
                                 <div className="mt-2 flex justify-center gap-2 md:justify-start">
                                     <Badge
                                         variant={
-                                            user.role === role_enum.admin
+                                            profileUser.role === role_enum.admin
                                                 ? "destructive"
-                                                : user.role === "manager"
+                                                : profileUser.role === "manager"
                                                     ? "default"
                                                     : "secondary"
                                         } className="capitalize" >
-                                        {user.role}
+                                        {profileUser.role}
                                     </Badge>
                                 </div>
                             </div>
@@ -151,7 +149,7 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
                                     Joined
                                 </p>
                                 <p className="font-medium">
-                                    {new Date(user.createdAt!).toLocaleDateString(undefined, {
+                                    {new Date(profileUser.createdAt!).toLocaleDateString(undefined, {
                                         year: "numeric",
                                         month: "long",
                                         day: "numeric",
@@ -168,7 +166,7 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
                                 <p className="text-sm font-medium text-muted-foreground">
                                     Gained Points
                                 </p>
-                                <p className="font-medium">{user.points} pts</p>
+                                {/* <p className="font-medium">{user.points} pts</p> */}
                             </div>
                         </div>
 
@@ -192,7 +190,7 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
                     </div>
                 </CardContent>
                 <CardFooter className="bg-muted/50 p-4 text-center text-xs text-muted-foreground">
-                    Profile ID: {user.userId}
+                    Profile ID: {profileUser.userId}
                 </CardFooter>
             </Card>
         </div>
@@ -202,7 +200,7 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
         return (
             <Dialog>
                 <DialogTrigger asChild>
-                    {user?.uId == Number(id) &&
+                    {currentUser?.userId == Number(id) &&
                         <Button variant="destructive" size="sm" className="gap-2">
                             <LogOut className="h-4 w-4" />
                         </Button>
