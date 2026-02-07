@@ -23,12 +23,6 @@ export default async function AdminDashboard() {
                             View All Projects
                         </Link>
                     </Button>
-                    {/* <Button asChild className="gap-2">
-                        <Link href="/admin/addProject">
-                            <Plus className="h-4 w-4" />
-                            Add Project
-                        </Link>
-                    </Button> */}
                     <Button asChild variant="ghost" className="gap-2">
                         <Link href={`/admin/${data?.userId}`}>
                             <User className="h-6 w-6" />

@@ -4,11 +4,12 @@ export enum Status { Todo = "todo", Pending = "pending", Completed = "completed"
 
 export type User = {
     userId?: number | undefined,
-    userName?: string | undefined,
+    userName: string | undefined,
     email?: string | undefined,
     passwordHash?: string | undefined,
     createdAt?: Date | null, 
     role?: role_enum,
+    points?: number,
 }
 
 export type Task = {

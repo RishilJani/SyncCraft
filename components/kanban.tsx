@@ -27,6 +27,7 @@ import {
   TooltipTrigger,
 } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
+import { Slot } from '@radix-ui/react-slot';
 
 export type KanbanBoardDndMonitorEventHandler = {
   onDragStart?: (activeId: string) => void;
@@ -700,6 +701,7 @@ export type KanbanBoardCardProps<T extends { id: number } = { id: number }> = {
    * Whether the card is being moved with the keyboard.
    */
   isActive?: boolean;
+  asChild?: boolean;
 };
 
 const kanbanBoardCardClassNames =
@@ -709,14 +711,17 @@ export function KanbanBoardCard({
   className,
   data,
   isActive = false,
+  asChild = false,
   ref,
   ...props
-}: ComponentProps<'button'> & KanbanBoardCardProps) {
+}: ComponentProps<'div'> & KanbanBoardCardProps) {
   const [isDragging, setIsDragging] = useState(false);
   const { draggableDescribedById, onDragStart } = useDndEvents();
 
+  const Comp = asChild ? Slot : 'div';
+
   return (
-    <button
+    <Comp
       aria-describedby={draggableDescribedById}
       aria-roledescription="draggable"
       className={cn(
@@ -736,10 +741,12 @@ export function KanbanBoardCard({
           DATA_TRANSFER_TYPES.CARD,
           JSON.stringify(data),
         );
-        // Remove outline from the card when dragging.
-        event.currentTarget.blur();
+        // Remove focus from the card when dragging.
+        if (event.currentTarget instanceof HTMLElement) {
+          event.currentTarget.blur();
+        }
 
-        onDragStart(data.id +"");
+        onDragStart(data.id + "");
       }}
       onDragEnd={() => {
         setIsDragging(false);

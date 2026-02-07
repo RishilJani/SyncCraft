@@ -80,7 +80,7 @@ export default function TaskDialog({
             //         points: Number(points),
             //         projectId: projectId,
             //     });
-        
+
             // await wait(3000);
             // var res = {
             //     error : false,
@@ -180,22 +180,6 @@ export default function TaskDialog({
                                 <Input type="number" value={points} onChange={(e) => setPoints(e.target.value)} placeholder="0" />
                             </div>
                         </div>
-
-                        {isUpdate && (
-                            <div className="space-y-2">
-                                <Label className="text-sm font-medium">Status</Label>
-                                <Select onValueChange={(val: Status) => setStatus(val)} value={status}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select Status" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value={Status.Todo}>To Do</SelectItem>
-                                        <SelectItem value={Status.Pending}>Pending</SelectItem>
-                                        <SelectItem value={Status.Completed}>Completed</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        )}
 
                         <div className="pt-2">
                             <Button type="submit" className="w-full text-lg" disabled={loading}>

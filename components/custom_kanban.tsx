@@ -13,13 +13,12 @@ import {
     KanbanBoardProvider,
 } from "@/components/kanban";
 import { Badge } from "@/components/ui/badge";
-import { ClipboardList, ListTodo, Users } from "lucide-react";
+import { ClipboardList, ListTodo, Users, Pencil, Coins } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Task, Status, Priority, Project } from "@/app/(types)/myTypes";
-import { Button } from "./ui/button";
 import TaskDialog from "./dialogs/taskDialog";
-import { role_enum } from "@/app/generated/prisma/enums";
 import { useRouter } from "next/navigation";
+import { Button } from "./ui/button";
 
 type KanbanTask = Task & { id: number };
 
@@ -36,15 +35,7 @@ const statusColors = {
     [Status.Completed]: "bg-green-500/10 border-green-500/20",
 };
 
-// const mockUsers: Record<number, string> = {
-//     101: "Alice Johnson",
-//     102: "Bob Smith",
-//     103: "Charlie Davis",
-//     104: "Diana Evans",
-//     105: "Ethan Hunt"
-// };
-
-export default function MyKanbanBoard({ role, project , onAddTask }: { role: boolean, project: Project , onAddTask? : any  }) {
+export default function MyKanbanBoard({ role, project, onAddTask }: { role: boolean, project: Project, onAddTask?: any }) {
     if (project == undefined || project.tasks == undefined) {
         return (
             <>
@@ -119,32 +110,52 @@ export default function MyKanbanBoard({ role, project , onAddTask }: { role: boo
 
     const handleDropOverColumn = (dataTransferData: string, targetColumnId: string) => {
         const droppedCard: KanbanTask = JSON.parse(dataTransferData);
-        removeCard(droppedCard.taskId);
 
         setColumns((prev) =>
             prev.map((col) => {
+                // First remove the card from all columns
+                const filteredCards = col.cards.filter((card) => card.taskId !== droppedCard.taskId);
+
+                // If this is the target column, add the card to the end
                 if (col.id === targetColumnId) {
                     updateStatus(droppedCard.taskId, col.id as Status);
-                    return { ...col, cards: [...col.cards, { ...droppedCard, status: targetColumnId as Status }] }
+                    return {
+                        ...col,
+                        cards: [...filteredCards, { ...droppedCard, status: targetColumnId as Status }]
+                    };
                 }
-                return col;
-            }
-            )
+                return { ...col, cards: filteredCards };
+            })
         );
     };
 
     const handleDropOverListItem = (dataTransferData: string, dropDirection: "top" | "bottom", targetCardId: number) => {
         const droppedCard: KanbanTask = JSON.parse(dataTransferData);
-        removeCard(droppedCard.taskId);
+
         setColumns((prev) =>
             prev.map((col) => {
-                const targetIndex = col.cards.findIndex((card) => card.taskId === targetCardId); // Target lookup by taskId (which matches id)
-                if (targetIndex === -1) return col;
-                const newCards = [...col.cards];
-                const insertIndex = dropDirection === "top" ? targetIndex : targetIndex + 1;
-                newCards.splice(insertIndex, 0, { ...droppedCard, status: col.id as Status });
-                updateStatus(droppedCard.taskId, col.id as Status);
-                return { ...col, cards: newCards };
+                // First remove the card if it exists in this column
+                const filteredCards = col.cards.filter((card) => card.taskId !== droppedCard.taskId);
+
+                // Find if the target card is in this column
+                const targetIndex = filteredCards.findIndex((card) => card.taskId === targetCardId);
+
+                // If target card not in this column, just return filtered cards
+                if (targetIndex === -1 && col.id !== droppedCard.status) {
+                    // Optimization: if it wasn't here and it's not the column it belongs to, return as is (if filtered changed)
+                    return { ...col, cards: filteredCards };
+                }
+
+                // If the target is in this column, or if it's the target column and target was found
+                if (targetIndex !== -1) {
+                    const newCards = [...filteredCards];
+                    const insertIndex = dropDirection === "top" ? targetIndex : targetIndex + 1;
+                    newCards.splice(insertIndex, 0, { ...droppedCard, status: col.id as Status });
+                    updateStatus(droppedCard.taskId, col.id as Status);
+                    return { ...col, cards: newCards };
+                }
+
+                return { ...col, cards: filteredCards };
             })
         );
     };
@@ -156,7 +167,7 @@ export default function MyKanbanBoard({ role, project , onAddTask }: { role: boo
         }
         const name = mem[0].userName;
         return name;
-    }    
+    }
 
     return (
         <div className="container">
@@ -175,11 +186,11 @@ export default function MyKanbanBoard({ role, project , onAddTask }: { role: boo
                     }
 
 
-                    <div className="flex items-center justify-start overflow-hidden h-full mx-auto w-full">
+                    <div className="flex items-center justify-center overflow-hidden h-full mx-auto w-full">
                         <KanbanBoardProvider>
                             <KanbanBoard className="h-full gap-4">
                                 {columns.map((column) => (
-                                    <KanbanBoardColumn key={column.id} columnId={column.id} onDropOverColumn={role ? (data) => handleDropOverColumn(data, column.id) : undefined} className={`backdrop-blur-sm border mx-2 rounded-xl ${statusColors[column.status]}`} >
+                                    <KanbanBoardColumn key={column.id} columnId={column.id} onDropOverColumn={role ? (data) => handleDropOverColumn(data, column.id) : undefined} className={`backdrop-blur-sm border mx-4 rounded-xl min-w-90 ${statusColors[column.status]}`} >
                                         <KanbanBoardColumnHeader>
                                             <KanbanBoardColumnTitle columnId={column.id} className="text-lg font-semibold px-2">
                                                 {column.title}
@@ -194,12 +205,11 @@ export default function MyKanbanBoard({ role, project , onAddTask }: { role: boo
                                                     onDropOverListItem={role ? (data, dir) => {
                                                         if (dir === "top" || dir === "bottom")
                                                             handleDropOverListItem(data, dir, card.id);
-                                                    } : undefined
-                                                    } >
+                                                    } : undefined} >
                                                     <KanbanBoardCard data={card} draggable={role} className="cursor-grab active:cursor-grabbing hover:shadow-md transition-all"     >
                                                         <div className="flex justify-between items-start">
                                                             <KanbanBoardCardTitle className="text-[17px]">{card.title}</KanbanBoardCardTitle>
-                                                            <Badge variant={card.priority === Priority.High ? "destructive" : card.priority === Priority.Medium ? "outline" : "secondary"} className="text-[12px] px-1.5 py-0">
+                                                            <Badge variant={card.priority === Priority.High ? "destructive" : card.priority === Priority.Medium ? "outline" : "secondary"} className="text-[12px] px-2 py-0">
                                                                 {card.priority}
                                                             </Badge>
                                                         </div>
@@ -207,13 +217,25 @@ export default function MyKanbanBoard({ role, project , onAddTask }: { role: boo
                                                             {card.description}
                                                         </KanbanBoardCardDescription>
                                                         <div className="mt-3 flex items-center justify-between gap-2 text-xs text-muted-foreground w-full">
-                                                            <div>{/* Left side content if needed (like due date) */}</div>
-                                                            {card.assignedTo && (
-                                                                <div className="flex items-center gap-1 font-medium text-[12px] text-primary/80 bg-background/50 px-2 py-1 rounded-md shadow-sm border border-border/20">
-                                                                    <Users className="h-3 w-3" />
-                                                                    {assignedName(card.assignedTo) || "Unknown"}
-                                                                </div>
-                                                            )}
+                                                            <div className="flex items-center gap-1.5 bg-yellow-500/10 text-yellow-600 dark:text-yellow-500 px-2 py-1 rounded-md border border-yellow-500/20 font-medium">
+                                                                <Coins className="h-3.5 w-3.5" />
+                                                                <span>{card.points || 0} pts</span>
+                                                            </div>
+                                                            <div className="flex items-center gap-2">
+                                                                {card.assignedTo && (
+                                                                    <div className="flex items-center gap-1 font-medium text-[12px] text-primary/80 bg-background/50 px-2 py-1 rounded-md shadow-sm border border-border/20">
+                                                                        <Users className="h-3 w-3" />
+                                                                        {assignedName(card.assignedTo) || "Unknown"}
+                                                                    </div>
+                                                                )}
+                                                                {role && (
+                                                                    <TaskDialog projectId={project.projectId!} members={project.members!} task={card} onSuccess={() => { console.log("On Success Edit"); if (onAddTask) onAddTask(); }} >
+                                                                        <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full hover:bg-primary/10 hover:text-primary transition-colors" >
+                                                                            <Pencil className="h-3.5 w-3.5" />
+                                                                        </Button>
+                                                                    </TaskDialog>
+                                                                )}
+                                                            </div>
                                                         </div>
                                                     </KanbanBoardCard>
                                                 </KanbanBoardColumnListItem>

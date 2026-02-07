@@ -13,13 +13,11 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import {
-    User,
     Mail,
     Calendar,
     Briefcase,
     Trophy,
     Edit,
-    Loader2,
     LogOut,
 } from "lucide-react";
 import { OrbitalLoader } from "./ui/orbital-loader";
@@ -36,40 +34,27 @@ import {
 import { getUser, logout } from "@/app/actions/users/Users";
 import { redirect, RedirectType, useRouter } from "next/navigation";
 import { role_enum } from "@/app/generated/prisma/enums";
-import { Task } from "@/app/(types)/myTypes";
-import { allTasks } from "@/app/actions/tasks/task";
+import { User } from "@/app/(types)/myTypes";
 
-interface UserProfile {
-    id: number;
-    name: string;
-    email: string;
-    role: role_enum;
-    createdAt: string;
-    assignedTask?: Task[];
-    points: number;
+type UserProfile = User & {
     uId?: number
 }
 
 // Mock data fetching function
-const fetchUserData = async (id: string | number): Promise<UserProfile> => {
+const fetchUserData = async (id: string | number) => {
     // Simulate network delay
     await new Promise((resolve) => setTimeout(resolve, 1000));
-    const assignedTasks = allTasks;
-    // Mock data based on ID for demonstration
-    const uId = await getUser();
-    console.log("uId = ", uId?.userId);
-    console.log("id = ", id);
+    const res = await fetch(`/api/user/${id}`);
+    const data = await res.json();
+    console.log("data = ", data);
 
-    return {
-        id: Number(id),
-        name: "Alex Johnson",
-        email: "alex.johnson@example.com",
-        role: role_enum.admin,
-        createdAt: "2023-01-15",
-        assignedTask: assignedTasks,
-        points: 1250,
-        uId: uId?.userId,
-    };
+    if (data.error) {
+        console.log("Error = ", data.message);
+        alert("Something went wrong");
+        return null;
+    }
+    const uId = await getUser();
+    return { ...data.data, uId: uId?.userId };
 };
 
 export default function UserProfilePage({ id, viewerRole }: { id: string | number; viewerRole?: role_enum; }) {
@@ -81,6 +66,7 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
         await logout();
         redirect("/login", RedirectType.replace);
     };
+
     useEffect(() => {
 
         const loadData = async () => {
@@ -121,10 +107,10 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
                     <div className="flex flex-col items-center gap-4 md:flex-row md:items-start md:justify-between">
                         <div className="flex flex-col items-center gap-4 md:flex-row">
                             <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 text-4xl font-bold text-primary ring-4 ring-background">
-                                {user.name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)}
+                                {user.userName!.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)}
                             </div>
                             <div className="text-center md:text-left">
-                                <CardTitle className="text-2xl font-bold">{user.name}</CardTitle>
+                                <CardTitle className="text-2xl font-bold">{user.userName}</CardTitle>
                                 <CardDescription className="text-md flex items-center justify-center gap-2 md:justify-start">
                                     <Mail className="h-4 w-4" /> {user.email}
                                 </CardDescription>
@@ -165,7 +151,7 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
                                     Joined
                                 </p>
                                 <p className="font-medium">
-                                    {new Date(user.createdAt).toLocaleDateString(undefined, {
+                                    {new Date(user.createdAt!).toLocaleDateString(undefined, {
                                         year: "numeric",
                                         month: "long",
                                         day: "numeric",
@@ -186,7 +172,7 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
                             </div>
                         </div>
 
-                        {user.role == role_enum.member &&
+                        {/* {user.role == role_enum.member &&
                             <>
                                 <div className="text-md flex items-center justify-center gap-2 md:justify-start mx-2">Assigned Tasks</div>
                                 {user.assignedTask!.map((task) => {
@@ -202,11 +188,11 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
                                     );
                                 })}
                             </>
-                        }
+                        } */}
                     </div>
                 </CardContent>
                 <CardFooter className="bg-muted/50 p-4 text-center text-xs text-muted-foreground">
-                    Profile ID: {user.id}
+                    Profile ID: {user.userId}
                 </CardFooter>
             </Card>
         </div>
