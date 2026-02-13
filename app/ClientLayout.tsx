@@ -9,9 +9,7 @@ function LoaderWrapper({ children }: { children: React.ReactNode }) {
 
     return (
         <>
-            {loading && (
-                <CustomLoader message="Syncing your workspace..." />
-            )}
+            {loading && ( <CustomLoader message="Syncing your workspace..." /> )}
             <div className={loading ? "hidden" : "block"}>
                 {children}
             </div>

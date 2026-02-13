@@ -5,15 +5,15 @@ import { Project, User } from "../(types)/myTypes";
 
 interface UserContextType {
     user: User | null;
-    projects: Project[];
-    loading: boolean;
     setUser: (user: User | null) => void;
+    projects: Project[];
     setProjects: (projects: Project[]) => void;
+    loading: boolean;
     setLoading: (loading: boolean) => void;
     refreshData: () => Promise<void>;
 }
 
-export const MyContext = createContext<UserContextType | undefined>(undefined);
+const MyContext = createContext<UserContextType | undefined>(undefined);
 
 export function MyContextProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
@@ -22,6 +22,8 @@ export function MyContextProvider({ children }: { children: ReactNode }) {
 
     const refreshData = async () => {
         setLoading(true);
+        console.log("Refreshing Data....");
+        
         try {
             const userRes = await fetch("/api/user/current");
             const userData = await userRes.json();
@@ -45,7 +47,6 @@ export function MyContextProvider({ children }: { children: ReactNode }) {
             setLoading(false);
         }
     };
-
     useEffect(() => {
         refreshData();
     }, []);

@@ -10,19 +10,27 @@ import { getAllUsers } from "@/app/actions/users/Users";
 import { User } from "@/app/(types)/myTypes";
 import { role_enum } from "@/app/generated/prisma/enums";
 import { useRouter } from "next/navigation";
+import CustomLoader from "@/components/custom_loader";
 
 export default function EmployeesPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [filter, setFilter] = useState("All");
     const [employees, setEmployee] = useState<any>([]);
+    const [loading, setLoading] = useState(false);
     const router = useRouter();
     useEffect(() => {
         // Cookie Logic Here
+        setLoading(true);
         getAllUsers().then((res) => {
             res = res.filter((emp) => emp.userId != 3);
             setEmployee(res);
+            setLoading(false);
         });
     }, []);
+
+    if(loading){
+        return (<CustomLoader/>);
+    }
 
     const handleClick = (id : number)=>{
         router.push("/admin/employees/"+id);
@@ -45,7 +53,7 @@ export default function EmployeesPage() {
                 <div className="flex items-center gap-4">
                     <Button variant="outline" size="icon" asChild>
                         <Link href="/admin">
-                            <ArrowLeft className="h-4 w-4" />
+                            <ArrowLeft className="h-5 w-5" />
                         </Link>
                     </Button>
                     <h1 className="text-3xl font-bold tracking-tight">Employees</h1>
@@ -105,45 +113,3 @@ export default function EmployeesPage() {
         </>
     );
 }
-/*
- // const employees = [
-  {
-            userId: 1,
-            userName: "Alice Johnson",
-            role: Role.Manager,
-            email: "alice.j@synccraft.com",
-            phone: "+1 (555) 123-4567",
-        },
-        {
-            userId: 2,
-            userName: "Bob Smith",
-            role: Role.Member,
-            email: "bob.smith@synccraft.com",
-            phone: "+1 (555) 987-6543",
-        },
-        {
-            userId: 3,
-            userName: "Charlie Brown",
-            role: Role.Member,
-            email: "charlie.b@synccraft.com",
-        },
-        {
-            userId: 4,
-            userName: "Diana Prince",
-            role: Role.Manager,
-            email: "diana.p@synccraft.com",
-        },
-        {
-            userId: 5,
-            userName: "Evan Wright",
-            role: Role.Member,
-            email: "evan.w@synccraft.com",
-        },
-        {
-            userId: 6,
-            userName: "Fiona Gallagher",
-            role: Role.Member,
-            email: "fiona.g@synccraft.com",
-        }      
-    // ];
-*/

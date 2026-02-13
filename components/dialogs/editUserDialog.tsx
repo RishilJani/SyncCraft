@@ -37,7 +37,7 @@ export default function EditUserDialog({ user, onSuccess, children }: EditUserDi
             const res = await fetch(`/api/user/${user.userId}`, {
                 method: "PUT",
                 headers: myHeaders,
-                body: JSON.stringify({ userName, email }),
+                body: JSON.stringify({ userName, email , role}),
             });
             const data = await res.json();
             if (!data.error) {
@@ -47,7 +47,7 @@ export default function EditUserDialog({ user, onSuccess, children }: EditUserDi
                 alert(data.message);
             }
         } catch (error) {
-            console.error("Failed to update user:", error);
+            console.log("Failed to update user:", error);
             alert("An error occurred while updating the profile.");
         } finally {
             setLoading(false);

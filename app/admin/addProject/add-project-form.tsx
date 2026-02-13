@@ -1,7 +1,6 @@
 "use client";
 
 import { User } from "@/app/(types)/myTypes";
-import { getUser } from "@/app/actions/users/Users";
 import { myHeaders } from "@/app/(utils)/utils";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
@@ -16,6 +15,7 @@ import { Calendar as CalendarIcon, X } from "lucide-react";
 import Link from "next/link";
 import { redirect, RedirectType } from "next/navigation";
 import React, { useState } from "react";
+import { useMyContext } from "@/app/(utils)/myContext";
 
 interface AddProjectFormProps {
     managers: User[];
@@ -23,6 +23,7 @@ interface AddProjectFormProps {
 }
 
 export default function AddProjectForm({managers, members }: AddProjectFormProps) {
+    const userContext = useMyContext();
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
     const [dueDate, setDueDate] = useState<Date>();
@@ -32,8 +33,7 @@ export default function AddProjectForm({managers, members }: AddProjectFormProps
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         console.log("Handle Submit Functin\n");
-        
-        const adminId = (await getUser())?.userId;
+        const adminId = userContext.user?.userId;
     
         var res = await(await fetch("/api/projects",{
             method : "POST",
@@ -49,6 +49,7 @@ export default function AddProjectForm({managers, members }: AddProjectFormProps
         })).json();
         console.log("Res = ", res);
         
+        await userContext.refreshData();
         if(!res.error){
             console.log("Project added");
             redirect("/admin",RedirectType.replace);

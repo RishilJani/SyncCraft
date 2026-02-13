@@ -9,39 +9,25 @@ import { useEffect, useState } from 'react'
 import CustomLoader from '@/components/custom_loader';
 import { Project, Status } from '@/app/(types)/myTypes';
 import { useMyContext } from '@/app/(utils)/myContext';
-
 const filters = ["All", "Completed", "Pending", "Todo"];
 
 function ProjectsList() {
-    const { user, loading: globalLoading } = useMyContext();
+    const userContext = useMyContext();
+    const allProjects = userContext.projects;
     const [searchQuery, setSearchQuery] = useState("");
     const [activeFilter, setActiveFilter] = useState("All");
-    const [allProjects, setAllProjects] = useState<Project[]>([]);
-    const [localLoading, setLocalLoading] = useState(false);
+    // const [allProjects, setAllProjects] = useState<Project[]>(userContext.projects);
+    const [loading, setLoading] = useState(false);
 
-    useEffect(() => {
-        setLocalLoading(true);
-        fetch("/api/projects", { method: "GET" }).then((res) => res.json()).then((res) => {
-            if (res.error) {
-                console.log("Error");
-                console.log(res.message);
-                setLocalLoading(false);
-            } else {
-                console.log("data fetched = ", res.data);
-                setAllProjects(res.data);
-                setLocalLoading(false);
-            }
-        });
-    }, []);
 
-    if (globalLoading || localLoading) {
-        return null; // Global Loader is already shown by ClientLayout
+    if (userContext.loading) {
+        return null;
     }
 
-    if (allProjects.length == 0) {
+    if (userContext.projects.length == 0) {
         return (
             <>
-                <h2>Some Error Occured</h2>
+                Not any projects yet
             </>
         );
     }
@@ -59,7 +45,7 @@ function ProjectsList() {
                 <div className="flex items-center gap-4">
                     <Button variant="outline" size="icon" asChild>
                         <Link href="/admin">
-                            <ArrowLeft className="h-4 w-4" />
+                            <ArrowLeft className="h-5 w-5" />
                         </Link>
                     </Button>
                     <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
@@ -124,7 +110,7 @@ function ProjectsList() {
                 )}
             </div>
         </>
-    )
+    );
 }
 
 function StatusBadge({ status }: { status: string }) {
@@ -147,4 +133,17 @@ function StatusBadge({ status }: { status: string }) {
     );
 }
 
+
 export default ProjectsList;
+
+    // function fetchingData() {
+    //     setLoading(true);
+    //     fetch("/api/projects", { method: "GET" }).then((res) => res.json()).then((res) => {
+    //         if (res.error) {
+    //             console.log("Error", res.message);
+    //         } else {
+    //             setAllProjects(res.data);
+    //         }
+    //         setLoading(false);
+    //     });
+    // }

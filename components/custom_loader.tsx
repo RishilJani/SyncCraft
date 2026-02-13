@@ -1,4 +1,3 @@
-import React from 'react'
 import { OrbitalLoader } from './ui/orbital-loader'
 
 interface CustomLoaderProps {
