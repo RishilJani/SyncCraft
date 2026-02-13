@@ -8,7 +8,7 @@ export default function AdminDashboard() {
     const userData = useMyContext();
 
     return (
-        <>
+        <>  
             <div className="flex items-center justify-between">
                 <h1 className="text-4xl font-bold tracking-tight">Dashboard</h1>
                 <div className="flex gap-2">

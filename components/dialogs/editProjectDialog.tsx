@@ -13,7 +13,7 @@ import { format } from "date-fns";
 import { Calendar as CalendarIcon, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { Project, User } from "@/app/(types)/myTypes";
 import { getAllUsers } from "@/app/actions/users/Users";
@@ -28,7 +28,6 @@ interface EditProjectFormProps {
 export default function EditProjectForm({
     children,
     data,
-
 }: EditProjectFormProps) {
     const router = useRouter();
     const [title, setTitle] = useState(data.projectName);

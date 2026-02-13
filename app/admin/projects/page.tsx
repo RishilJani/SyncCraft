@@ -9,6 +9,7 @@ import { useEffect, useState } from 'react'
 import CustomLoader from '@/components/custom_loader';
 import { Project, Status } from '@/app/(types)/myTypes';
 import { useMyContext } from '@/app/(utils)/myContext';
+import AddProjectDialog from '@/components/dialogs/addProjectDialog';
 const filters = ["All", "Completed", "Pending", "Todo"];
 
 function ProjectsList() {
@@ -16,9 +17,12 @@ function ProjectsList() {
     const allProjects = userContext.projects;
     const [searchQuery, setSearchQuery] = useState("");
     const [activeFilter, setActiveFilter] = useState("All");
-    // const [allProjects, setAllProjects] = useState<Project[]>(userContext.projects);
-    const [loading, setLoading] = useState(false);
-
+    const [open, setOpen] = useState(false);
+    const [dialogKey, setDialogKey] = useState(0);
+    const handleClose = () => {
+        setOpen(!open);
+        setDialogKey(dialogKey + 1);
+    }
 
     if (userContext.loading) {
         return null;
@@ -51,12 +55,12 @@ function ProjectsList() {
                     <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
                 </div>
                 <div className='flex justify-end'>
-                    <Button asChild className="gap-2">
-                        <Link href="/admin/addProject">
-                            <Plus className="h-4 w-4" />
+                    <AddProjectDialog open={open} setOpen={handleClose}>
+                        <Button className="gap-2">
+                            <Plus className="h-5 w-5" />
                             Add Project
-                        </Link>
-                    </Button>
+                        </Button>
+                    </AddProjectDialog>
                 </div>
             </div>
 
@@ -136,14 +140,14 @@ function StatusBadge({ status }: { status: string }) {
 
 export default ProjectsList;
 
-    // function fetchingData() {
-    //     setLoading(true);
-    //     fetch("/api/projects", { method: "GET" }).then((res) => res.json()).then((res) => {
-    //         if (res.error) {
-    //             console.log("Error", res.message);
-    //         } else {
-    //             setAllProjects(res.data);
-    //         }
-    //         setLoading(false);
-    //     });
-    // }
+// function fetchingData() {
+//     setLoading(true);
+//     fetch("/api/projects", { method: "GET" }).then((res) => res.json()).then((res) => {
+//         if (res.error) {
+//             console.log("Error", res.message);
+//         } else {
+//             setAllProjects(res.data);
+//         }
+//         setLoading(false);
+//     });
+// }

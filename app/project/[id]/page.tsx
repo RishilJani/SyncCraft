@@ -9,9 +9,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { useEffect, useState } from "react";
-import CustomLoader from "@/components/custom_loader";
 import { role_enum } from "@/app/generated/prisma/enums";
-import EditProjectForm from "../../admin/editProject/[id]/edit-project-form";
+import EditProjectForm from "../../../components/dialogs/editProjectDialog";
 import { Project, Status } from "@/app/(types)/myTypes";
 import { useMyContext } from "@/app/(utils)/myContext";
 import { formateDate } from "@/app/(utils)/utils";
@@ -72,7 +71,7 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
                         </Button>
                         <div className="flex-1">
                             <div className="flex items-center gap-3">
-                                <h1 className="text-2xl font-bold">{project.projectName}</h1>
+                                <h1 className="text-3xl font-bold">{project.projectName}</h1>
                                 <StatusBadge status={project.status ?? Status.Todo} className="text-md" />
                             </div>
                         </div>

@@ -7,7 +7,6 @@ import { NextRequest } from "next/server";
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
-        console.log("Body = ", body);
         const user = await prisma.users.findFirst({
             where: {
                 userName: body.userName
