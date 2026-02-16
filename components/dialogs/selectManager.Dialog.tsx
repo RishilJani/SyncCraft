@@ -6,7 +6,7 @@ import { Dialog, DialogContent } from "../ui/dialog";
 import { DialogTitle, DialogTrigger } from "@radix-ui/react-dialog";
 import { Button } from "../ui/button";
 import { Skeleton } from "../ui/skeleton";
-import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "../ui/select";
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { Card, CardContent, CardFooter } from "../ui/card";
 
 export default function SelectManagerDialog({user_id}:{user_id:number}){

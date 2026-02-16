@@ -59,7 +59,6 @@ export async function GET(request :Request, {params} : {params : Promise<{id : s
             return us;
             
         });
-        // console.log("members = ", projectMembers);
 
        const tasks = await prisma.tasks.findMany({
             where : {
@@ -161,29 +160,45 @@ export async function DELETE(request : Request, {params} : {params : Promise<{id
     try{
         const projectId = Number( (await params).id );
 
-        await prisma.$transaction( async (tx)=>{
+        await prisma.$transaction(async (tx) => {
             await tx.user_projects.deleteMany({
-                where:{
-                    projectid : projectId
+                where: {
+                    projectid: projectId
                 }
             });
-            
+
             console.log("\n Deleted rows from User_Projects \n");
-            
-            // var res = await tx.taskLists.findMany({select : {listId : true} , where : { projectId : projectId} });
-            // var listids = res.map((e)=> e.listId);
-            // console.log("List Ids = ",listids);
+
+            // Delete task comments for all tasks in this project
+            await tx.taskComments.deleteMany({
+                where: {
+                    tasks: {
+                        projectId: projectId
+                    }
+                }
+            });
+            console.log("\n Deleted rows from TaskComments \n");
+
+            // Delete task history for all tasks in this project
+            await tx.taskHistory.deleteMany({
+                where: {
+                    tasks: {
+                        projectId: projectId
+                    }
+                }
+            });
+            console.log("\n Deleted rows from TaskHistory \n");
 
             await tx.tasks.deleteMany({
-                where : {
-                    projectId : projectId
+                where: {
+                    projectId: projectId
                 }
             });
             console.log("\n Deleted rows from Tasks  \n");
-            
+
             await tx.projects.delete({
-                where : {
-                    projectId : projectId
+                where: {
+                    projectId: projectId
                 }
             });
             console.log("\n Deleted row from Project  \n");

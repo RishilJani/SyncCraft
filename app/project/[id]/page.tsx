@@ -14,6 +14,17 @@ import EditProjectForm from "../../../components/dialogs/editProjectDialog";
 import { Project, Status } from "@/app/(types)/myTypes";
 import { useMyContext } from "@/app/(utils)/myContext";
 import { formateDate } from "@/app/(utils)/utils";
+import {
+    AlertDialog,
+    AlertDialogAction,
+    AlertDialogCancel,
+    AlertDialogContent,
+    AlertDialogDescription,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogTitle,
+    AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 
 export default function ProjectDetail({ params }: { params: Promise<{ id: string }> }) {
     const { user: currentUser, loading: globalLoading } = useMyContext();
@@ -21,6 +32,8 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
     const [localLoading, setLocalLoading] = useState(true);
     const [project, setProject] = useState<Project>();
     const [refreshKey, setRefreshKey] = useState(0);
+    const myContext = useMyContext();
+
     useEffect(() => {
         setLocalLoading(true);
         params.then((val) => {
@@ -41,6 +54,29 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
     }, [refreshKey]);
 
     const handleBack = () => { router.back(); };
+
+    const handleDelete = async (id: number) => {
+        try {
+            myContext.setLoading(true);
+            const res = await fetch(`/api/projects/${id}`, {
+                method: "DELETE",
+            });
+            const data = await res.json();
+            if (data.error) {
+                console.error("Error deleting project:", data.message);
+                alert("Message = " + data.message);
+                return;
+            }
+            else {
+                myContext.setProjects(myContext.projects.filter((p) => p.projectId !== id));
+                router.replace("/admin/projects");
+            }
+        } catch (error) {
+            console.error("Failed to delete project:", error);
+        } finally {
+            myContext.setLoading(false);
+        }
+    };
 
     if (globalLoading || localLoading) {
         return null; // Global Loader is already shown
@@ -86,9 +122,29 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
                                     </EditProjectForm>
                                 </div>
                                 <div className="flex items-end gap-2 mx-2">
-                                    <Button variant="destructive" size="sm" className="gap-2" >
-                                        <Trash2 className="h-5 w-5" />
-                                    </Button>
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button variant="destructive" size="sm" className="gap-2" >
+                                                <Trash2 className="h-5 w-5" />
+                                                Delete Project
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent className="text-center">
+                                            <AlertDialogHeader >
+                                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                                <AlertDialogDescription>
+                                                    This action cannot be undone. This will permanently delete the
+                                                    project "{project.projectName}" and all its tasks, comments, and history.
+                                                </AlertDialogDescription>
+                                            </AlertDialogHeader>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                                <AlertDialogAction onClick={() => handleDelete(project.projectId!)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90" >
+                                                    Delete
+                                                </AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
                                 </div>
                             </div>
                         }
@@ -174,11 +230,6 @@ function StatusBadge({ status, className }: { status: Status; className?: string
     if (status == Status.Pending) colorClass = "bg-blue-500 hover:bg-blue-600 text-white border-transparent";
     if (status == Status.Todo) colorClass = "text-orange-600 border-orange-200 bg-orange-50";
 
-    // Task Status Colors
-    // if (status === "Done") colorClass = "bg-green-100 text-green-700 hover:bg-green-200 border-transparent";
-    // if (status === "In Progress") colorClass = "bg-blue-100 text-blue-700 hover:bg-blue-200 border-transparent";
-    // if (status === "Todo") colorClass = "bg-slate-100 text-slate-700 hover:bg-slate-200 border-transparent";
-
     return (
         <Badge variant={variants[status] || "outline"} className={colorClass + " " + className}>
             {status}
@@ -194,15 +245,4 @@ async function getProjectById(id: number) {
     return project.data;
 }
 
-async function deleteProject(id: number) {
-    console.log("Project Deleting");
-    const project = await (await fetch(`/api/projects/${id}`, {
-        method: "DELETE",
-    })).json();
-    if (project.error) {
-        return null;
-    }
-    console.log("Project Deleted");
-    // revalidatePath("/admin/projects");
-    redirect("/admin/projects");
-}
+

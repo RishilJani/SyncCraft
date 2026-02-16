@@ -2,7 +2,7 @@
 
 import { User } from "@/app/(types)/myTypes";
 import { useMyContext } from "@/app/(utils)/myContext";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";
 import { myHeaders } from "@/app/(utils)/utils";
 import { Button } from "../ui/button";
@@ -28,7 +28,6 @@ export default function AddProjectDialog({
 
     const router = useRouter();
     const userContext = useMyContext();
-    // const [open, setOpen] = useState(true);
 
     const [title, setTitle] = useState("");
     const [description, setDescription] = useState("");
@@ -55,6 +54,7 @@ export default function AddProjectDialog({
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        userContext.setLoading(true);
         console.log("Handle Submit Functin\n");
         const adminId = userContext.user?.userId;
     
@@ -72,11 +72,11 @@ export default function AddProjectDialog({
         })).json();
         console.log("Res = ", res);
         
-        await userContext.refreshData();
-        if(!res.error){
-            console.log("Project added");
-            router.replace("/admin");
+        if(!res.error){ 
+            await userContext.refreshData();
+            router.back();
         }
+        userContext.setLoading(false);
     }
     const addMember = (memberId: string) => {
         const mem = Number(memberId);
