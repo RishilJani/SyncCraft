@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { getAllUsers } from "@/app/actions/users/Users";
+import { getAllUsers } from "@/app/actions/users/userFunctions";
 import { User } from "@/app/(types)/myTypes";
 import { role_enum } from "@/app/generated/prisma/enums";
 import { useRouter } from "next/navigation";
@@ -47,8 +47,6 @@ export default function EmployeesPage() {
 
     return (
         <>
-            {/*<div className="flex min-h-screen w-full flex-col bg-muted/40 p-4 md:p-8">*/}
-
             <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
                 <div className="flex items-center gap-4">
                     <Button variant="outline" size="icon" asChild>
@@ -109,7 +107,6 @@ export default function EmployeesPage() {
                     </div>
                 )}
             </div>
-            {/* </div> */}
         </>
     );
 }

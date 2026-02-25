@@ -6,7 +6,7 @@ import { PasswordInput } from "@/components/ui/password-input";
 import { Label } from "@radix-ui/react-label";
 import Link from "next/link";
 import { redirect, RedirectType } from "next/navigation";
-import React, { Activity, useState } from "react";
+import React, { useState } from "react";
 import { Errors } from "../register/page";
 import CustomLoader from "@/components/custom_loader";
 import { myHeaders } from "@/app/(utils)/utils";

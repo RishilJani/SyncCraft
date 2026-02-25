@@ -15,8 +15,8 @@ import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DialogTrigger } from "@radix-ui/react-dialog";
-import { Project, User } from "@/app/(types)/myTypes";
-import { getAllUsers } from "@/app/actions/users/Users";
+import { Project } from "@/app/(types)/myTypes";
+import { getAllUsers } from "@/app/actions/users/userFunctions";
 import { role_enum } from "@/app/generated/prisma/enums";
 import CustomLoader from "@/components/custom_loader";
 

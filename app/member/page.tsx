@@ -1,8 +1,8 @@
-import MyKanbanBoard from '@/components/custom_kanban'
-import { getUser } from "../actions/users/Users";
+import MyKanbanBoard from '@/components/custom_kanban';
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Users } from "lucide-react";
+import { getUser } from '../actions/users/userFunctions';
 
 async function MemberDashboard() {
   const user = await getUser();
@@ -21,7 +21,7 @@ async function MemberDashboard() {
         </div>
       </div>
       <div className="flex-1 w-full max-w-7xl mx-auto">
-        <MyKanbanBoard role={false} projectId={1} />
+        {/* <MyKanbanBoard role={false} projectId={1} /> */}
       </div>
     </div>
   )

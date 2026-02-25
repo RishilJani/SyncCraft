@@ -12,10 +12,9 @@ function LoaderWrapper({ children }: { children: React.ReactNode }) {
             {loading && (
                 <CustomLoader
                     message="Syncing your workspace..."
-                    containerClassName="fixed inset-0 flex justify-center items-center z-[110] bg-transparent"
                 />
             )}
-            <div>
+            <div className={loading ? "hidden"  : "block"}>
                 {children}
             </div>
         </>

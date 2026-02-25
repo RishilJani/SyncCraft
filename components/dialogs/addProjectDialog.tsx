@@ -15,10 +15,10 @@ import { Calendar } from "../ui/calendar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-import { getAllUsers } from "@/app/actions/users/Users";
 import { role_enum } from "@/app/generated/prisma/enums";
 import CustomLoader from "../custom_loader";
 import { useRouter } from "next/navigation";
+import { getAllUsers } from "@/app/actions/users/userFunctions";
 
 export default function AddProjectDialog({
     children,
@@ -37,6 +37,7 @@ export default function AddProjectDialog({
     const [managers , setManagers] = useState<User[]>([]);
     const [members , setMembers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
+
     useEffect(()=>{
         try {
             setLoading(true);

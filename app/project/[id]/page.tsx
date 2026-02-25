@@ -65,7 +65,7 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
             if (data.error) {
                 console.error("Error deleting project:", data.message);
                 alert("Message = " + data.message);
-                return;
+                return; 
             }
             else {
                 myContext.setProjects(myContext.projects.filter((p) => p.projectId !== id));

@@ -31,12 +31,12 @@ import {
     DialogTrigger,
     DialogClose,
 } from "@/components/ui/dialog";
-import { logout } from "@/app/actions/users/Users";
 import { useRouter } from "next/navigation";
 import { role_enum } from "@/app/generated/prisma/enums";
 import { User } from "@/app/(types)/myTypes";
 import { useMyContext } from "@/app/(utils)/myContext";
 import EditUserDialog from "./dialogs/editUserDialog";
+import { logout } from "@/app/actions/users/userFunctions";
 
 // Data fetching function for a specific user ID
 const fetchUserData = async (id: string | number) => {

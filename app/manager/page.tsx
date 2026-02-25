@@ -1,15 +1,15 @@
+"use client"
 import MyKanbanBoard from "@/components/custom_kanban";
 import { Button } from "@/components/ui/button";
-import { LogOut, User, Users } from "lucide-react";
+import { User, Users } from "lucide-react";
 import Link from "next/link";
-import { getUser } from "../actions/users/Users";
-import { notFound } from "next/navigation";
-import { getManagerProject } from "../actions/manager/manager";
+import { useMyContext } from "../(utils)/myContext";
 
-export default async function ManageDashboard() {
-  const user = await getUser();
-  const project = await getManagerProject(user?.userId!);
- 
+export default function ManageDashboard() {
+  const myContext = useMyContext();
+  const user = myContext.user;
+  console.log("MyContext = ", myContext);
+
   return (
     <>
       <div className="flex min-h-screen w-full flex-col bg-muted/40 p-4 md:p-8">
@@ -32,7 +32,7 @@ export default async function ManageDashboard() {
         </div>
 
         <div className="flex-1 w-full max-w-7xl mx-auto">
-          <MyKanbanBoard role={true} project={project} />
+          <MyKanbanBoard role={true} project={myContext.projects[0]} />
         </div>
       </div>
     </>

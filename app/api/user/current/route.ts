@@ -1,5 +1,5 @@
+import { getUserCookie } from "@/app/actions/users/userFunctions";
 import { ErrorResponse, MyResponse } from "@/app/(utils)/utils";
-import { getUserCookie } from "@/app/actions/users/Users";
 import { NextResponse } from "next/server";
 
 export async function GET() {

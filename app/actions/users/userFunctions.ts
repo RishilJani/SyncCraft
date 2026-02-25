@@ -1,11 +1,9 @@
-"use server";
+"use server"
 
-import { User } from "@/app/(types)/myTypes";
-import { role_enum } from "@/app/generated/prisma/enums";
-import { prisma } from "@/lib/prisma";
-import bcrypt from 'bcryptjs';
 import { cookies } from "next/headers";
-
+import { User } from "../../(types)/myTypes";
+import { role_enum } from "../../generated/prisma/enums";
+import { prisma } from "@/lib/prisma";
 
 // Cookie consts
 const USER_ID = "userId";
@@ -13,54 +11,6 @@ const USER_NAME = "userName";
 const EMAIL = "email";
 const ROLE = "role";
 const CREATED_AT = "createdAt";
-
-// sign up Logic
-export async function addUser(userName: string, password: string, email: string, role: role_enum) {
-    try {
-        const salt = process.env.SALT ? Number.parseInt(process.env.SALT) : 10;
-        const hashedPassword = bcrypt.hashSync(password, salt);
-
-        const user = await prisma.users.create({
-            data: {
-                userName: userName,
-                passwordHash: hashedPassword,
-                email: email,
-                createdAt: new Date(),
-                role: role
-            }
-        });
-        console.log("User created:", user.userId);
-
-        await putUserCookie(user);
-        return true;
-    } catch (err) {
-        console.error("Error creating user:", err);
-        return false;
-    }
-}
-
-// Logout Logic
-export async function logout() {
-    const cookie = await cookies();
-    cookie.delete(USER_ID);
-    cookie.delete(USER_NAME);
-    cookie.delete(EMAIL);
-    cookie.delete(ROLE);
-    cookie.delete(CREATED_AT);
-}
-
-// to delete a user
-export async function deleteUser(userId: number) {
-    try {
-        await prisma.users.delete({
-            where: {
-                userId: userId
-            }
-        });
-    } catch (error) {
-        console.error("Error deleting user:", error);
-    }
-}
 
 export async function getAllUsers() {
     try {
@@ -77,6 +27,18 @@ export async function getAllUsers() {
         console.error('Error fetching all users:', err);
         return [];
     }
+}
+
+
+
+
+export async function logout() {
+    const cookie = await cookies();
+    cookie.delete(USER_ID);
+    cookie.delete(USER_NAME);
+    cookie.delete(EMAIL);
+    cookie.delete(ROLE);
+    cookie.delete(CREATED_AT);
 }
 
 export async function getUser() {
@@ -128,4 +90,3 @@ export async function putUserCookie(user: any) {
         cookieStore.set(CREATED_AT, user.createdAt.toString(), options);
     }
 }
-

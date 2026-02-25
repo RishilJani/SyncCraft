@@ -17,47 +17,49 @@ export async function GET(request :Request, {params} : {params : Promise<{id : s
             return MyResponse(true,"Project not found", null, {status : 404});
         }
 
-        const manager = await prisma.user_projects.findFirst({
-            include : {
-                Users : {
-                    where:{
-                        role : role_enum.manager
-                    }
+        const managerEntry = await prisma.user_projects.findFirst({
+            where: {
+                projectid: projectInfo.projectId,
+                Users: {
+                    role: role_enum.manager
                 }
             },
-            where :{
-                AND : {
-                    projectid : projectInfo.projectId,
-                }
+            include: {
+                Users: true
             }
         });
 
-        const porjectManager : User ={
-            userId : manager?.Users?.userId,
-            userName : manager?.Users?.userName,
-            email : manager?.Users?.email,
-            role : manager?.Users?.role,
-            createdAt: manager?.Users?.createdAt,
-        } 
+        const porjectManager: User = {
+            userId: managerEntry?.Users?.userId,
+            userName: managerEntry?.Users?.userName,
+            email: managerEntry?.Users?.email,
+            role: managerEntry?.Users?.role,
+            createdAt: managerEntry?.Users?.createdAt,
+        }
         // console.log("manager = ", porjectManager);
 
 
-        const members = await prisma.user_projects.findMany({
-            include:{ Users:{ where : { role: role_enum.member } } },
-            where : { projectid : projectInfo.projectId } 
+        const membersEntries = await prisma.user_projects.findMany({
+            where: {
+                projectid: projectInfo.projectId,
+                Users: {
+                    role: role_enum.member
+                }
+            },
+            include: {
+                Users: true
+            }
         });
-        
-        const projectMembers = members.filter((e)=>{  return e.Users?.userId; }).map((e) => {
 
-            const us : User = {
-                userId : e.Users?.userId,
-                userName : e.Users?.userName,
-                role : e.Users?.role,
-                email: e.Users?.email,
-                createdAt : e.Users?.createdAt
-            }; 
+        const projectMembers = membersEntries.filter((e) => e.Users).map((e) => {
+            const us: User = {
+                userId: e.Users!.userId,
+                userName: e.Users!.userName,
+                role: e.Users!.role,
+                email: e.Users!.email,
+                createdAt: e.Users!.createdAt
+            };
             return us;
-            
         });
 
        const tasks = await prisma.tasks.findMany({

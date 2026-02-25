@@ -7,8 +7,7 @@ import { myHeaders } from '@/app/(utils)/utils';
 import { Label } from '@radix-ui/react-label';
 import Link from 'next/link';
 import { redirect, RedirectType } from 'next/navigation';
-import { Activity, useState } from 'react';
-import { addUser, deleteUser } from '../../actions/users/Users';
+import { useState } from 'react';
 import CustomLoader from '@/components/custom_loader';
 import { role_enum } from '@/app/generated/prisma/enums';
 
@@ -60,7 +59,6 @@ function SignUp() {
         setIsLoading(true);
         if (validateForm()) {
             const data = { userName, password, email, role };
-            console.log("Data = ", data);
 
             setIsLoading(true);
             var res = await (await fetch("/api/register", {
@@ -71,7 +69,6 @@ function SignUp() {
 
             setIsLoading(false);
             if (!res.error) {
-                console.log("Register Successful");
                 setIsLoading(false);
                 await refreshData();
                 redirect(res.data.role.toLowerCase(), RedirectType.replace);

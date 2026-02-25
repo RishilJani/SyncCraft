@@ -30,11 +30,15 @@ export function MyContextProvider({ children }: { children: ReactNode }) {
 
             if (userData && !userData.error) {
                 setUser(userData.data);
+                console.log("UserData = ", userData.data);
+                
+                
                 if (userData.data.userId) {
                     const projectsRes = await fetch(`/api/projects/user/${userData.data.userId}`);
                     const projectsData = await projectsRes.json();
-                    if (projectsData && !projectsData.error) {
+                    if (projectsData && !projectsData.error) { 
                         setProjects(projectsData.data);
+                        console.log("Projectdata = ", projectsData.data);
                     }
                 }
             } else {

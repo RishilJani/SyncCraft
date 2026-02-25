@@ -36,6 +36,8 @@ const statusColors = {
 };
 
 export default function MyKanbanBoard({ role, project, onAddTask }: { role: boolean, project: Project, onAddTask?: any }) {
+    console.log("Project = ", project, " Task = " , project.tasks);
+    
     if (project == undefined || project.tasks == undefined) {
         return (
             <>
@@ -51,7 +53,6 @@ export default function MyKanbanBoard({ role, project, onAddTask }: { role: bool
     const todosTasks = kanbanTasks.filter((task) => task.status === Status.Todo);
     const pendingTasks = kanbanTasks.filter((task) => task.status === Status.Pending);
     const completedTasks = kanbanTasks.filter((task) => task.status === Status.Completed);
-    // const [refreshKey, setRefreshKey] = useState(0);
 
     const [columns, setColumns] = useState<Column[]>([
         {

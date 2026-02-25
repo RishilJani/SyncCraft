@@ -1,4 +1,3 @@
-import { Priority, Project, Status } from "@/app/(types)/myTypes";
 import { prisma } from "@/lib/prisma";
 
 export async function getManagerProject(managerId : number){

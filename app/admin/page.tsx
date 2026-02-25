@@ -3,7 +3,6 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Users, User, Kanban } from "lucide-react";
 import {useMyContext } from "../(utils)/myContext";
-import { AlertDialog } from "@/components/ui/alert-dialog";
 
 export default function AdminDashboard() {
     const userData = useMyContext();

@@ -1,4 +1,4 @@
-import { putUserCookie } from "@/app/actions/users/Users";
+import { putUserCookie } from "@/app/actions/users/userFunctions";
 import { ErrorResponse, MyResponse } from "@/app/(utils)/utils";
 import { prisma } from "@/lib/prisma";
 import bcrypt from "bcryptjs";
