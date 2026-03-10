@@ -1,4 +1,4 @@
-import { Status } from "@/app/(types)/myTypes";
+
 import { ErrorResponse, MyResponse } from "@/app/(utils)/utils";
 import { prisma } from "@/lib/prisma";
 
