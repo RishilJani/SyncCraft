@@ -15,3 +15,24 @@ export function formateDate(date : Date | null | undefined){
     const formatedDate =( new Date(date)).toLocaleDateString("en-GB");
     return formatedDate;
 }
+
+export function customLog(obj : any){
+    if(typeof obj == typeof []){
+        console.log("[ ");
+        obj.forEach( (e : any)=> {
+            customLog(e);            
+            console.log("\b\b ,");
+        });
+        console.log("\b\b] ");
+    }else if(typeof obj == typeof {}){
+        console.log("{");
+        
+        for (const key in obj) {
+            console.log("\t", key, ":", obj[key]);
+        }
+        console.log("}");
+    }else{
+        console.log(obj + " ");
+        
+    }
+}

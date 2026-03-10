@@ -22,23 +22,20 @@ export function MyContextProvider({ children }: { children: ReactNode }) {
 
     const refreshData = async () => {
         setLoading(true);
-        console.log("Refreshing Data....");
-        
+        // console.log("Refreshing Data....");
         try {
             const userRes = await fetch("/api/user/current");
             const userData = await userRes.json();
 
             if (userData && !userData.error) {
                 setUser(userData.data);
-                console.log("UserData = ", userData.data);
-                
+                // console.log("UserData = ", userData.data);
                 
                 if (userData.data.userId) {
                     const projectsRes = await fetch(`/api/projects/user/${userData.data.userId}`);
                     const projectsData = await projectsRes.json();
                     if (projectsData && !projectsData.error) { 
                         setProjects(projectsData.data);
-                        console.log("Projectdata = ", projectsData.data);
                     }
                 }
             } else {

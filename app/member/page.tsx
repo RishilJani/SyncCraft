@@ -15,7 +15,7 @@ async function MemberDashboard() {
           <Button asChild variant="ghost" className="gap-2">
             <Link href={`/member/${user?.userId}`}>
               <Users className="h-4 w-4" />
-              Profile
+              <span>Profile</span>
             </Link>
           </Button>
         </div>

@@ -17,7 +17,7 @@ import { ClipboardList, ListTodo, Users, Pencil, Coins } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Task, Status, Priority, Project } from "@/app/(types)/myTypes";
 import TaskDialog from "./dialogs/taskDialog";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 
 type KanbanTask = Task & { id: number };
@@ -36,8 +36,6 @@ const statusColors = {
 };
 
 export default function MyKanbanBoard({ role, project, onAddTask }: { role: boolean, project: Project, onAddTask?: any }) {
-    console.log("Project = ", project, " Task = " , project.tasks);
-    
     if (project == undefined || project.tasks == undefined) {
         return (
             <>
@@ -49,7 +47,6 @@ export default function MyKanbanBoard({ role, project, onAddTask }: { role: bool
     }
     const allTasks = project.tasks;
     const kanbanTasks: KanbanTask[] = allTasks.map(task => ({ ...task, id: task.taskId }));
-    const router = useRouter();
     const todosTasks = kanbanTasks.filter((task) => task.status === Status.Todo);
     const pendingTasks = kanbanTasks.filter((task) => task.status === Status.Pending);
     const completedTasks = kanbanTasks.filter((task) => task.status === Status.Completed);
@@ -170,10 +167,20 @@ export default function MyKanbanBoard({ role, project, onAddTask }: { role: bool
         return name;
     }
 
-    return (
+    console.log("Project Memebers = ", project.members);
+    console.log("Project Memebers = ", project);
+
+
+    (
         <div className="container">
 
             <div className="flex min-h-screen w-full flex-col bg-muted/40 p-4 md:p-8">
+                <div className="mx-6 mb-6">
+                    <h1 className="text-4xl font-semibold mb-2">{project.projectName}</h1>
+                    {project.description && (
+                        <p className="text-muted-foreground text-lg">{project.description}</p>
+                    )}
+                </div>
                 <div className="mx-auto w-full space-y-6">
                     {
                         role && <div className="flex flex-col items-end mx-auto w-full ml-3">
@@ -230,11 +237,11 @@ export default function MyKanbanBoard({ role, project, onAddTask }: { role: bool
                                                                     </div>
                                                                 )}
                                                                 {role && (
-                                                                    <TaskDialog projectId={project.projectId!} members={project.members!} task={card} onSuccess={() => { console.log("On Success Edit"); if (onAddTask) onAddTask(); }} >
-                                                                        <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full hover:bg-primary/10 hover:text-primary transition-colors" >
-                                                                            <Pencil className="h-3.5 w-3.5" />
-                                                                        </Button>
-                                                                    </TaskDialog>
+                                                                    // <TaskDialog projectId={project.projectId!} members={project.members!} task={card} onSuccess={() => { console.log("On Success Edit"); if (onAddTask) onAddTask(); }} >
+                                                                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full hover:bg-primary/10 hover:text-primary transition-colors" >
+                                                                        <Pencil className="h-3.5 w-3.5" />
+                                                                    </Button>
+                                                                    // </TaskDialog>
                                                                 )}
                                                             </div>
                                                         </div>

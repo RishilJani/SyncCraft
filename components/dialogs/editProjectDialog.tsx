@@ -94,13 +94,13 @@ export default function EditProjectForm({
 
             if (!res.error) {
                 setOpen(false);
-                router.push("/project/"+data.projectId);
+                router.push("/project/" + data.projectId);
                 router.refresh();
             } else {
                 alert("Error: " + res.message);
             }
         } catch (error) {
-            console.error("Update failed:", error);
+            // console.error("Update failed:", error);
             alert("Something went wrong");
         }
     };

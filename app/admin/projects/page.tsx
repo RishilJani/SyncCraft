@@ -5,9 +5,8 @@ import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/com
 import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { ArrowLeft, Plus, Search } from 'lucide-react';
-import { useEffect, useState } from 'react'
-import CustomLoader from '@/components/custom_loader';
-import { Project, Status } from '@/app/(types)/myTypes';
+import { useState } from 'react'
+import { Status } from '@/app/(types)/myTypes';
 import { useMyContext } from '@/app/(utils)/myContext';
 import AddProjectDialog from '@/components/dialogs/addProjectDialog';
 const filters = ["All", "Completed", "Pending", "Todo"];

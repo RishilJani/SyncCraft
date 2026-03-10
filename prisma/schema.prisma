@@ -18,7 +18,7 @@ model Projects {
   completionDate DateTime?       @db.Timestamptz(6)
   status         status_enum     @default(todo)
   Users          Users?          @relation(fields: [createdBy], references: [userId], onDelete: NoAction, onUpdate: NoAction)
-  Tasks          Tasks[]
+  tasks          tasks[]
   user_projects  user_projects[]
 }
 
@@ -29,7 +29,7 @@ model TaskComments {
   userId      Int?
   commentText String    @db.VarChar
   createdDate DateTime? @default(now()) @db.Timestamptz(6)
-  tasks       Tasks     @relation(fields: [taskId], references: [taskId], onDelete: NoAction, onUpdate: NoAction)
+  tasks       tasks     @relation(fields: [taskId], references: [taskId], onDelete: NoAction, onUpdate: NoAction)
   Users       Users?    @relation(fields: [userId], references: [userId], onDelete: NoAction, onUpdate: NoAction)
 }
 
@@ -41,7 +41,7 @@ model TaskHistory {
   changeType String    @db.VarChar
   changeTime DateTime? @default(now()) @db.Timestamptz(6)
   Users      Users?    @relation(fields: [changedBy], references: [userId], onDelete: NoAction, onUpdate: NoAction)
-  tasks      Tasks     @relation(fields: [taskId], references: [taskId], onDelete: NoAction, onUpdate: NoAction)
+  tasks      tasks     @relation(fields: [taskId], references: [taskId], onDelete: NoAction, onUpdate: NoAction)
 }
 
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
@@ -55,14 +55,23 @@ model Users {
   Projects      Projects[]
   TaskComments  TaskComments[]
   TaskHistory   TaskHistory[]
-  Tasks         Tasks[]
+  tasks         tasks[]
   user_projects user_projects[]
 }
 
-/// This table contains check constraints and requires additional setup for migrations. Visit https://pris.ly/d/check-constraints for more info.
 /// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model Tasks {
-  taskId         Int            @id(map: "tasks_pkey") @default(autoincrement())
+model user_projects {
+  up_id     Int       @id @default(autoincrement())
+  userid    Int?
+  projectid Int?
+  Projects  Projects? @relation(fields: [projectid], references: [projectId], onDelete: Cascade, onUpdate: NoAction)
+  Users     Users?    @relation(fields: [userid], references: [userId], onDelete: Cascade, onUpdate: NoAction)
+}
+
+/// This model or at least one of its fields has comments in the database, and requires an additional setup for migrations: Read more: https://pris.ly/d/database-comments
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model tasks {
+  taskId         Int            @id @default(autoincrement())
   assignedto     Int?
   title          String         @db.VarChar(100)
   description    String?        @db.VarChar(255)
@@ -75,17 +84,8 @@ model Tasks {
   priority       priority_enum  @default(Low)
   TaskComments   TaskComments[]
   TaskHistory    TaskHistory[]
-  Projects       Projects       @relation(fields: [projectId], references: [projectId], onDelete: Cascade)
-  Users          Users?         @relation(fields: [assignedto], references: [userId], onDelete: NoAction, onUpdate: NoAction, map: "tasks_assignedto_fkey")
-}
-
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model user_projects {
-  up_id     Int       @id @default(autoincrement())
-  userid    Int?
-  projectid Int?
-  Projects  Projects? @relation(fields: [projectid], references: [projectId], onDelete: Cascade, onUpdate: NoAction)
-  Users     Users?    @relation(fields: [userid], references: [userId], onDelete: Cascade, onUpdate: NoAction)
+  Projects       Projects       @relation(fields: [projectId], references: [projectId], onDelete: Cascade, map: "Tasks_projectId_fkey")
+  Users          Users?         @relation(fields: [assignedto], references: [userId], onDelete: NoAction, onUpdate: NoAction)
 }
 
 enum role_enum {

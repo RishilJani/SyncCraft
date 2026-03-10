@@ -68,28 +68,11 @@ export default function TaskDialog({
                     projectId: projectId,
                 }),
             })).json();
-            // console.log({
-            //         title,
-            //         description,
-            //         dueDate,
-            //         assignedto: assignedTo ? Number(assignedTo) : null,
-            //         priority,
-            //         status,
-            //         points: Number(points),
-            //         projectId: projectId,
-            //     });
 
-            // await wait(3000);
-            // var res = {
-            //     error : false,
-            //     message : "Hello World"
-            // }
             if (!res.error) {
                 if (onSuccess) onSuccess();
                 console.log("Helloooooooooooooooooo");
                 setOpen(false);
-                // setState(true);
-                // router.refresh();
             } else {
                 alert("Error: " + res.message);
             }

@@ -14,13 +14,13 @@ export default function AdminDashboard() {
                     <Button asChild variant="ghost" className="gap-2">
                         <Link href="/admin/employees">
                             <Users className="h-5 w-5" />
-                            View All Employees
+                            <span>View All Employees</span>
                         </Link>
                     </Button>
                     <Button asChild variant="outline" className="gap-2">
                         <Link href="/admin/projects">
                             <Kanban className='h-5 w-5' />
-                            View All Projects
+                            <span>View All Projects</span>
                         </Link>
                     </Button>
                     <Button asChild variant="ghost" className="gap-2">
