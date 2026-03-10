@@ -166,17 +166,19 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
                             </div>
                         </div>
 
-                        <div className="flex items-start gap-3 rounded-lg border p-4">
-                            <div className="rounded-md bg-yellow-100 p-2 text-yellow-600 dark:bg-yellow-900/20 dark:text-yellow-400">
-                                <Trophy className="h-5 w-5" />
+                        {profileUser.role != role_enum.admin &&
+                            <div className="flex items-start gap-3 rounded-lg border p-4">
+                                <div className="rounded-md bg-yellow-100 p-2 text-yellow-600 dark:bg-yellow-900/20 dark:text-yellow-400">
+                                    <Trophy className="h-5 w-5" />
+                                </div>
+                                <div>
+                                    <p className="text-sm font-medium text-muted-foreground">
+                                        Gained Points
+                                    </p>
+                                    <p className="font-medium">{profileUser.points} pts</p>
+                                </div>
                             </div>
-                            <div>
-                                <p className="text-sm font-medium text-muted-foreground">
-                                    Gained Points
-                                </p>
-                                {/* <p className="font-medium">{user.points} pts</p> */}
-                            </div>
-                        </div>
+                        }
                     </div>
                 </CardContent>
                 <CardFooter className="bg-muted/50 p-4 text-center text-xs text-muted-foreground">

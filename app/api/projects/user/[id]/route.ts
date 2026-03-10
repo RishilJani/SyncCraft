@@ -53,7 +53,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
                     }
                 }
             });
-            console.log("userProjectResult = ", userProjectsResult);
 
             // Extract the projects from the user_projects wrapper
             fetchedProjects = userProjectsResult.map(up => up.Projects).filter(Boolean) as any[];

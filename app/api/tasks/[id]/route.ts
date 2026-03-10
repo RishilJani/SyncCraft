@@ -1,3 +1,4 @@
+import { Status } from "@/app/(types)/myTypes";
 import { ErrorResponse, MyResponse } from "@/app/(utils)/utils";
 import { prisma } from "@/lib/prisma";
 
@@ -30,15 +31,14 @@ export async function PUT(
         const { id } = await params;
         const taskId = Number(id);
         const body = await request.json();
-        
+
         // Remove taskId from body to prevent accidental update of primary key
         const { taskId: _, ...updateData } = body;
-        console.log("updateDate ",updateData);
-        console.log("taskId ",taskId);
+
         // Convert dates if present
         if (updateData.dueDate) updateData.dueDate = new Date(updateData.dueDate);
         if (updateData.completionDate) updateData.completionDate = new Date(updateData.completionDate);
-        
+
         // Ensure numeric fields are numbers if they come as strings
         if (updateData.assignedto !== undefined) updateData.assignedto = updateData.assignedto ? Number(updateData.assignedto) : null;
         if (updateData.projectId !== undefined) updateData.projectId = Number(updateData.projectId);

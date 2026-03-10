@@ -1,9 +1,10 @@
-import { Role } from '@/app/(utils)/utils'
+
+import { role_enum } from '@/app/generated/prisma/enums';
 import UserProfilePage from '@/components/profilePage'
 
 async function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
-    return <UserProfilePage id={id} viewerRole={Role.Member} />;
+    return <UserProfilePage id={id} viewerRole={role_enum.member} />;
 }
 
 export default ProfilePage;

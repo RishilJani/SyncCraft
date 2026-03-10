@@ -97,14 +97,6 @@ export default function MyKanbanBoard({ role, project, onAddTask }: { role: bool
         console.log("UseEffrect ");
     }, [project.tasks]);
 
-    const removeCard = (taskId: number) => {
-        setColumns((prev) =>
-            prev.map((col) => ({
-                ...col,
-                cards: col.cards.filter((card) => card.taskId !== taskId),
-            }))
-        );
-    };
 
     const handleDropOverColumn = (dataTransferData: string, targetColumnId: string) => {
         const droppedCard: KanbanTask = JSON.parse(dataTransferData);
@@ -167,20 +159,10 @@ export default function MyKanbanBoard({ role, project, onAddTask }: { role: bool
         return name;
     }
 
-    console.log("Project Memebers = ", project.members);
-    console.log("Project Memebers = ", project);
-
-
-    (
+    return (
         <div className="container">
 
             <div className="flex min-h-screen w-full flex-col bg-muted/40 p-4 md:p-8">
-                <div className="mx-6 mb-6">
-                    <h1 className="text-4xl font-semibold mb-2">{project.projectName}</h1>
-                    {project.description && (
-                        <p className="text-muted-foreground text-lg">{project.description}</p>
-                    )}
-                </div>
                 <div className="mx-auto w-full space-y-6">
                     {
                         role && <div className="flex flex-col items-end mx-auto w-full ml-3">
@@ -286,3 +268,13 @@ const updateStatus = async (taskId: number, status: Status) => {
     }
 
 }
+/*
+const removeCard = (taskId: number) => {
+        setColumns((prev) =>
+            prev.map((col) => ({
+                ...col,
+                cards: col.cards.filter((card) => card.taskId !== taskId),
+            }))
+        );
+    };
+    */
