@@ -131,11 +131,10 @@ export default function AdminDashboard() {
                                             right: 30,
                                             left: 20,
                                             bottom: 5,
-                                        }}
-                                    >
-                                        <CartesianGrid strokeDasharray="3 3" opacity={0.2} />
+                                        }} >
+                                        <CartesianGrid strokeDasharray="4 4" opacity={0.75} />
                                         <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} />
-                                        <YAxis fontSize={12} tickLine={false} axisLine={false} />
+                                        <YAxis fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
                                         <Tooltip cursor={{ fill: 'var(--muted)' }} contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)' }} />
                                         <Legend />
                                         <Bar dataKey="value" name="Projects" fill="#3b82f6" radius={[4, 4, 0, 0]} />

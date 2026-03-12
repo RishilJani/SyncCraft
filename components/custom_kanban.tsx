@@ -109,6 +109,7 @@ export default function MyKanbanBoard({ role, project, onAddTask }: { role: bool
                 // If this is the target column, add the card to the end
                 if (col.id === targetColumnId) {
                     updateStatus(droppedCard.taskId, col.id as Status);
+                    
                     return {
                         ...col,
                         cards: [...filteredCards, { ...droppedCard, status: targetColumnId as Status }]

@@ -47,6 +47,7 @@ export async function GET() {
             value: item._count.priority
         }));
 
+        console.log("Project Status Distribution ", projectStatusDistribution);
 
         const dashboardData = {
             totalProjects,
@@ -57,7 +58,7 @@ export async function GET() {
             taskPriorityDistribution
         };
 
-        console.log("Dashboard Data = ", dashboardData);
+        // console.log("Dashboard Data = ", dashboardData);
 
         return MyResponse(false, "Dashboard Data fetched", dashboardData, { status: 200 });
 

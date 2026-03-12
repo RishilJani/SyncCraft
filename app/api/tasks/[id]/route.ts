@@ -1,6 +1,7 @@
 
 import { ErrorResponse, MyResponse } from "@/app/(utils)/utils";
 import { prisma } from "@/lib/prisma";
+import { updateProjectStatusBasedOnTasks } from "@/app/(utils)/projectUtils";
 
 export async function GET(
     request: Request,
@@ -44,10 +45,18 @@ export async function PUT(
         if (updateData.projectId !== undefined) updateData.projectId = Number(updateData.projectId);
         if (updateData.points !== undefined) updateData.points = Number(updateData.points);
 
+        // const existingTask = await prisma.tasks.findUnique({ where: { taskId } });
+
         const task = await prisma.tasks.update({
             where: { taskId },
             data: updateData,
         });
+
+        // if (existingTask && existingTask.projectId !== task.projectId) {
+        //     await updateProjectStatusBasedOnTasks(existingTask.projectId);
+        // }
+        await updateProjectStatusBasedOnTasks(task.projectId);
+
         return MyResponse(false, "Task Updated Successfully", task, { status: 200 });
     } catch (err) {
         console.log('Some Error Occured at api/tasks/[id]/PATCH');
@@ -63,9 +72,16 @@ export async function DELETE(
     try {
         const { id } = await params;
         const taskId = Number(id);
+        const existingTask = await prisma.tasks.findUnique({ where: { taskId } });
+
         await prisma.tasks.delete({
             where: { taskId },
         });
+
+        if (existingTask) {
+            await updateProjectStatusBasedOnTasks(existingTask.projectId);
+        }
+
         return MyResponse(false, "Task Deleted Successfully", { deleted: true }, { status: 200 });
     } catch (err) {
         console.log('Some Error Occured at api/tasks/[id]/DELETE');

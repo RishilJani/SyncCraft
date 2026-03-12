@@ -1,6 +1,7 @@
 import { Status } from "@/app/(types)/myTypes";
 import { ErrorResponse, MyResponse } from "@/app/(utils)/utils";
 import { prisma } from "@/lib/prisma";
+import { updateProjectStatusBasedOnTasks } from "@/app/(utils)/projectUtils";
 
 export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
@@ -8,8 +9,8 @@ export async function GET(request: Request) {
     const assignedto = searchParams.get("assignedto");
     console.log("projectId", projectId, "assignedto", assignedto);
     console.log(new Date());
-    console.log(new Date(2026,12,31));
-    
+    console.log(new Date(2026, 12, 31));
+
     try {
         const tasks = await prisma.tasks.findMany({
             where: {
@@ -29,7 +30,7 @@ export async function POST(request: Request) {
     try {
         const body = await request.json();
         const { title, description, priority, dueDate, assignedto, projectId, points, status } = body;
-        
+
         const task = await prisma.tasks.create({
             data: {
                 title,
@@ -43,6 +44,9 @@ export async function POST(request: Request) {
                 points: points ? Number(points) : 0,
             },
         });
+
+        await updateProjectStatusBasedOnTasks(task.projectId);
+
         return MyResponse(false, "Task Created Successfully", task, { status: 201 });
     } catch (err) {
         console.log('Some Error Occured at api/tasks/POST');
