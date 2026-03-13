@@ -4,30 +4,29 @@ import { ErrorResponse, MyResponse } from "@/app/(utils)/utils";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-export async function GET(request :Request, {params} : {params : Promise<{id : string}>}) {
-    try{
-        const {id} = await params;
-        
-        const projectInfo = await prisma.projects.findFirst({
-            where:{
-                projectId : Number(id),
-            }
-        });
-        if(!projectInfo){
-            return MyResponse(true,"Project not found", null, {status : 404});
-        }
+export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
+    try {
+        const { id } = await params;
 
-        const managerEntry = await prisma.user_projects.findFirst({
+        const projectInfo = await prisma.projects.findFirst({
             where: {
-                projectid: projectInfo.projectId,
-                Users: {
-                    role: role_enum.manager
-                }
+                projectId: Number(id),
             },
             include: {
-                Users: true
+                tasks: true
             }
         });
+        if (!projectInfo) {
+            return MyResponse(true, "Project not found", null, { status: 404 });
+        }
+
+        const projectEmp = await prisma.user_projects.findMany({
+            where: { projectid: projectInfo.projectId },
+            include: { Users: true }
+        });
+
+        const managerEntry = projectEmp.find((e) => e.Users?.role == role_enum.manager);
+        const membersEntries = projectEmp.filter((e) => e.Users?.role == role_enum.member);
 
         const porjectManager: User = {
             userId: managerEntry?.Users?.userId,
@@ -36,20 +35,6 @@ export async function GET(request :Request, {params} : {params : Promise<{id : s
             role: managerEntry?.Users?.role,
             createdAt: managerEntry?.Users?.createdAt,
         }
-        // console.log("manager = ", porjectManager);
-
-
-        const membersEntries = await prisma.user_projects.findMany({
-            where: {
-                projectid: projectInfo.projectId,
-                Users: {
-                    role: role_enum.member
-                }
-            },
-            include: {
-                Users: true
-            }
-        });
 
         const projectMembers = membersEntries.filter((e) => e.Users).map((e) => {
             const us: User = {
@@ -62,12 +47,8 @@ export async function GET(request :Request, {params} : {params : Promise<{id : s
             return us;
         });
 
-       const tasks = await prisma.tasks.findMany({
-            where : {
-                projectId : projectInfo.projectId
-            }
-       });
-        const projectTasks: Task[] = tasks.map((e) => ({
+
+        const projectTasks: Task[] = projectInfo.tasks.map((e) => ({
             taskId: e.taskId,
             title: e.title ?? "",
             description: e.description ?? "",
@@ -79,8 +60,8 @@ export async function GET(request :Request, {params} : {params : Promise<{id : s
             priority: e.priority as Priority,
             status: e.status as Status,
         }));
-        
-        const project : Project = {
+
+        const project: Project = {
             projectId: projectInfo.projectId,
             projectName: projectInfo.projectName,
             description: projectInfo.description,
@@ -90,14 +71,14 @@ export async function GET(request :Request, {params} : {params : Promise<{id : s
             completionDate: projectInfo.completionDate,
             status: projectInfo.status as Status,
 
-            manager : porjectManager,
-            members : projectMembers,
-            tasks : projectTasks
+            manager: porjectManager,
+            members: projectMembers,
+            tasks: projectTasks
         };
-        
-        return MyResponse(false,"Project Found", project, {status : 200});
-    }catch(err){
-    
+
+        return MyResponse(false, "Project Found", project, { status: 200 });
+    } catch (err) {
+
         console.log('Some Error Occured at api/projects/ Get by ID');
         console.log(err)
         return ErrorResponse(err);
@@ -158,9 +139,9 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
     }
 }
 
-export async function DELETE(request : Request, {params} : {params : Promise<{id : string}>}) {
-    try{
-        const projectId = Number( (await params).id );
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+    try {
+        const projectId = Number((await params).id);
 
         await prisma.$transaction(async (tx) => {
             await tx.user_projects.deleteMany({
@@ -205,12 +186,12 @@ export async function DELETE(request : Request, {params} : {params : Promise<{id
             });
             console.log("\n Deleted row from Project  \n");
         });
-        return MyResponse(false, "Project Deleted Succuessfully", {deleted : true} , {status : 200});
-    }catch(err){
-    
+        return MyResponse(false, "Project Deleted Succuessfully", { deleted: true }, { status: 200 });
+    } catch (err) {
+
         console.log('Some Error Occured at api/projects/DELETE');
         console.log(err)
         return ErrorResponse(err);
     }
-    
+
 }

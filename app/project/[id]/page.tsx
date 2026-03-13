@@ -65,7 +65,7 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
             if (data.error) {
                 console.error("Error deleting project:", data.message);
                 alert("Message = " + data.message);
-                return; 
+                return;
             }
             else {
                 myContext.setProjects(myContext.projects.filter((p) => p.projectId !== id));
@@ -198,11 +198,10 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
                         </Card>
 
 
-                        {/* Task List Section - Kanban */}
                         <div className="flex-1 w-full mx-auto">
                             {
                                 project.tasks != undefined
-                                    ? <MyKanbanBoard role={currentUser?.role == role_enum.admin || currentUser?.role == role_enum.manager} project={project} onAddTask={() => { console.log("On Add Task"); setRefreshKey(refreshKey + 1); }} />
+                                    ? <MyKanbanBoard role={currentUser?.role == role_enum.admin || currentUser?.role == role_enum.manager} projectId={project.projectId!} onAddTask={() => { console.log("On Add Task"); setRefreshKey(refreshKey + 1); }} />
                                     : <div> Tasks Not Found</div>
                             }
                         </div>

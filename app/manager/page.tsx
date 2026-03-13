@@ -32,7 +32,7 @@ export default function ManageDashboard() {
         <div className="flex-1 w-full max-w-7xl mx-auto">
           {
             projects.length > 0
-              ? <MyKanbanBoard role={true} project={projects[0]} />
+              ? <MyKanbanBoard role={true} projectId={projects[0].projectId!} />
               : <p>No Project here</p>
           }
         </div>

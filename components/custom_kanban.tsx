@@ -19,6 +19,7 @@ import { Task, Status, Priority, Project } from "@/app/(types)/myTypes";
 import TaskDialog from "./dialogs/taskDialog";
 // import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
+import { useMyContext } from "@/app/(utils)/myContext";
 
 type KanbanTask = Task & { id: number };
 
@@ -35,7 +36,10 @@ const statusColors = {
     [Status.Completed]: "bg-green-500/10 border-green-500/20",
 };
 
-export default function MyKanbanBoard({ role, project, onAddTask }: { role: boolean, project: Project, onAddTask?: any }) {
+export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: boolean, projectId: number, onAddTask?: any }) {
+    const { projects ,refreshData} = useMyContext();
+    const project = projects.find(p => p.projectId === projectId);
+
     if (project == undefined || project.tasks == undefined) {
         return (
             <>
@@ -98,6 +102,32 @@ export default function MyKanbanBoard({ role, project, onAddTask }: { role: bool
     }, [project.tasks]);
 
 
+    const updateStatus = async (taskId: number, status: Status) => {
+        try {
+            var completionDate = null;
+            if (status === Status.Completed) {
+                completionDate = new Date();
+            }
+
+            var data = JSON.stringify({
+                status,
+                completionDate
+            });
+            const res = await (await fetch("/api/tasks/" + taskId, {
+                method: "PUT",
+                body: data
+            })).json();
+
+            if (res.error) {
+                console.log("Res Errro = ", res.message);
+                alert(res.message);
+            }
+        } catch (err) {
+            console.log('Some Error Occured at Custom_KanBan');
+            console.log(err)
+        }
+    }
+
     const handleDropOverColumn = (dataTransferData: string, targetColumnId: string) => {
         const droppedCard: KanbanTask = JSON.parse(dataTransferData);
 
@@ -109,7 +139,7 @@ export default function MyKanbanBoard({ role, project, onAddTask }: { role: bool
                 // If this is the target column, add the card to the end
                 if (col.id === targetColumnId) {
                     updateStatus(droppedCard.taskId, col.id as Status);
-                    
+
                     return {
                         ...col,
                         cards: [...filteredCards, { ...droppedCard, status: targetColumnId as Status }]
@@ -243,32 +273,6 @@ export default function MyKanbanBoard({ role, project, onAddTask }: { role: bool
     );
 }
 
-const updateStatus = async (taskId: number, status: Status) => {
-    try {
-        var completionDate = null;
-        if (status === Status.Completed) {
-            completionDate = new Date();
-        }
-
-        var data = JSON.stringify({
-            status,
-            completionDate
-        });
-        const res = await (await fetch("/api/tasks/" + taskId, {
-            method: "PUT",
-            body: data
-        })).json();
-
-        if (res.error) {
-            console.log("Res Errro = ", res.message);
-            alert(res.message);
-        }
-    } catch (err) {
-        console.log('Some Error Occured at Custom_KanBan');
-        console.log(err)
-    }
-
-}
 /*
 const removeCard = (taskId: number) => {
         setColumns((prev) =>
