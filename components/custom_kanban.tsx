@@ -37,7 +37,7 @@ const statusColors = {
 };
 
 export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: boolean, projectId: number, onAddTask?: any }) {
-    const { projects ,refreshData} = useMyContext();
+    const { projects, setSpecificProject } = useMyContext();
     const project = projects.find(p => p.projectId === projectId);
 
     if (project == undefined || project.tasks == undefined) {
@@ -98,7 +98,6 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
                 status: Status.Completed,
             },
         ]);
-        console.log("UseEffrect ");
     }, [project.tasks]);
 
 
@@ -121,6 +120,8 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
             if (res.error) {
                 console.log("Res Errro = ", res.message);
                 alert(res.message);
+            } else {
+                setSpecificProject({ projectId: project.projectId! });
             }
         } catch (err) {
             console.log('Some Error Occured at Custom_KanBan');
@@ -138,7 +139,9 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
 
                 // If this is the target column, add the card to the end
                 if (col.id === targetColumnId) {
-                    updateStatus(droppedCard.taskId, col.id as Status);
+                    if (col.id !== droppedCard.status) {
+                        updateStatus(droppedCard.taskId, col.id as Status);
+                    }
 
                     return {
                         ...col,
@@ -152,6 +155,7 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
 
     const handleDropOverListItem = (dataTransferData: string, dropDirection: "top" | "bottom", targetCardId: number) => {
         const droppedCard: KanbanTask = JSON.parse(dataTransferData);
+        if (droppedCard.taskId === targetCardId) return;
 
         setColumns((prev) =>
             prev.map((col) => {
@@ -172,7 +176,10 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
                     const newCards = [...filteredCards];
                     const insertIndex = dropDirection === "top" ? targetIndex : targetIndex + 1;
                     newCards.splice(insertIndex, 0, { ...droppedCard, status: col.id as Status });
-                    updateStatus(droppedCard.taskId, col.id as Status);
+
+                    if (col.id !== droppedCard.status) {
+                        updateStatus(droppedCard.taskId, col.id as Status);
+                    }
                     return { ...col, cards: newCards };
                 }
 
@@ -183,7 +190,7 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
 
     const assignedName = (aId: number) => {
         var mem = project.members?.filter((val) => val.userId == aId);
-        if (!mem) {
+        if (!mem || mem.length <= 0) {
             return "Not Assigned";
         }
         const name = mem[0].userName;

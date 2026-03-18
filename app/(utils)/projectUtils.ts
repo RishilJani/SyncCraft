@@ -28,8 +28,6 @@ export async function updateProjectStatusBasedOnTasks(projectId: number) {
     } else if (allCompleted) {
         newStatus = Status.Completed;
     }
-    console.log("new Status = ", newStatus);
-
 
     await prisma.projects.update({
         where: { projectId: projId },

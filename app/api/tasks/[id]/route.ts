@@ -52,9 +52,6 @@ export async function PUT(
             data: updateData,
         });
 
-        // if (existingTask && existingTask.projectId !== task.projectId) {
-        //     await updateProjectStatusBasedOnTasks(existingTask.projectId);
-        // }
         await updateProjectStatusBasedOnTasks(task.projectId);
 
         return MyResponse(false, "Task Updated Successfully", task, { status: 200 });

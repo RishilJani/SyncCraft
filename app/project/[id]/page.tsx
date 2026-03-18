@@ -27,31 +27,21 @@ import {
 } from "@/components/ui/alert-dialog";
 
 export default function ProjectDetail({ params }: { params: Promise<{ id: string }> }) {
-    const { user: currentUser, loading: globalLoading } = useMyContext();
-    const router = useRouter();
-    const [localLoading, setLocalLoading] = useState(true);
-    const [project, setProject] = useState<Project>();
-    const [refreshKey, setRefreshKey] = useState(0);
     const myContext = useMyContext();
+    const { user: currentUser, loading: globalLoading, projects, setSpecificProject } = myContext;
+    const router = useRouter();
+    const [projectId, setProjectId] = useState<number | null>(null);
 
     useEffect(() => {
-        setLocalLoading(true);
         params.then((val) => {
             var temp = Number(val.id);
-            if (temp != -1) {
-                getProjectById(temp).then(
-                    (res) => {
-                        if (res == null) {
-                            setLocalLoading(false);
-                            setProject(undefined);
-                        }
-                        setProject(res);
-                        setLocalLoading(false);
-                    }
-                );
+            if (!isNaN(temp) && temp !== -1) {
+                setProjectId(temp);
             }
-        })
-    }, [refreshKey]);
+        });
+    }, [params]);
+
+    const project = projectId !== null ? projects.find(p => p.projectId === projectId) : undefined;
 
     const handleBack = () => { router.back(); };
 
@@ -78,7 +68,7 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
         }
     };
 
-    if (globalLoading || localLoading) {
+    if (globalLoading || projectId === null) {
         return null; // Global Loader is already shown
     }
 
@@ -201,7 +191,7 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
                         <div className="flex-1 w-full mx-auto">
                             {
                                 project.tasks != undefined
-                                    ? <MyKanbanBoard role={currentUser?.role == role_enum.admin || currentUser?.role == role_enum.manager} projectId={project.projectId!} onAddTask={() => { console.log("On Add Task"); setRefreshKey(refreshKey + 1); }} />
+                                    ? <MyKanbanBoard role={currentUser?.role == role_enum.admin || currentUser?.role == role_enum.manager} projectId={project.projectId!} onAddTask={() => { console.log("On Add Task"); setSpecificProject({ projectId: project.projectId! }); }} />
                                     : <div> Tasks Not Found</div>
                             }
                         </div>
@@ -236,12 +226,6 @@ function StatusBadge({ status, className }: { status: Status; className?: string
     );
 }
 
-async function getProjectById(id: number) {
-    const project = await (await fetch(`/api/projects/${id}`)).json();
-    if (project.error) {
-        return null;
-    }
-    return project.data;
-}
+
 
 
