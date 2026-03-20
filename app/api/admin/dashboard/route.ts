@@ -1,12 +1,28 @@
 import { ErrorResponse, MyResponse } from "@/app/(utils)/utils";
 import { prisma } from "@/lib/prisma";
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
-        const totalProjects = await prisma.projects.count();
+        const { searchParams } = new URL(request.url);
+        const userId = searchParams.get("userId");
+
+        if (!userId) {
+            return MyResponse(true, "User ID is required", null, { status: 400 });
+        }
+
+        const adminId = Number(userId);
+
+        const adminProjects = await prisma.projects.findMany({
+            where: { createdBy: adminId },
+            select: { projectId: true }
+        });
+        const projectIds = adminProjects.map(p => p.projectId);
+
+        const totalProjects = adminProjects.length;
 
         const activeProjects = await prisma.projects.count({
             where: {
+                createdBy: adminId,
                 status: {
                     in: ["todo", "pending"]
                 }
@@ -15,15 +31,22 @@ export async function GET() {
 
         const completedProjects = await prisma.projects.count({
             where: {
+                createdBy: adminId,
                 status: "completed"
             }
         });
 
-        const totalEmployees = await prisma.users.count();
+        const uniqueEmployees = await prisma.user_projects.findMany({
+            where: { projectid: { in: projectIds } },
+            distinct: ['userid'],
+            select: { userid: true }
+        });
+        const totalEmployees = uniqueEmployees.length;
 
         // Get counts grouped by status for charts
         const projectStatusDistributionData = await prisma.projects.groupBy({
             by: ['status'],
+            where: { createdBy: adminId },
             _count: {
                 status: true,
             },
@@ -35,17 +58,21 @@ export async function GET() {
         }));
 
         // Similarly, counting priorities for another chart
-        const taskPriorityDistributionData = await prisma.tasks.groupBy({
-            by: ['priority'],
-            _count: {
-                priority: true,
-            },
-        });
+        let taskPriorityDistribution: { name: string; value: number }[] = [];
+        if (projectIds.length > 0) {
+            const taskPriorityDistributionData = await prisma.tasks.groupBy({
+                by: ['priority'],
+                where: { projectId: { in: projectIds } },
+                _count: {
+                    priority: true,
+                },
+            });
 
-        const taskPriorityDistribution = taskPriorityDistributionData.map(item => ({
-            name: item.priority,
-            value: item._count.priority
-        }));
+            taskPriorityDistribution = taskPriorityDistributionData.map(item => ({
+                name: item.priority || "Undefined",
+                value: item._count.priority
+            }));
+        }
 
         console.log("Project Status Distribution ", projectStatusDistribution);
 
@@ -57,8 +84,6 @@ export async function GET() {
             projectStatusDistribution,
             taskPriorityDistribution
         };
-
-        // console.log("Dashboard Data = ", dashboardData);
 
         return MyResponse(false, "Dashboard Data fetched", dashboardData, { status: 200 });
 

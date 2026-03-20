@@ -27,13 +27,13 @@ function ProjectsList() {
         return null;
     }
 
-    if (userContext.projects.length == 0) {
-        return (
-            <>
-                Not any projects yet
-            </>
-        );
-    }
+    // if (userContext.projects.length == 0) {
+    //     return (
+    //         <>
+    //             Not any projects yet
+    //         </>
+    //     );
+    // }
 
     const filteredProjects = allProjects.filter((project) => {
         const matchesSearch = project.projectName.toLowerCase().includes(searchQuery.toLowerCase());
@@ -83,35 +83,40 @@ function ProjectsList() {
                 </div>
             </div>
 
-            <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mt-6">
-                {filteredProjects.map((project) => (
-                    <Link href={`/project/${project.projectId}`} key={project.projectId} className="block group">
-                        <Card className="h-full transition-all hover:shadow-md border-transparent hover:border-primary/20">
-                            <CardHeader>
-                                <div className="flex justify-between items-start">
-                                    <CardTitle className="text-xl group-hover:text-primary transition-colors">
-                                        {project.projectName}
-                                    </CardTitle>
-                                    <StatusBadge status={project.status as Status} />
-                                </div>
-                                <CardDescription className="line-clamp-2 mt-2">
-                                    {project.description}
-                                </CardDescription>
-                            </CardHeader>
-                            <CardContent>
-                                <div className="text-sm text-muted-foreground">
-                                    Due: {new Date(project.dueDate!).toLocaleDateString()}
-                                </div>
-                            </CardContent>
-                        </Card>
-                    </Link>
-                ))}
-                {filteredProjects.length === 0 && (
-                    <div className="col-span-full text-center py-12 text-muted-foreground">
-                        No projects found matching your criteria.
+            {
+                userContext.projects.length == 0
+                    ? <> Not any projects yet </>
+                    :
+                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mt-6">
+                        {filteredProjects.map((project) => (
+                            <Link href={`/project/${project.projectId}`} key={project.projectId} className="block group">
+                                <Card className="h-full transition-all hover:shadow-md border-transparent hover:border-primary/20">
+                                    <CardHeader>
+                                        <div className="flex justify-between items-start">
+                                            <CardTitle className="text-xl group-hover:text-primary transition-colors">
+                                                {project.projectName}
+                                            </CardTitle>
+                                            <StatusBadge status={project.status as Status} />
+                                        </div>
+                                        <CardDescription className="line-clamp-2 mt-2">
+                                            {project.description}
+                                        </CardDescription>
+                                    </CardHeader>
+                                    <CardContent>
+                                        <div className="text-sm text-muted-foreground">
+                                            Due: {new Date(project.dueDate!).toLocaleDateString()}
+                                        </div>
+                                    </CardContent>
+                                </Card>
+                            </Link>
+                        ))}
+                        {filteredProjects.length === 0 && (
+                            <div className="col-span-full text-center py-12 text-muted-foreground">
+                                No projects found matching your criteria.
+                            </div>
+                        )}
                     </div>
-                )}
-            </div>
+            }
         </>
     );
 }

@@ -21,7 +21,6 @@ interface TaskDialogProps {
     projectId: number;
     members: User[];
     task?: Task;
-    // setState : Dispatch<SetStateAction<boolean>>;
     onSuccess?: () => void;
 }
 
@@ -30,10 +29,8 @@ export default function TaskDialog({
     projectId,
     members,
     task,
-    // setState,
     onSuccess,
 }: TaskDialogProps) {
-    // const router = useRouter();
     const isUpdate = !!task;
 
     const [title, setTitle] = useState(task?.title || "");
@@ -41,10 +38,19 @@ export default function TaskDialog({
     const [dueDate, setDueDate] = useState<Date | undefined>(task?.dueDate ? new Date(task.dueDate) : undefined);
     const [assignedTo, setAssignedTo] = useState(task?.assignedTo?.toString() || "");
     const [priority, setPriority] = useState<Priority>(task?.priority || Priority.Medium);
-    const [status, setStatus] = useState<Status>(task?.status || Status.Todo);
     const [points, setPoints] = useState(task?.points?.toString() || "0");
+
     const [open, setOpen] = useState(false);
     const [loading, setLoading] = useState(false);
+
+    const clearState = () => {
+        setTitle(task?.title || "");
+        setDescription(task?.description || "");
+        setDueDate(task?.dueDate ? new Date(task.dueDate) : undefined);
+        setAssignedTo(task?.assignedTo?.toString() || "");
+        setPriority(task?.priority || Priority.Medium);
+        setPoints(task?.points?.toString() || "0");
+    }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -63,7 +69,7 @@ export default function TaskDialog({
                     dueDate,
                     assignedto: assignedTo ? Number(assignedTo) : null,
                     priority,
-                    status,
+                    status: Status.Todo,
                     points: Number(points),
                     projectId: projectId,
                 }),
@@ -71,14 +77,14 @@ export default function TaskDialog({
 
             if (!res.error) {
                 if (onSuccess) onSuccess();
-                console.log("Helloooooooooooooooooo");
+                clearState();
                 setOpen(false);
             } else {
                 alert("Error: " + res.message);
             }
         } catch (error) {
             console.error("Operation failed:", error);
-            alert("Something went wrong");
+            alert("Something went wrong" + error);
         } finally {
             setLoading(false);
         }
@@ -123,7 +129,7 @@ export default function TaskDialog({
                                         </Button>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-auto p-0" align="start">
-                                        <Calendar mode="single" fromDate={new Date()} selected={dueDate} onSelect={setDueDate} initialFocus />
+                                        <Calendar mode="single" hidden={{ before: new Date() }} selected={dueDate} onSelect={setDueDate} autoFocus />
                                     </PopoverContent>
                                 </Popover>
                             </div>

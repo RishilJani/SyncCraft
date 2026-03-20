@@ -36,8 +36,10 @@ export default function AdminDashboard() {
 
     useEffect(() => {
         const fetchDashboardData = async () => {
+            if (!userData?.user?.userId) return;
             try {
-                const res = await fetch('/api/admin/dashboard');
+                setLoading(true);
+                const res = await fetch(`/api/admin/dashboard?userId=${userData.user.userId}`, { cache: 'no-store' });
                 const json = await res.json();
                 if (json && !json.error) {
                     setData(json.data);
@@ -50,7 +52,7 @@ export default function AdminDashboard() {
         };
 
         fetchDashboardData();
-    }, []);
+    }, [userData?.user?.userId]);
 
     return (
         <div className="space-y-6 pb-8">

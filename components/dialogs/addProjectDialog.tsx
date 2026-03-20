@@ -24,7 +24,7 @@ export default function AddProjectDialog({
     children,
     open,
     setOpen
-}: {children : React.ReactNode, open : boolean, setOpen : Function}) {
+}: { children: React.ReactNode, open: boolean, setOpen: Function }) {
 
     const router = useRouter();
     const userContext = useMyContext();
@@ -34,48 +34,48 @@ export default function AddProjectDialog({
     const [dueDate, setDueDate] = useState<Date>();
     const [manager, setManager] = useState("");
     const [selectedMembers, setSelectedMembers] = useState<number[]>([]);
-    const [managers , setManagers] = useState<User[]>([]);
-    const [members , setMembers] = useState<User[]>([]);
+    const [managers, setManagers] = useState<User[]>([]);
+    const [members, setMembers] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(()=>{
+    useEffect(() => {
         try {
             setLoading(true);
-            getAllUsers().then((users)=>{
-                setManagers(users.filter((user) => user.role === role_enum.manager));
-                setMembers(users.filter((user) => user.role === role_enum.member));
+            getAllUsers().then((users) => {
+                setManagers(users.filter((user: User) => user.role === role_enum.manager));
+                setMembers(users.filter((user: User) => user.role === role_enum.member));
             });
-        }finally{
+        } finally {
             setLoading(false);
         }
-        
-    },[]);
 
-    if(loading){return ( <CustomLoader message="Just a minute"/>);}
+    }, []);
+
+    if (loading) { return (<CustomLoader message="Just a minute" />); }
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         userContext.setLoading(true);
         console.log("Handle Submit Functin\n");
         const adminId = userContext.user?.userId;
-    
-        var res = await(await fetch("/api/projects",{
-            method : "POST",
-            headers : myHeaders,
-            body : JSON.stringify({
-                projectName : title,
-                description : description,
-                createdBy : Number(adminId),
-                dueDate : dueDate,
-                managerId : Number(manager),
+
+        var res = await (await fetch("/api/projects", {
+            method: "POST",
+            headers: myHeaders,
+            body: JSON.stringify({
+                projectName: title,
+                description: description,
+                createdBy: Number(adminId),
+                dueDate: dueDate,
+                managerId: Number(manager),
                 memberIds: selectedMembers
             }),
         })).json();
         console.log("Res = ", res);
-        
-        if(!res.error){ 
+
+        if (!res.error) {
             await userContext.refreshData();
-            router.back();
+            router.replace('/admin/projects');
         }
         userContext.setLoading(false);
     }
@@ -96,7 +96,7 @@ export default function AddProjectDialog({
 
     return (
         <>
-        <Dialog open={open}  onOpenChange={handleOpenChange}>
+            <Dialog open={open} onOpenChange={handleOpenChange}>
                 <DialogTrigger asChild>
                     {children}
                 </DialogTrigger>
@@ -127,11 +127,11 @@ export default function AddProjectDialog({
                                             <Popover>
                                                 <PopoverTrigger asChild>
                                                     <Button variant={"outline"} className={cn("w-full justify-start text-left font-normal", !dueDate && "text-muted-foreground")} >
-                                                        <CalendarIcon className="mr-2 h-4 w-4"  /> {dueDate ? format(dueDate, "PPP") : <span>Pick a date</span>}
+                                                        <CalendarIcon className="mr-2 h-4 w-4" /> {dueDate ? format(dueDate, "PPP") : <span>Pick a date</span>}
                                                     </Button>
                                                 </PopoverTrigger>
                                                 <PopoverContent className="w-auto p-0" align="start">
-                                                    <Calendar fromDate={new Date()} mode="single" selected={dueDate}  onSelect={setDueDate} initialFocus />
+                                                    <Calendar hidden={{ before: new Date() }} mode="single" selected={dueDate} onSelect={setDueDate} autoFocus />
                                                 </PopoverContent>
                                             </Popover>
                                         </div>
@@ -183,7 +183,7 @@ export default function AddProjectDialog({
 
                                 </div>
                             </div>
-                
+
                             <div className="pt-2">
                                 <Button type="submit" className="w-full text-lg">Add Project</Button>
                             </div>
@@ -198,7 +198,7 @@ export default function AddProjectDialog({
                         </div>
                     </div>
                 </DialogContent>
-                </Dialog>
+            </Dialog>
         </>
 
     );

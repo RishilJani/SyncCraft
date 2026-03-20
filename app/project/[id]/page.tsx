@@ -191,7 +191,7 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
                         <div className="flex-1 w-full mx-auto">
                             {
                                 project.tasks != undefined
-                                    ? <MyKanbanBoard role={currentUser?.role == role_enum.admin || currentUser?.role == role_enum.manager} projectId={project.projectId!} onAddTask={() => { console.log("On Add Task"); setSpecificProject({ projectId: project.projectId! }); }} />
+                                    ? <MyKanbanBoard role={currentUser?.role == role_enum.admin || currentUser?.role == role_enum.manager} projectId={project.projectId!} onAddTask={() => { setSpecificProject({ projectId: project.projectId! }); }} />
                                     : <div> Tasks Not Found</div>
                             }
                         </div>

@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { getAllUsers } from "@/app/actions/users/userFunctions";
 import { User } from "@/app/(types)/myTypes";
 import { role_enum } from "@/app/generated/prisma/enums";
 import { useRouter } from "next/navigation";
@@ -19,21 +18,25 @@ export default function EmployeesPage() {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
     useEffect(() => {
-        // Cookie Logic Here
         setLoading(true);
-        getAllUsers().then((res) => {
-            res = res.filter((emp) => emp.userId != 3);
-            setEmployee(res);
-            setLoading(false);
-        });
+        fetch("/api/admin/emoloyess")
+            .then((res) => res.json())
+            .then((data) => {
+                setEmployee(data);
+                setLoading(false);
+            })
+            .catch((err) => {
+                console.error("Failed to fetch employees:", err);
+                setLoading(false);
+            });
     }, []);
 
-    if(loading){
-        return (<CustomLoader/>);
+    if (loading) {
+        return (<CustomLoader />);
     }
 
-    const handleClick = (id : number)=>{
-        router.push("/admin/employees/"+id);
+    const handleClick = (id: number) => {
+        router.push("/admin/employees/" + id);
     }
 
     const filteredEmployees = employees.filter((employee: User) => {
@@ -84,7 +87,7 @@ export default function EmployeesPage() {
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {filteredEmployees.length > 0 ? (
                     filteredEmployees.map((employee: User) => (
-                        <Card key={employee.userId} className="hover:shadow-lg transition-all duration-300 border-border/50" onClick={(e)=>{handleClick(employee.userId!)}}>
+                        <Card key={employee.userId} className="hover:shadow-lg transition-all duration-300 border-border/50" onClick={(e) => { handleClick(employee.userId!) }}>
                             <CardHeader className="flex flex-row items-center gap-4 pb-2">
                                 <div className="flex flex-col">
                                     <CardTitle className="text-lg">{employee.userName}</CardTitle>
