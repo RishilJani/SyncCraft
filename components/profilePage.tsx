@@ -56,9 +56,9 @@ const fetchUserData = async (id: string | number) => {
 };
 
 export default function UserProfilePage({ id, viewerRole }: { id: string | number; viewerRole?: role_enum; }) {
-    const { user: currentUser, loading: globalLoading, refreshData } = useMyContext();
+    const { user: currentUser, loading: globalLoading, setLoading: setGlobalLoading, refreshData } = useMyContext();
     const [profileUser, setProfileUser] = useState<User | null>(null);
-    const [localLoading, setLocalLoading] = useState(true);
+    // const [localLoading, setLocalLoading] = useState(true);
     const router = useRouter();
 
     const handleLogout = async () => {
@@ -68,14 +68,14 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
     };
 
     const loadData = async () => {
-        setLocalLoading(true);
+        setGlobalLoading(true);
         try {
             const data = await fetchUserData(id);
             setProfileUser(data);
         } catch (error) {
             console.error("Failed to load user data", error);
         } finally {
-            setLocalLoading(false);
+            setGlobalLoading(false);
         }
     };
 
@@ -87,7 +87,7 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
         router.back();
     };
 
-    if (globalLoading || localLoading) {
+    if (globalLoading) {
         return null; // Global loader handles initial state
     }
 

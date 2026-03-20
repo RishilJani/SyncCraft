@@ -18,7 +18,6 @@ import { format } from "date-fns";
 import { role_enum } from "@/app/generated/prisma/enums";
 import CustomLoader from "../custom_loader";
 import { useRouter } from "next/navigation";
-import { getAllUsers } from "@/app/actions/users/userFunctions";
 
 export default function AddProjectDialog({
     children,
@@ -41,19 +40,25 @@ export default function AddProjectDialog({
     useEffect(() => {
         try {
             setLoading(true);
-            getAllUsers().then((users) => {
-                setManagers(users.filter((user: User) => user.role === role_enum.manager));
-                setMembers(users.filter((user: User) => user.role === role_enum.member));
-            });
+            fetch("/api/admin/emoloyess")
+                .then((res) => res.json())
+                .then((data) => {
+                    setManagers(data.filter((user: User) => user.role === role_enum.manager));
+                    setMembers(data.filter((user: User) => user.role === role_enum.member));
+                    setLoading(false);
+                })
+                .catch((err) => {
+                    console.error("Failed to fetch employees:", err);
+                    setLoading(false);
+                });
         } finally {
             setLoading(false);
         }
 
     }, []);
-
     if (loading) { return (<CustomLoader message="Just a minute" />); }
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault();
         userContext.setLoading(true);
         console.log("Handle Submit Functin\n");
@@ -75,7 +80,7 @@ export default function AddProjectDialog({
 
         if (!res.error) {
             await userContext.refreshData();
-            router.replace('/admin/projects');
+            setOpen(false);
         }
         userContext.setLoading(false);
     }

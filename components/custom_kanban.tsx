@@ -13,13 +13,15 @@ import {
     KanbanBoardProvider,
 } from "@/components/kanban";
 import { Badge } from "@/components/ui/badge";
-import { ClipboardList, ListTodo, Users, Pencil, Coins } from "lucide-react";
+import { ClipboardList, ListTodo, Users, Pencil, Coins, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Task, Status, Priority, Project } from "@/app/(types)/myTypes";
 import TaskDialog from "./dialogs/taskDialog";
 // import { useRouter } from "next/navigation";
 import { Button } from "./ui/button";
 import { useMyContext } from "@/app/(utils)/myContext";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
+import { cn } from "@/lib/utils";
 
 type KanbanTask = Task & { id: number };
 
@@ -39,6 +41,8 @@ const statusColors = {
 export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: boolean, projectId: number, onAddTask?: any }) {
     const { projects, setSpecificProject } = useMyContext();
     const project = projects.find(p => p.projectId === projectId);
+    const [taskToDelete, setTaskToDelete] = useState<KanbanTask | null>(null);
+    const [isDeleteHovered, setIsDeleteHovered] = useState(false);
 
     if (project == undefined || project.tasks == undefined) {
         return (
@@ -126,6 +130,28 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
         } catch (err) {
             console.log('Some Error Occured at Custom_KanBan');
             console.log(err)
+        }
+    }
+
+    const confirmDeleteTask = async () => {
+        if (!taskToDelete) return;
+        try {
+            const res = await (await fetch("/api/tasks/" + taskToDelete.taskId, {
+                method: "DELETE"
+            })).json();
+
+            if (res.error) {
+                console.log("Delete error =", res.message);
+                alert(res.message);
+            } else {
+                setSpecificProject({ projectId: project.projectId! });
+            }
+        } catch (err) {
+            console.log('Error deleting task');
+            console.log(err);
+        } finally {
+            setTaskToDelete(null);
+            setIsDeleteHovered(false);
         }
     }
 
@@ -276,6 +302,53 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
                     </div>
                 </div>
             </div>
+
+            {role && (
+                <>
+                    <div
+                        className={cn(
+                            "fixed bottom-8 right-8 z-50 flex h-16 w-16 items-center justify-center rounded-full shadow-lg transition-all duration-300",
+                            isDeleteHovered ? "bg-destructive text-destructive-foreground scale-110 shadow-destructive/50" : "bg-muted text-muted-foreground hover:bg-destructive/90 hover:text-destructive-foreground"
+                        )}
+                        onDragOver={(e) => {
+                            if (e.dataTransfer.types.includes('kanban-board-card')) {
+                                e.preventDefault();
+                                setIsDeleteHovered(true);
+                            }
+                        }}
+                        onDragLeave={() => setIsDeleteHovered(false)}
+                        onDrop={(e) => {
+                            e.preventDefault();
+                            setIsDeleteHovered(false);
+                            const data = e.dataTransfer.getData('kanban-board-card');
+                            if (data) {
+                                const droppedCard: KanbanTask = JSON.parse(data);
+                                setTaskToDelete(droppedCard);
+                            }
+                        }}
+                    >
+                        <Trash2 className="h-6 w-6" />
+                    </div>
+
+                    <AlertDialog open={!!taskToDelete} onOpenChange={(open) => !open && setTaskToDelete(null)}>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    This action cannot be undone. This will permanently delete the task
+                                    "{taskToDelete?.title}".
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                                <AlertDialogAction onClick={confirmDeleteTask} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">
+                                    Delete
+                                </AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                    </AlertDialog>
+                </>
+            )}
         </div>
     );
 }

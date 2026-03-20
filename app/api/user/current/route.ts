@@ -1,4 +1,4 @@
-import { getUserCookie } from "@/app/actions/users/userFunctions";
+    import { getUserCookie } from "@/app/actions/users/userFunctions";
 import { ErrorResponse, MyResponse } from "@/app/(utils)/utils";
 import { NextResponse } from "next/server";
 

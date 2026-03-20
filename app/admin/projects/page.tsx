@@ -143,15 +143,3 @@ function StatusBadge({ status }: { status: string }) {
 
 
 export default ProjectsList;
-
-// function fetchingData() {
-//     setLoading(true);
-//     fetch("/api/projects", { method: "GET" }).then((res) => res.json()).then((res) => {
-//         if (res.error) {
-//             console.log("Error", res.message);
-//         } else {
-//             setAllProjects(res.data);
-//         }
-//         setLoading(false);
-//     });
-// }

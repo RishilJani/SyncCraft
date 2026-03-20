@@ -14,8 +14,7 @@ import {
 } from "@/components/ui/select";
 
 export default function ManageDashboard() {
-  const myContext = useMyContext();
-  const { user, projects, setSpecificProject } = myContext;
+  const { user, projects, setSpecificProject } = useMyContext();
   const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
 
   useEffect(() => {
@@ -30,12 +29,9 @@ export default function ManageDashboard() {
         <div className="flex items-center justify-between mb-8 mx-auto w-full max-w-7xl">
           <div className="flex flex-col gap-1">
             <h1 className="text-4xl font-bold tracking-tight">Dashboard</h1>
-            {projects.length > 0 && (
+            {projects.length > 1 && (
               <div className="mt-2 w-64">
-                <Select
-                  value={selectedProjectId?.toString()}
-                  onValueChange={(value) => setSelectedProjectId(parseInt(value))}
-                >
+                <Select value={selectedProjectId?.toString()} onValueChange={(value) => setSelectedProjectId(parseInt(value))} >
                   <SelectTrigger className="w-full">
                     <SelectValue placeholder="Select a project" />
                   </SelectTrigger>
@@ -62,7 +58,10 @@ export default function ManageDashboard() {
         <div className="flex-1 w-full max-w-7xl mx-auto">
           {
             projects.length > 0 && selectedProjectId !== null
-              ? <MyKanbanBoard role={true} projectId={selectedProjectId} />
+              ? <MyKanbanBoard role={true} projectId={selectedProjectId} onAddTask={() => {
+                console.log("onAddTask manager");
+                setSpecificProject({ projectId: selectedProjectId });
+              }} />
               : <p>No Project here</p>
           }
         </div>

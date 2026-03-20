@@ -1,11 +1,20 @@
+"use client"
 import MyKanbanBoard from '@/components/custom_kanban';
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Users } from "lucide-react";
-import { getUser } from '../actions/users/userFunctions';
+import { useMyContext } from '../(utils)/myContext';
+import { useEffect, useState } from 'react';
 
-async function MemberDashboard() {
-  const user = await getUser();
+function MemberDashboard() {
+  const { user, projects, setSpecificProject } = useMyContext();
+  const [selectedProjectId, setSelectedProjectId] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (projects.length > 0 && selectedProjectId === null) {
+      setSelectedProjectId(projects[0].projectId!);
+    }
+  }, [projects, selectedProjectId]);
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40 p-4 md:p-8">
@@ -21,7 +30,10 @@ async function MemberDashboard() {
         </div>
       </div>
       <div className="flex-1 w-full max-w-7xl mx-auto">
-        {/* <MyKanbanBoard role={false} projectId={1} /> */}
+        <MyKanbanBoard role={false} projectId={1} onAddTask={() => {
+          console.log("onAddTask manager");
+          setSpecificProject({ projectId: selectedProjectId! });
+        }} />
       </div>
     </div>
   )

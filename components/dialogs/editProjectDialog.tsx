@@ -16,7 +16,6 @@ import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { Project, User } from "@/app/(types)/myTypes";
-import { getAllUsers } from "@/app/actions/users/userFunctions";
 import { role_enum } from "@/app/generated/prisma/enums";
 import CustomLoader from "@/components/custom_loader";
 
@@ -40,15 +39,25 @@ export default function EditProjectForm({
     const [managers, setManagers] = useState<any>(null);
     const [members, setMembers] = useState<any>(null);
 
+    const [loading, setLoading] = useState(false);
     useEffect(() => {
-        getAllUsers().then((users) => {
-            var mana = users.filter((user: User) => user.role === role_enum.manager);
-            var mem = users.filter((user: User) => user.role === role_enum.member);
-            setManagers(mana);
-            setMembers(mem);
-        });
+        setLoading(true);
+        fetch("/api/admin/emoloyess")
+            .then((res) => res.json())
+            .then((data) => {
+                setManagers(data.filter((user: User) => user.role === role_enum.manager));
+                setMembers(data.filter((user: User) => user.role === role_enum.member));
+                setLoading(false);
+            })
+            .catch((err) => {
+                console.error("Failed to fetch employees:", err);
+                setLoading(false);
+            });
 
     }, []);
+
+
+    if (loading) { return (<CustomLoader message="Just a minute" />); }
 
     if (!open) {
         return (
