@@ -22,6 +22,7 @@ import { Button } from "./ui/button";
 import { useMyContext } from "@/app/(utils)/myContext";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
+import ProjectProgress from "@/components/project_progress";
 
 type KanbanTask = Task & { id: number };
 
@@ -229,7 +230,7 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
             <div className="flex min-h-screen w-full flex-col bg-muted/40 p-4 md:p-8">
                 <div className="mx-auto w-full space-y-6">
                     {
-                        role && <div className="flex flex-col items-end mx-auto w-full ml-3">
+                        role && <div className="flex flex-col items-end mx-auto w-full ml-3 px-4 pb-4">
                             <TaskDialog projectId={project.projectId!} members={project.members!} onSuccess={() => { console.log("On Success"); onAddTask(); }}>
                                 <Button variant="default" className="gap-2" size="sm">
                                     <ClipboardList className="h-5 w-5" />
@@ -300,6 +301,12 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
                             </KanbanBoard>
                         </KanbanBoardProvider>
                     </div>
+
+                    {role && (
+                        <div className="w-full mt-8 px-4 pb-8">
+                            <ProjectProgress tasks={columns.flatMap(col => col.cards)} />
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -352,14 +359,3 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
         </div>
     );
 }
-
-/*
-const removeCard = (taskId: number) => {
-        setColumns((prev) =>
-            prev.map((col) => ({
-                ...col,
-                cards: col.cards.filter((card) => card.taskId !== taskId),
-            }))
-        );
-    };
-    */

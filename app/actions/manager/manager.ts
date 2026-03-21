@@ -7,11 +7,8 @@ export async function getManagerProject(managerId : number){
                 userid : managerId
             }
         });
-        console.log("projs =  ", projs );
-
-
         var res = await (await fetch("/api/projects/" + projs[0].projectid)).json();
-        console.log("Res = ", res);
+
         if(!res.error){
             const project = res.data;
             return project;

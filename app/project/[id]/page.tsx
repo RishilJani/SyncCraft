@@ -85,7 +85,7 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
 
     return (
         <>
-            <div className="flex min-h-screen w-full flex-col bg-muted/40 p-4 md:p-8">
+            <div className="flex min-h-screen w-full flex-col bg-muted/40 p-4 md:p-8 bg-red">
                 <div className="w-full space-y-8 max-w-7xl mx-auto">
 
                     {/* Header Section */}

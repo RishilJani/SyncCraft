@@ -11,20 +11,6 @@ const EMAIL = "email";
 const ROLE = "role";
 const CREATED_AT = "createdAt";
 
-export async function getAllUsers() {
-    try {
-        const data = await (await fetch("/api/admin/emoloyess")).json();
-        console.log("data = ", data);
-        if (data) {
-            return data;
-        } else {
-            return [];
-        }
-    } catch (err) {
-        console.error('Error fetching all users:', err);
-        return [];
-    }
-}
 
 export async function logout() {
     const cookie = await cookies();
