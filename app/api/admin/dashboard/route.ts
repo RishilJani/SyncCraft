@@ -74,8 +74,6 @@ export async function GET(request: Request) {
             }));
         }
 
-        console.log("Project Status Distribution ", projectStatusDistribution);
-
         const dashboardData = {
             totalProjects,
             activeProjects,
