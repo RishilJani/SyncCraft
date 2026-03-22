@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { ArrowLeft, Calendar, Flag, CheckCircle2, NotepadText, Edit, Trash2 } from "lucide-react";
 import MyKanbanBoard from "@/components/custom_kanban";
 import { Button } from "@/components/ui/button";
@@ -11,7 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { useEffect, useState } from "react";
 import { role_enum } from "@/app/generated/prisma/enums";
 import EditProjectForm from "../../../components/dialogs/editProjectDialog";
-import { Project, Status } from "@/app/(types)/myTypes";
+import { Status } from "@/app/(types)/myTypes";
 import { useMyContext } from "@/app/(utils)/myContext";
 import { formateDate } from "@/app/(utils)/utils";
 import {

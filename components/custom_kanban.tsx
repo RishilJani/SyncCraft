@@ -13,11 +13,11 @@ import {
     KanbanBoardProvider,
 } from "@/components/kanban";
 import { Badge } from "@/components/ui/badge";
-import { ClipboardList, ListTodo, Users, Pencil, Coins, Trash2 } from "lucide-react";
+import { ClipboardList, Users, Pencil, Coins, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Task, Status, Priority, Project } from "@/app/(types)/myTypes";
 import TaskDialog from "./dialogs/taskDialog";
-// import { useRouter } from "next/navigation";
+import TaskDetailDialog from "./dialogs/taskDetail";
 import { Button } from "./ui/button";
 import { useMyContext } from "@/app/(utils)/myContext";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -44,6 +44,7 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
     const project = projects.find(p => p.projectId === projectId);
     const [taskToDelete, setTaskToDelete] = useState<KanbanTask | null>(null);
     const [isDeleteHovered, setIsDeleteHovered] = useState(false);
+    const [selectedTask, setSelectedTask] = useState<KanbanTask | null>(null);
 
     if (project == undefined || project.tasks == undefined) {
         return (
@@ -261,7 +262,12 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
                                                         if (dir === "top" || dir === "bottom")
                                                             handleDropOverListItem(data, dir, card.id);
                                                     } : undefined} >
-                                                    <KanbanBoardCard data={card} draggable={role} className="cursor-grab active:cursor-grabbing hover:shadow-md transition-all"     >
+                                                    <KanbanBoardCard
+                                                        data={card}
+                                                        draggable={role}
+                                                        className="cursor-grab active:cursor-grabbing hover:shadow-md transition-all"
+                                                        onClick={() => setSelectedTask(card)}
+                                                    >
                                                         <div className="flex justify-between items-start">
                                                             <KanbanBoardCardTitle className="text-[17px]">{card.title}</KanbanBoardCardTitle>
                                                             <Badge variant={card.priority === Priority.High ? "destructive" : card.priority === Priority.Medium ? "outline" : "secondary"} className="text-[12px] px-2 py-0">
@@ -284,11 +290,13 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
                                                                     </div>
                                                                 )}
                                                                 {role && (
-                                                                    <TaskDialog projectId={project.projectId!} members={project.members!} task={card} onSuccess={() => { console.log("On Success Edit"); if (onAddTask) onAddTask(); }} >
-                                                                        <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full hover:bg-primary/10 hover:text-primary transition-colors" >
-                                                                            <Pencil className="h-3.5 w-3.5" />
-                                                                        </Button>
-                                                                    </TaskDialog>
+                                                                    <div onClick={(e) => e.stopPropagation()}>
+                                                                        <TaskDialog projectId={project.projectId!} members={project.members!} task={card} onSuccess={() => { console.log("On Success Edit"); if (onAddTask) onAddTask(); }} >
+                                                                            <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full hover:bg-primary/10 hover:text-primary transition-colors" >
+                                                                                <Pencil className="h-3.5 w-3.5" />
+                                                                            </Button>
+                                                                        </TaskDialog>
+                                                                    </div>
                                                                 )}
                                                             </div>
                                                         </div>
@@ -355,6 +363,15 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
                         </AlertDialogContent>
                     </AlertDialog>
                 </>
+            )}
+
+            {selectedTask && (
+                <TaskDetailDialog
+                    task={selectedTask}
+                    members={project.members!}
+                    open={!!selectedTask}
+                    onOpenChange={(open) => !open && setSelectedTask(null)}
+                />
             )}
         </div>
     );
