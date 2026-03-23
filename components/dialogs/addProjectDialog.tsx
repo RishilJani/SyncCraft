@@ -106,7 +106,9 @@ export default function AddProjectDialog({
                     {children}
                 </DialogTrigger>
 
-                <DialogContent className="sm:max-w-3/8 p-0 max-h-11/12 overflow-scoll">
+                <DialogContent className="sm:max-w-3/8 p-0 max-h-11/12 overflow-auto" style={{
+                    scrollbarWidth: 'none'
+                }} >
                     <div>
                         <DialogHeader className="p-6 pb-2">
                             <DialogTitle className="text-2xl font-bold text-center mt-2">Add Project</DialogTitle>

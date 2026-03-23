@@ -104,7 +104,12 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
                         {currentUser?.role == role_enum.admin &&
                             <div className="flex justify-end">
                                 <div className="flex items-end gap-2 mx-2">
-                                    <EditProjectForm data={project} >
+                                    <EditProjectForm data={project} onEdit={() => {
+                                        setSpecificProject({ projectId: projectId });
+                                        console.log("updating Project");
+
+
+                                    }}>
                                         <Button variant="outline" size="sm" className="gap-2">
                                             <Edit className="h-5 w-5" />
                                             Edit Project

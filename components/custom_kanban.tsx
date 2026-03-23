@@ -40,6 +40,7 @@ const statusColors = {
 };
 
 export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: boolean, projectId: number, onAddTask?: any }) {
+    console.log("After Updating The project");
     const { projects, setSpecificProject } = useMyContext();
     const project = projects.find(p => p.projectId === projectId);
     const [taskToDelete, setTaskToDelete] = useState<KanbanTask | null>(null);
@@ -83,6 +84,8 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
     ]);
 
     useEffect(() => {
+        console.log("After Updating The project useEffect");
+
         const kanbanTasks: KanbanTask[] = (project.tasks || []).map(task => ({ ...task, id: task.taskId }));
         setColumns([
             {
@@ -104,7 +107,7 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
                 status: Status.Completed,
             },
         ]);
-    }, [project.tasks]);
+    }, [projects, project.tasks]);
 
 
     const updateStatus = async (taskId: number, status: Status) => {
@@ -312,7 +315,7 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
 
                     {role && (
                         <div className="w-full mt-8 px-4 pb-8">
-                            <ProjectProgress tasks={columns.flatMap(col => col.cards)} />
+                            <ProjectProgress tasks={columns.flatMap(col => col.cards)} projectStartDate={project.createdAt ? new Date(project.createdAt) : undefined} projectEndDate={project.dueDate ? new Date(project.dueDate) : (project.completionDate ? new Date(project.completionDate) : undefined)} />
                         </div>
                     )}
                 </div>

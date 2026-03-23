@@ -45,7 +45,14 @@ export async function PUT(
         if (updateData.projectId !== undefined) updateData.projectId = Number(updateData.projectId);
         if (updateData.points !== undefined) updateData.points = Number(updateData.points);
 
-        // const existingTask = await prisma.tasks.findUnique({ where: { taskId } });
+        const existingTask = await prisma.tasks.findUnique({ where: { taskId } });
+        if (updateData.dueDate && existingTask?.completionDate) {
+            if (updateData.dueDate < existingTask?.completionDate) {
+                updateData.completionDate = null;
+                console.log("updateData.completionDate = ", updateData.completionDate);
+            }
+        }
+        console.log("updatedData = ", updateData);
 
         const task = await prisma.tasks.update({
             where: { taskId },

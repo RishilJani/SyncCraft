@@ -83,8 +83,11 @@ export type Range = "daily" | "monthly" | "quarterly"
 export type TimelineData = {
   year: number
   quarters: {
+    quarterIndex: number;
     months: {
-      days: number
+      days: number;
+      monthIndex: number;
+      startDay: number;
     }[]
   }[]
 }[]
@@ -165,7 +168,8 @@ const getAddRange = (range: Range) => {
 }
 
 const getDateByMousePosition = (context: GanttContextProps, mouseX: number) => {
-  const timelineStartDate = new Date(context.timelineData[0].year, 0, 1)
+  const firstData = context.timelineData[0];
+  const timelineStartDate = new Date(firstData?.year ?? 0, firstData?.quarters[0]?.months[0]?.monthIndex ?? 0, firstData?.quarters[0]?.months[0]?.startDay ?? 1)
   const columnWidth = (context.columnWidth * context.zoom) / 100
   const offset = Math.floor(mouseX / columnWidth)
   const daysIn = getsDaysIn(context.range)
@@ -179,38 +183,71 @@ const getDateByMousePosition = (context: GanttContextProps, mouseX: number) => {
   return actualDate
 }
 
-const createInitialTimelineData = (today: Date) => {
+const createInitialTimelineData = (startDate?: Date, endDate?: Date) => {
   const data: TimelineData = []
 
-  data.push(
-    { year: today.getFullYear() - 1, quarters: new Array(4).fill(null) },
-    { year: today.getFullYear(), quarters: new Array(4).fill(null) },
-    { year: today.getFullYear() + 1, quarters: new Array(4).fill(null) },
-  )
+  const today = new Date()
+  const startYear = startDate ? startDate.getFullYear() : today.getFullYear() - 1
+  const endYear = Math.max(startYear, endDate ? endDate.getFullYear() : today.getFullYear() + 1)
+  const startMonth = startDate ? startDate.getMonth() : 0
+  const endMonth = (endDate && endDate.getFullYear() === endYear) ? endDate.getMonth() : 11
+  
+  const startDayOfMonth = startDate ? startDate.getDate() : 1
+  const endDayOfMonth = (endDate && endDate.getFullYear() === endYear && endDate.getMonth() === endMonth) ? endDate.getDate() : 31
 
-  for (const yearObj of data) {
-    yearObj.quarters = new Array(4).fill(null).map((_, quarterIndex) => ({
-      months: new Array(3).fill(null).map((_, monthIndex) => {
-        const month = quarterIndex * 3 + monthIndex
-        return {
-          days: getDaysInMonth(new Date(yearObj.year, month, 1)),
+  for (let year = startYear; year <= endYear; year++) {
+    const quarters = []
+    for (let quarterIndex = 0; quarterIndex < 4; quarterIndex++) {
+      const months = []
+      for (let m = 0; m < 3; m++) {
+        const monthIndex = quarterIndex * 3 + m
+        if (startDate && year === startYear && monthIndex < startMonth) continue
+        if (endDate && year === endYear && monthIndex > endMonth) continue
+        
+        const totalDays = getDaysInMonth(new Date(year, monthIndex, 1))
+        let startDay = 1
+        let endDay = totalDays
+        
+        if (startDate && year === startYear && monthIndex === startMonth) {
+           startDay = startDayOfMonth
         }
-      }),
-    }))
+        if (endDate && year === endYear && monthIndex === endMonth) {
+           endDay = Math.min(endDayOfMonth, totalDays)
+        }
+        
+        if (startDay > endDay) continue
+        
+        months.push({
+          days: endDay - startDay + 1,
+          monthIndex,
+          startDay
+        })
+      }
+      if (months.length > 0) quarters.push({ quarterIndex, months })
+    }
+    if (quarters.length > 0) data.push({ year, quarters })
   }
 
+  if (data.length === 0) {
+    data.push({
+      year: startYear,
+      quarters: [{ quarterIndex: 0, months: [{ days: 31, monthIndex: 0, startDay: 1 }] }],
+    })
+  }
   return data
 }
 
 const getOffset = (date: Date, timelineStartDate: Date, context: GanttContextProps) => {
   const parsedColumnWidth = (context.columnWidth * context.zoom) / 100
-  const differenceIn = getDifferenceIn(context.range)
   const startOf = getStartOf(context.range)
-  const fullColumns = differenceIn(startOf(date), timelineStartDate)
 
   if (context.range === "daily") {
-    return parsedColumnWidth * fullColumns
+    const startOfTimeline = startOfDay(timelineStartDate);
+    return parsedColumnWidth * differenceInDays(startOfDay(date), startOfTimeline)
   }
+
+  const differenceIn = getDifferenceIn(context.range)
+  const fullColumns = differenceIn(startOfMonth(date), startOfMonth(timelineStartDate))
 
   const partialColumns = date.getDate()
   const daysInMonth = getDaysInMonth(date)
@@ -302,7 +339,7 @@ export const GanttContentHeader: FC<GanttContentHeaderProps> = ({
 
   return (
     <div
-      className="sticky top-0 z-20 grid w-full shrink-0 bg-backdrop/90 backdrop-blur-sm"
+      className="sticky top-0 z-20 grid w-full shrink-0 bg-backdrop/90 backdrop-blur-sm bg-amber-300 "
       style={{ height: "var(--gantt-header-height)" }}
     >
       <div>
@@ -340,24 +377,26 @@ const DailyHeader: FC = () => {
   return gantt.timelineData.map(year =>
     year.quarters
       .flatMap(quarter => quarter.months)
-      .map((month, index) => (
-        <div className="relative flex flex-col" key={`${year.year}-${index}`}>
+      .map((month) => (
+        <div className="relative flex flex-col" key={`${year.year}-${month.monthIndex}`}>
           <GanttContentHeader
             columns={month.days}
-            renderHeaderItem={(item: number) => (
+            renderHeaderItem={(item: number) => {
+              const actualDate = addDays(new Date(year.year, month.monthIndex, month.startDay), item)
+              return (
               <div className="flex items-center justify-center gap-1">
-                <p>{format(addDays(new Date(year.year, index, 1), item), "d")}</p>
+                <p>{format(actualDate, "d")}</p>
                 <p className="text-muted-foreground">
-                  {format(addDays(new Date(year.year, index, 1), item), "EEEEE")}
+                  {format(actualDate, "EEEEE")}
                 </p>
               </div>
-            )}
-            title={format(new Date(year.year, index, 1), "MMMM yyyy")}
+            )}}
+            title={format(new Date(year.year, month.monthIndex, 1), "MMMM yyyy")}
           />
           <GanttColumns
             columns={month.days}
             isColumnSecondary={(item: number) =>
-              [0, 6].includes(addDays(new Date(year.year, index, 1), item).getDay())
+              [0, 6].includes(addDays(new Date(year.year, month.monthIndex, month.startDay), item).getDay())
             }
           />
         </div>
@@ -368,30 +407,33 @@ const DailyHeader: FC = () => {
 const MonthlyHeader: FC = () => {
   const gantt = useContext(GanttContext)
 
-  return gantt.timelineData.map(year => (
-    <div className="relative flex flex-col" key={year.year}>
-      <GanttContentHeader
-        columns={year.quarters.flatMap(quarter => quarter.months).length}
-        renderHeaderItem={(item: number) => <p>{format(new Date(year.year, item, 1), "MMM")}</p>}
-        title={`${year.year}`}
-      />
-      <GanttColumns columns={year.quarters.flatMap(quarter => quarter.months).length} />
-    </div>
-  ))
+  return gantt.timelineData.map(year => {
+    const flatMonths = year.quarters.flatMap(quarter => quarter.months);
+    return (
+      <div className="relative flex flex-col" key={year.year}>
+        <GanttContentHeader
+          columns={flatMonths.length}
+          renderHeaderItem={(item: number) => <p>{format(new Date(year.year, flatMonths[item].monthIndex, 1), "MMM")}</p>}
+          title={`${year.year}`}
+        />
+        <GanttColumns columns={flatMonths.length} />
+      </div>
+    )
+  })
 }
 
 const QuarterlyHeader: FC = () => {
   const gantt = useContext(GanttContext)
 
   return gantt.timelineData.map(year =>
-    year.quarters.map((quarter, quarterIndex) => (
-      <div className="relative flex flex-col" key={`${year.year}-${quarterIndex}`}>
+    year.quarters.map((quarter) => (
+      <div className="relative flex flex-col" key={`${year.year}-${quarter.quarterIndex}`}>
         <GanttContentHeader
           columns={quarter.months.length}
           renderHeaderItem={(item: number) => (
-            <p>{format(new Date(year.year, quarterIndex * 3 + item, 1), "MMM")}</p>
+            <p>{format(new Date(year.year, quarter.months[item].monthIndex, 1), "MMM")}</p>
           )}
-          title={`Q${quarterIndex + 1} ${year.year}`}
+          title={`Q${quarter.quarterIndex + 1} ${year.year}`}
         />
         <GanttColumns columns={quarter.months.length} />
       </div>
@@ -461,7 +503,7 @@ export const GanttSidebarItem: FC<GanttSidebarItemProps> = ({
   return (
     <div
       className={cn(
-        "relative flex items-center gap-2.5 p-2.5 text-xs hover:bg-secondary",
+        "relative flex items-center gap-2.5 p-2.5 text-xs hover:bg-gray-300",
         className,
       )}
       key={feature.id}
@@ -488,7 +530,7 @@ export const GanttSidebarItem: FC<GanttSidebarItemProps> = ({
 
 export const GanttSidebarHeader: FC = () => (
   <div
-    className="sticky top-0 z-10 flex shrink-0 items-end justify-between gap-2.5 border-border/50 border-b bg-backdrop/90 p-2.5 font-medium text-muted-foreground text-xs backdrop-blur-sm"
+    className="sticky top-0 z-10 flex shrink-0 items-end justify-between gap-2.5 border-border/50 border-b bg-backdrop/90 p-2.5 font-medium text-foreground text-xs backdrop-blur-sm bg-blue-300 "
     style={{ height: "var(--gantt-header-height)" }}
   >
     {/* <Checkbox className="shrink-0" /> */}
@@ -506,7 +548,7 @@ export interface GanttSidebarGroupProps {
 export const GanttSidebarGroup: FC<GanttSidebarGroupProps> = ({ children, name, className }) => (
   <div className={className}>
     <p
-      className="w-full truncate p-2.5 text-left font-medium text-muted-foreground text-xs"
+      className="w-full truncate p-2.5 text-left font-medium text-muted-foreground bg-orange-400 text-xs"
       style={{ height: "var(--gantt-row-height)" }}
     >
       {name}
@@ -523,7 +565,7 @@ export interface GanttSidebarProps {
 export const GanttSidebar: FC<GanttSidebarProps> = ({ children, className }) => (
   <div
     className={cn(
-      "sticky left-0 z-30 h-max min-h-full overflow-clip border-border/50 border-r bg-background/90 backdrop-blur-md",
+      "sticky left-0 z-30 h-max min-h-full overflow-clip border-border/50 border-r bg-background/90 backdrop-blur-md ",
       className,
     )}
     data-roadmap-ui="gantt-sidebar"
@@ -594,8 +636,8 @@ export const GanttColumn: FC<GanttColumnProps> = ({ index, isColumnSecondary }) 
   return (
     <div
       className={cn(
-        "group relative h-full overflow-hidden",
-        isColumnSecondary?.(index) ? "bg-secondary" : "",
+        "group relative h-full overflow-hidden border-x-[] border-black",
+        isColumnSecondary?.(index) ? "bg-gray-100" : "",
       )}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
@@ -775,7 +817,10 @@ export const GanttFeatureItem: FC<GanttFeatureItemProps> = ({
   const [scrollX] = useGanttScrollX()
   const gantt = useContext(GanttContext)
   const timelineStartDate = useMemo(
-    () => new Date(gantt.timelineData.at(0)?.year ?? 0, 0, 1),
+    () => {
+      const firstData = gantt.timelineData.at(0);
+      return new Date(firstData?.year ?? 0, firstData?.quarters[0]?.months[0]?.monthIndex ?? 0, firstData?.quarters[0]?.months[0]?.startDay ?? 1)
+    },
     [gantt.timelineData],
   )
   const [startAt, setStartAt] = useState<Date>(feature.startAt)
@@ -1000,7 +1045,10 @@ export const GanttMarker: FC<
   const gantt = useContext(GanttContext)
   const differenceIn = useMemo(() => getDifferenceIn(gantt.range), [gantt.range])
   const timelineStartDate = useMemo(
-    () => new Date(gantt.timelineData.at(0)?.year ?? 0, 0, 1),
+    () => {
+      const firstData = gantt.timelineData.at(0);
+      return new Date(firstData?.year ?? 0, firstData?.quarters[0]?.months[0]?.monthIndex ?? 0, firstData?.quarters[0]?.months[0]?.startDay ?? 1)
+    },
     [gantt.timelineData],
   )
 
@@ -1063,6 +1111,8 @@ export interface GanttProviderProps {
   onAddItem?: (date: Date) => void
   children: ReactNode
   className?: string
+  startDate?: Date
+  endDate?: Date
 }
 
 export const GanttProvider: FC<GanttProviderProps> = ({
@@ -1071,11 +1121,17 @@ export const GanttProvider: FC<GanttProviderProps> = ({
   onAddItem,
   children,
   className,
+  startDate,
+  endDate
 }) => {
   const scrollRef = useRef<HTMLDivElement>(null)
   const [timelineData, setTimelineData] = useState<TimelineData>(
-    createInitialTimelineData(new Date()),
+    createInitialTimelineData(startDate, endDate),
   )
+
+  useEffect(() => {
+    setTimelineData(createInitialTimelineData(startDate, endDate))
+  }, [startDate, endDate]);
   const [, setScrollX] = useGanttScrollX()
   const [sidebarWidth, setSidebarWidth] = useState(0)
 
@@ -1104,11 +1160,16 @@ export const GanttProvider: FC<GanttProviderProps> = ({
 
   useEffect(() => {
     if (scrollRef.current) {
-      scrollRef.current.scrollLeft =
-        scrollRef.current.scrollWidth / 2 - scrollRef.current.clientWidth / 2
-      setScrollX(scrollRef.current.scrollLeft)
+      if (startDate) {
+        scrollRef.current.scrollLeft = 0;
+        setScrollX(0);
+      } else {
+        scrollRef.current.scrollLeft =
+          scrollRef.current.scrollWidth / 2 - scrollRef.current.clientWidth / 2
+        setScrollX(scrollRef.current.scrollLeft)
+      }
     }
-  }, [setScrollX])
+  }, [setScrollX, startDate])
 
   // Update sidebar width when DOM is ready
   useEffect(() => {
@@ -1147,6 +1208,7 @@ export const GanttProvider: FC<GanttProviderProps> = ({
       setScrollX(scrollLeft)
 
       if (scrollLeft === 0) {
+        if (startDate) return;
         // Extend timelineData to the past
         const firstYear = timelineData[0]?.year
 
@@ -1158,10 +1220,13 @@ export const GanttProvider: FC<GanttProviderProps> = ({
         newTimelineData.unshift({
           year: firstYear - 1,
           quarters: new Array(4).fill(null).map((_, quarterIndex) => ({
+            quarterIndex,
             months: new Array(3).fill(null).map((_, monthIndex) => {
               const month = quarterIndex * 3 + monthIndex
               return {
-                days: getDaysInMonth(new Date(firstYear, month, 1)),
+                days: getDaysInMonth(new Date(firstYear - 1, month, 1)),
+                monthIndex: month,
+                startDay: 1,
               }
             }),
           })),
@@ -1172,7 +1237,8 @@ export const GanttProvider: FC<GanttProviderProps> = ({
         // Scroll a bit forward so it's not at the very start
         scrollElement.scrollLeft = scrollElement.clientWidth
         setScrollX(scrollElement.scrollLeft)
-      } else if (scrollLeft + clientWidth >= scrollWidth) {
+      } else if (scrollLeft + clientWidth + 10 >= scrollWidth) {
+        if (endDate) return;
         // Extend timelineData to the future
         const lastYear = timelineData.at(-1)?.year
 
@@ -1184,10 +1250,13 @@ export const GanttProvider: FC<GanttProviderProps> = ({
         newTimelineData.push({
           year: lastYear + 1,
           quarters: new Array(4).fill(null).map((_, quarterIndex) => ({
+            quarterIndex,
             months: new Array(3).fill(null).map((_, monthIndex) => {
               const month = quarterIndex * 3 + monthIndex
               return {
-                days: getDaysInMonth(new Date(lastYear, month, 1)),
+                days: getDaysInMonth(new Date(lastYear + 1, month, 1)),
+                monthIndex: month,
+                startDay: 1,
               }
             }),
           })),
@@ -1225,7 +1294,11 @@ export const GanttProvider: FC<GanttProviderProps> = ({
       }
 
       // Calculate timeline start date from timelineData
-      const timelineStartDate = new Date(timelineData[0].year, 0, 1)
+      const timelineStartDate = new Date(
+        timelineData[0]?.year ?? 0, 
+        timelineData[0]?.quarters[0]?.months[0]?.monthIndex ?? 0, 
+        timelineData[0]?.quarters[0]?.months[0]?.startDay ?? 1
+      )
 
       // Calculate the horizontal offset for the feature's start date
       const offset = getOffset(feature.startAt, timelineStartDate, {
@@ -1270,7 +1343,7 @@ export const GanttProvider: FC<GanttProviderProps> = ({
     >
       <div
         className={cn(
-          "gantt relative grid h-full w-full flex-none select-none overflow-auto rounded-sm bg-secondary",
+          "gantt relative grid h-full w-full flex-none select-none overflow-auto rounded-sm ",
           range,
           className,
         )}
@@ -1307,7 +1380,10 @@ export const GanttToday: FC<GanttTodayProps> = ({ className }) => {
   const gantt = useContext(GanttContext)
   const differenceIn = useMemo(() => getDifferenceIn(gantt.range), [gantt.range])
   const timelineStartDate = useMemo(
-    () => new Date(gantt.timelineData.at(0)?.year ?? 0, 0, 1),
+    () => {
+      const firstData = gantt.timelineData.at(0);
+      return new Date(firstData?.year ?? 0, firstData?.quarters[0]?.months[0]?.monthIndex ?? 0, firstData?.quarters[0]?.months[0]?.startDay ?? 1)
+    },
     [gantt.timelineData],
   )
 

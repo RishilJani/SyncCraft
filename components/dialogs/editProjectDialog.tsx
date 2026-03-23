@@ -18,16 +18,21 @@ import { DialogTrigger } from "@radix-ui/react-dialog";
 import { Project, User } from "@/app/(types)/myTypes";
 import { role_enum } from "@/app/generated/prisma/enums";
 import CustomLoader from "@/components/custom_loader";
+import { before } from "node:test";
+import { useMyContext } from "@/app/(utils)/myContext";
 
 interface EditProjectFormProps {
     children: React.ReactNode;
     data: Project;
+    onEdit: Function;
 }
 
 export default function EditProjectForm({
     children,
     data,
+    onEdit
 }: EditProjectFormProps) {
+    const { setSpecificProject } = useMyContext();
     const router = useRouter();
     const [title, setTitle] = useState(data.projectName);
     const [description, setDescription] = useState(data.description || "");
@@ -85,7 +90,7 @@ export default function EditProjectForm({
         );
     }
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault();
 
         try {
@@ -103,8 +108,9 @@ export default function EditProjectForm({
 
             if (!res.error) {
                 setOpen(false);
-                router.push("/project/" + data.projectId);
-                router.refresh();
+                if (onEdit)
+                    onEdit();
+                
             } else {
                 alert("Error: " + res.message);
             }
@@ -165,7 +171,7 @@ export default function EditProjectForm({
                                         </Button>
                                     </PopoverTrigger>
                                     <PopoverContent className="w-auto p-0" align="start">
-                                        <Calendar mode="single" selected={dueDate} onSelect={setDueDate} initialFocus />
+                                        <Calendar mode="single" selected={dueDate} onSelect={setDueDate} autoFocus hidden={{ before: new Date(data.createdAt ?? "") }} />
                                     </PopoverContent>
                                 </Popover>
                             </div>
