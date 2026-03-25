@@ -1,4 +1,4 @@
-Syncraft is a real-time collaborative project management tool designed to help teams plan, track, and execute projects seamlessly.
+# Syncraft is a real-time collaborative project management tool designed to help teams plan, track, and execute projects seamlessly.
 
 ## Getting Started
 
