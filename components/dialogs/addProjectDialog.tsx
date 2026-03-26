@@ -61,7 +61,6 @@ export default function AddProjectDialog({
     const handleSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault();
         userContext.setLoading(true);
-        console.log("Handle Submit Functin\n");
         const adminId = userContext.user?.userId;
 
         var res = await (await fetch("/api/projects", {
@@ -76,7 +75,6 @@ export default function AddProjectDialog({
                 memberIds: selectedMembers
             }),
         })).json();
-        console.log("Res = ", res);
 
         if (!res.error) {
             await userContext.refreshData();

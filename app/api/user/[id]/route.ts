@@ -14,7 +14,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
             _sum: { points: true },
             where: { AND: { status: Status.Completed, assignedto: uid } }
         });
-        console.log("points = ", points);
 
         const res: User = {
             userId: user?.userId,
@@ -24,7 +23,6 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
             createdAt: user?.createdAt,
             points : points._sum.points ?? 0
         }
-        console.log(res);
 
         return MyResponse(false, "User found", res, { status: 200 });
     } catch (error) {

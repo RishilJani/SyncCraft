@@ -59,7 +59,6 @@ export default function ManageDashboard() {
           {
             projects.length > 0 && selectedProjectId !== null
               ? <MyKanbanBoard role={true} projectId={selectedProjectId} onAddTask={() => {
-                console.log("onAddTask manager");
                 setSpecificProject({ projectId: selectedProjectId });
               }} />
               : <p>No Project here</p>

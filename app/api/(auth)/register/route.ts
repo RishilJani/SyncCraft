@@ -19,7 +19,6 @@ export async function POST(request: NextRequest) {
                 role: body.role,
             }
         });
-        console.log("User created:", user.userId);
         await putUserCookie(user);
 
         return MyResponse(false,"Added Successfully", user, {status : 200});

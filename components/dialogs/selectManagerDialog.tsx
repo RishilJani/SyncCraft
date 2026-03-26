@@ -24,8 +24,6 @@ export default function SelectManagerDialog({user_id}:{user_id:number}){
             setManagers((mangs.data as User[]).filter(mang=>mang.userId!=user_id) as User[]);
             setProjects(data.data as Project[]);
             setIsLoading(false);
-            console.log("mangs.data = ",mangs.data);
-            console.log("data.data = " , data.data);
             
         });
     },[]);

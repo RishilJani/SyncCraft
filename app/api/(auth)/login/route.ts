@@ -18,10 +18,8 @@ export async function POST(request: NextRequest) {
         }
         const isMatch = await bcrypt.compare(body.password, user.passwordHash);
         if (!isMatch) {
-            console.log("Password not matched");
             return MyResponse(true, "Credentials not matched", null, {status : 401});
         }
-        console.log("Putting Cookies");
         await putUserCookie(user);
     
         return MyResponse(false, "User Found", user , {status : 200});

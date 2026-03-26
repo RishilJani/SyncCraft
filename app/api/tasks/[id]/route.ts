@@ -49,10 +49,8 @@ export async function PUT(
         if (updateData.dueDate && existingTask?.completionDate) {
             if (updateData.dueDate < existingTask?.completionDate) {
                 updateData.completionDate = null;
-                console.log("updateData.completionDate = ", updateData.completionDate);
             }
         }
-        console.log("updatedData = ", updateData);
 
         const task = await prisma.tasks.update({
             where: { taskId },

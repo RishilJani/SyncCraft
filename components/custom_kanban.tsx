@@ -40,7 +40,6 @@ const statusColors = {
 };
 
 export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: boolean, projectId: number, onAddTask?: any }) {
-    console.log("After Updating The project");
     const { projects, setSpecificProject } = useMyContext();
     const project = projects.find(p => p.projectId === projectId);
     const [taskToDelete, setTaskToDelete] = useState<KanbanTask | null>(null);
@@ -84,7 +83,6 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
     ]);
 
     useEffect(() => {
-        console.log("After Updating The project useEffect");
 
         const kanbanTasks: KanbanTask[] = (project.tasks || []).map(task => ({ ...task, id: task.taskId }));
         setColumns([
@@ -127,7 +125,6 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
             })).json();
 
             if (res.error) {
-                console.log("Res Errro = ", res.message);
                 alert(res.message);
             } else {
                 setSpecificProject({ projectId: project.projectId! });
@@ -146,7 +143,6 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
             })).json();
 
             if (res.error) {
-                console.log("Delete error =", res.message);
                 alert(res.message);
             } else {
                 setSpecificProject({ projectId: project.projectId! });
@@ -235,7 +231,7 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
                 <div className="mx-auto w-full space-y-6">
                     {
                         role && <div className="flex flex-col items-end mx-auto w-full ml-3 px-4 pb-4">
-                            <TaskDialog projectId={project.projectId!} members={project.members!} onSuccess={() => { console.log("On Success"); onAddTask(); }}>
+                            <TaskDialog projectId={project.projectId!} members={project.members!} onSuccess={() => { onAddTask(); }}>
                                 <Button variant="default" className="gap-2" size="sm">
                                     <ClipboardList className="h-5 w-5" />
                                     Add Task
@@ -294,7 +290,7 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
                                                                 )}
                                                                 {role && (
                                                                     <div onClick={(e) => e.stopPropagation()}>
-                                                                        <TaskDialog projectId={project.projectId!} members={project.members!} task={card} onSuccess={() => { console.log("On Success Edit"); if (onAddTask) onAddTask(); }} >
+                                                                        <TaskDialog projectId={project.projectId!} members={project.members!} task={card} onSuccess={() => { if (onAddTask) onAddTask(); }} >
                                                                             <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full hover:bg-primary/10 hover:text-primary transition-colors" >
                                                                                 <Pencil className="h-3.5 w-3.5" />
                                                                             </Button>

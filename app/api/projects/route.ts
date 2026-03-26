@@ -18,7 +18,6 @@ export async function POST(request : Request) {
     const { projectName, description,  createdBy,  dueDate ,managerId,memberIds } = await request.json();
     const createdAt = new Date();
     try{
-        console.log("Creating Project");
         const project = await prisma.projects.create({
             data: {
                 projectName : projectName,
@@ -29,7 +28,6 @@ export async function POST(request : Request) {
                 status: Status.Todo,
             }
         });
-        console.log(`Project = ${project}`);
         const userProject = await prisma.user_projects.create({
             data:{
                 userid: managerId,
@@ -45,7 +43,6 @@ export async function POST(request : Request) {
                 }
             });
         });
-        console.log("Members and Manger added");
     
         revalidatePath("/admin/projects");
         return MyResponse(false,"Project Added Successfully" , project , {status : 200});

@@ -7,9 +7,6 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url);
     const projectId = searchParams.get("projectId");
     const assignedto = searchParams.get("assignedto");
-    console.log("projectId", projectId, "assignedto", assignedto);
-    console.log(new Date());
-    console.log(new Date(2026, 12, 31));
 
     try {
         const tasks = await prisma.tasks.findMany({

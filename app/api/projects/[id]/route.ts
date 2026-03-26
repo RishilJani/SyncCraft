@@ -150,8 +150,6 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
                 }
             });
 
-            console.log("\n Deleted rows from User_Projects \n");
-
             // Delete task comments for all tasks in this project
             await tx.taskComments.deleteMany({
                 where: {
@@ -160,7 +158,6 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
                     }
                 }
             });
-            console.log("\n Deleted rows from TaskComments \n");
 
             // Delete task history for all tasks in this project
             await tx.taskHistory.deleteMany({
@@ -170,21 +167,18 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
                     }
                 }
             });
-            console.log("\n Deleted rows from TaskHistory \n");
 
             await tx.tasks.deleteMany({
                 where: {
                     projectId: projectId
                 }
             });
-            console.log("\n Deleted rows from Tasks  \n");
 
             await tx.projects.delete({
                 where: {
                     projectId: projectId
                 }
             });
-            console.log("\n Deleted row from Project  \n");
         });
         return MyResponse(false, "Project Deleted Succuessfully", { deleted: true }, { status: 200 });
     } catch (err) {
