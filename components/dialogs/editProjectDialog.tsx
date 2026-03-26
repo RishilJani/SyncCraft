@@ -11,15 +11,12 @@ import { Textarea } from "@/components/ui/textarea";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 import { Calendar as CalendarIcon, X } from "lucide-react";
-import { useRouter } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { DialogTrigger } from "@radix-ui/react-dialog";
 import { Project, User } from "@/app/(types)/myTypes";
 import { role_enum } from "@/app/generated/prisma/enums";
 import CustomLoader from "@/components/custom_loader";
-import { before } from "node:test";
-import { useMyContext } from "@/app/(utils)/myContext";
 
 interface EditProjectFormProps {
     children: React.ReactNode;
@@ -32,8 +29,6 @@ export default function EditProjectForm({
     data,
     onEdit
 }: EditProjectFormProps) {
-    const { setSpecificProject } = useMyContext();
-    const router = useRouter();
     const [title, setTitle] = useState(data.projectName);
     const [description, setDescription] = useState(data.description || "");
     const [dueDate, setDueDate] = useState<Date | undefined>(data.dueDate ? new Date(data.dueDate) : undefined);
