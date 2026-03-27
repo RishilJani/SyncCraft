@@ -1,6 +1,7 @@
-# Syncraft is a real-time collaborative project management tool designed to help teams plan, track, and execute projects seamlessly.
+# <center> SyncCraft  </center>
+<b> Syncraft is a real-time collaborative project management tool designed to help teams plan, track, and execute projects seamlessly.</b>
 
-## Getting Started
+### Getting Started
 
 First, run the development server:
 
