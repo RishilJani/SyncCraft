@@ -81,7 +81,7 @@ function LoginPage() {
                             <div className="space-y-2">
                                 <Label htmlFor="pwd" className="text-title text-sm"> Password </Label>
                                 <PasswordInput required name="pwd" id="pwd" className="input sz-md variant-mixed" value={password} autoComplete='current-password' onChange={(e) => { setPassword(e.target.value); }} />
-                                <Link href="#" className="text-sm text-sky-600">Forget Password ?</Link>
+                                <Link href="/forgot-password" replace={true} className="text-sm text-sky-600">Forget Password ?</Link>
                                 {errors.password && <p className='text-red-500 text-sm'>{errors.password}</p>}
                             </div>
 
