@@ -14,7 +14,7 @@ export default function ForgotPasswordPage() {
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
 
-    const handleSubmit = async (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.SubmitEvent) => {
         e.preventDefault();
         setMessage("");
         setError("");
@@ -58,7 +58,7 @@ export default function ForgotPasswordPage() {
                         <hr className="my-4 border-dashed" />
                         {error && <p className="text-red-500 text-sm pb-3 text-center">{error}</p>}
                         {message && <p className="text-green-600 text-sm pb-3 text-center">{message}</p>}
-                        
+
                         <div className="space-y-5">
                             <div className="space-y-2">
                                 <Label htmlFor="email" className="block text-sm"> Email Address </Label>

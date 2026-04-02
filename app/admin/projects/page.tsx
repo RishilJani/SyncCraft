@@ -27,19 +27,11 @@ function ProjectsList() {
         return null;
     }
 
-    // if (userContext.projects.length == 0) {
-    //     return (
-    //         <>
-    //             Not any projects yet
-    //         </>
-    //     );
-    // }
-
     const filteredProjects = allProjects.filter((project) => {
         const matchesSearch = project.projectName.toLowerCase().includes(searchQuery.toLowerCase());
         const matchesDescSearch = project.description ?? "".toLowerCase().includes(searchQuery.toLowerCase());
         const matchesFilter = activeFilter === "All" || (project.status ?? Status.Todo).toLowerCase() === activeFilter.toLowerCase();
-        return matchesSearch || matchesDescSearch && matchesFilter;
+        return (matchesSearch || matchesDescSearch) && matchesFilter;
     });
 
     return (

@@ -30,7 +30,7 @@ function MemberDashboard() {
         </div>
       </div>
       <div className="flex-1 w-full max-w-7xl mx-auto">
-        <MyKanbanBoard role={false} projectId={1} onAddTask={() => {
+        <MyKanbanBoard role={false} projectId={projects[0].projectId!} onAddTask={() => {
           setSpecificProject({ projectId: selectedProjectId! });
         }} />
       </div>
