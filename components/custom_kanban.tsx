@@ -18,6 +18,7 @@ import { useEffect, useState } from "react";
 import { Task, Status, Priority, Project } from "@/app/(types)/myTypes";
 import TaskDialog from "./dialogs/taskDialog";
 import TaskDetailDialog from "./dialogs/taskDetail";
+import TaskDueDateDialog from "./dialogs/taskDueDateDialog";
 import { Button } from "./ui/button";
 import { useMyContext } from "@/app/(utils)/myContext";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
@@ -45,6 +46,8 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
     const [taskToDelete, setTaskToDelete] = useState<KanbanTask | null>(null);
     const [isDeleteHovered, setIsDeleteHovered] = useState(false);
     const [selectedTask, setSelectedTask] = useState<KanbanTask | null>(null);
+    const [modifiedTaskDateData, setModifiedTaskDateData] = useState<{ task: KanbanTask, newDate: Date } | null>(null);
+    const [rollbackCounter, setRollbackCounter] = useState(0);
 
     if (project == undefined || project.tasks == undefined) {
         return (
@@ -153,6 +156,65 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
         } finally {
             setTaskToDelete(null);
             setIsDeleteHovered(false);
+        }
+    }
+
+    const confirmDueDateChange = async () => {
+        if (!modifiedTaskDateData) return;
+        try {
+            const res = await (await fetch("/api/tasks/" + modifiedTaskDateData.task.taskId, {
+                method: "PUT",
+                body: JSON.stringify({
+                    dueDate: modifiedTaskDateData.newDate
+                })
+            })).json();
+
+            if (res.error) {
+                alert(res.message);
+            } else {
+                setSpecificProject({ projectId: project.projectId! });
+            }
+        } catch (err) {
+            console.log('Error updating task due date');
+            console.log(err);
+        } finally {
+            setModifiedTaskDateData(null);
+        }
+    }
+
+    const handleTaskDateChange = (taskId: number, newDueDate: Date) => {
+        const task = allTasks.find(t => t.taskId === taskId) as KanbanTask;
+        if (task) {
+            const taskCreatedAt = task.createdAt ? new Date(task.createdAt) : new Date();
+            taskCreatedAt.setHours(0, 0, 0, 0);
+            const targetDate = new Date(newDueDate);
+            targetDate.setHours(0, 0, 0, 0);
+
+            if (targetDate < taskCreatedAt) {
+                alert("Task due date cannot be set before its creation date.");
+                setRollbackCounter(prev => prev + 1);
+                return;
+            }
+
+            const projectEnd = project.dueDate ? new Date(project.dueDate) : (project.completionDate ? new Date(project.completionDate) : null);
+            if (projectEnd) {
+                projectEnd.setHours(0, 0, 0, 0);
+                if (targetDate > projectEnd) {
+                    alert("Task due date cannot be set after the project completion date.");
+                    setRollbackCounter(prev => prev + 1);
+                    return;
+                }
+            }
+
+            setModifiedTaskDateData({ task, newDate: newDueDate });
+        }
+    }
+
+    const handleDialogClose = (open: boolean) => {
+        if (!open) {
+            setModifiedTaskDateData(null);
+            // Trigger Gantt to recalculate features & reset drag state
+            setRollbackCounter(prev => prev + 1);
         }
     }
 
@@ -311,7 +373,13 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
 
                     {role && (
                         <div className="w-full mt-8 px-4 pb-8">
-                            <ProjectProgress tasks={columns.flatMap(col => col.cards)} projectStartDate={project.createdAt ? new Date(project.createdAt) : undefined} projectEndDate={project.dueDate ? new Date(project.dueDate) : (project.completionDate ? new Date(project.completionDate) : undefined)} />
+                            <ProjectProgress 
+                                tasks={columns.flatMap(col => col.cards)} 
+                                projectStartDate={project.createdAt ? new Date(project.createdAt) : undefined} 
+                                projectEndDate={project.dueDate ? new Date(project.dueDate) : (project.completionDate ? new Date(project.completionDate) : undefined)} 
+                                onTaskDateChange={handleTaskDateChange}
+                                rollbackCounter={rollbackCounter}
+                            />
                         </div>
                     )}
                 </div>
@@ -372,6 +440,14 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
                     onOpenChange={(open) => !open && setSelectedTask(null)}
                 />
             )}
+
+            <TaskDueDateDialog 
+                open={!!modifiedTaskDateData}
+                onOpenChange={handleDialogClose}
+                onConfirm={confirmDueDateChange}
+                taskTitle={modifiedTaskDateData?.task.title || ""}
+                newDate={modifiedTaskDateData?.newDate || null}
+            />
         </div>
     );
 }

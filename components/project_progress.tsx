@@ -24,9 +24,10 @@ interface ProjectProgressProps {
   projectStartDate?: Date;
   projectEndDate?: Date;
   className?: string;
+  onTaskDateChange?: (taskId: number, newDueDate: Date) => void;
+  rollbackCounter?: number;
 }
-
-export default function ProjectProgress({ tasks, projectStartDate, projectEndDate, className }: ProjectProgressProps) {
+export default function ProjectProgress({ tasks, projectStartDate, projectEndDate, className, onTaskDateChange, rollbackCounter }: ProjectProgressProps) {
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -56,7 +57,8 @@ export default function ProjectProgress({ tasks, projectStartDate, projectEndDat
 
     return tasks.map(t => {
       const startAt = t.createdAt ? new Date(t.createdAt) : new Date();
-      const endAt = t.dueDate ? new Date(t.dueDate) : new Date(startAt.getTime() + 24 * 60 * 60 * 1000);
+      const baseEndDate = t.dueDate ? new Date(t.dueDate) : new Date(startAt.getTime());
+      const endAt = new Date(baseEndDate.getTime() + 24 * 60 * 60 * 1000); // Exclusive bound for proper Gantt rendering
 
       const actualStart = startAt > endAt ? endAt : startAt;
       const actualEnd = startAt > endAt ? startAt : endAt;
@@ -77,7 +79,7 @@ export default function ProjectProgress({ tasks, projectStartDate, projectEndDat
         }
       };
     });
-  }, [tasks]);
+  }, [tasks, rollbackCounter]);
 
   if (!tasks || tasks.length === 0) return null;
 
@@ -120,7 +122,17 @@ export default function ProjectProgress({ tasks, projectStartDate, projectEndDat
               <GanttFeatureList>
                 <GanttFeatureListGroup>
                   {features.map(feature => (
-                    <GanttFeatureItem key={feature.id} {...feature}>
+                    <GanttFeatureItem 
+                      key={feature.id} 
+                      {...feature}
+                      onMove={onTaskDateChange ? (id, dragStart, dragEnd) => {
+                          if (dragEnd) {
+                              const correctedDueDate = new Date(dragEnd);
+                              correctedDueDate.setDate(correctedDueDate.getDate() - 1);
+                              onTaskDateChange(Number(id), correctedDueDate);
+                          }
+                      } : undefined}
+                    >
                       <p className="flex-1 truncate text-xs font-medium pl-1">{feature.name}</p>
                     </GanttFeatureItem>
                   ))}

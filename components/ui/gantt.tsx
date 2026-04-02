@@ -191,7 +191,7 @@ const createInitialTimelineData = (startDate?: Date, endDate?: Date) => {
   const endYear = Math.max(startYear, endDate ? endDate.getFullYear() : today.getFullYear() + 1)
   const startMonth = startDate ? startDate.getMonth() : 0
   const endMonth = (endDate && endDate.getFullYear() === endYear) ? endDate.getMonth() : 11
-  
+
   const startDayOfMonth = startDate ? startDate.getDate() : 1
   const endDayOfMonth = (endDate && endDate.getFullYear() === endYear && endDate.getMonth() === endMonth) ? endDate.getDate() : 31
 
@@ -203,20 +203,20 @@ const createInitialTimelineData = (startDate?: Date, endDate?: Date) => {
         const monthIndex = quarterIndex * 3 + m
         if (startDate && year === startYear && monthIndex < startMonth) continue
         if (endDate && year === endYear && monthIndex > endMonth) continue
-        
+
         const totalDays = getDaysInMonth(new Date(year, monthIndex, 1))
         let startDay = 1
         let endDay = totalDays
-        
+
         if (startDate && year === startYear && monthIndex === startMonth) {
-           startDay = startDayOfMonth
+          startDay = startDayOfMonth
         }
         if (endDate && year === endYear && monthIndex === endMonth) {
-           endDay = Math.min(endDayOfMonth, totalDays)
+          endDay = Math.min(endDayOfMonth, totalDays)
         }
-        
+
         if (startDay > endDay) continue
-        
+
         months.push({
           days: endDay - startDay + 1,
           monthIndex,
@@ -384,13 +384,14 @@ const DailyHeader: FC = () => {
             renderHeaderItem={(item: number) => {
               const actualDate = addDays(new Date(year.year, month.monthIndex, month.startDay), item)
               return (
-              <div className="flex items-center justify-center gap-1">
-                <p>{format(actualDate, "d")}</p>
-                <p className="text-muted-foreground">
-                  {format(actualDate, "EEEEE")}
-                </p>
-              </div>
-            )}}
+                <div className="flex items-center justify-center gap-1">
+                  <p>{format(actualDate, "d")}</p>
+                  <p className="text-muted-foreground">
+                    {format(actualDate, "EEEEE")}
+                  </p>
+                </div>
+              )
+            }}
             title={format(new Date(year.year, month.monthIndex, 1), "MMMM yyyy")}
           />
           <GanttColumns
@@ -743,7 +744,7 @@ export const GanttFeatureDragHelper: FC<GanttFeatureDragHelperProps> = ({
   return (
     <div
       className={cn(
-        "group -translate-y-1/2 !cursor-col-resize absolute top-1/2 z-[3] h-full w-6 rounded-md outline-none",
+        "group -translate-y-1/2 cursor-col-resize! absolute top-1/2 z-3 h-full w-6 rounded-md outline-none",
         direction === "left" ? "-left-2.5" : "-right-2.5",
       )}
       ref={setNodeRef}
@@ -825,6 +826,11 @@ export const GanttFeatureItem: FC<GanttFeatureItemProps> = ({
   )
   const [startAt, setStartAt] = useState<Date>(feature.startAt)
   const [endAt, setEndAt] = useState<Date | null>(feature.endAt)
+
+  useEffect(() => {
+    setStartAt(feature.startAt);
+    setEndAt(feature.endAt);
+  }, [feature.startAt, feature.endAt]);
 
   // Memoize expensive calculations
   const width = useMemo(() => getWidth(startAt, endAt, gantt), [startAt, endAt, gantt])
@@ -1081,7 +1087,7 @@ export const GanttMarker: FC<
             )}
           >
             {label}
-            <span className="max-h-[0] overflow-hidden opacity-80 transition-all group-hover:max-h-[2rem]">
+            <span className="max-h-0 overflow-hidden opacity-80 transition-all group-hover:max-h-[2rem]">
               {formatDate(date, "MMM dd, yyyy")}
             </span>
           </div>
@@ -1295,8 +1301,8 @@ export const GanttProvider: FC<GanttProviderProps> = ({
 
       // Calculate timeline start date from timelineData
       const timelineStartDate = new Date(
-        timelineData[0]?.year ?? 0, 
-        timelineData[0]?.quarters[0]?.months[0]?.monthIndex ?? 0, 
+        timelineData[0]?.year ?? 0,
+        timelineData[0]?.quarters[0]?.months[0]?.monthIndex ?? 0,
         timelineData[0]?.quarters[0]?.months[0]?.startDay ?? 1
       )
 
@@ -1412,7 +1418,7 @@ export const GanttToday: FC<GanttTodayProps> = ({ className }) => {
         )}
       >
         {label}
-        <span className="max-h-[0] overflow-hidden opacity-80 transition-all group-hover:max-h-[2rem]">
+        <span className="max-h-0 overflow-hidden opacity-80 transition-all group-hover:max-h-[2rem]">
           {formatDate(date, "MMM dd, yyyy")}
         </span>
       </div>
@@ -1516,11 +1522,11 @@ export function GanttDemo() {
     setData(prev =>
       prev
         ? {
-            ...prev,
-            features: prev.features.map(feature =>
-              feature.id === id ? { ...feature, startAt, endAt } : feature,
-            ),
-          }
+          ...prev,
+          features: prev.features.map(feature =>
+            feature.id === id ? { ...feature, startAt, endAt } : feature,
+          ),
+        }
         : null,
     )
   }, [])
