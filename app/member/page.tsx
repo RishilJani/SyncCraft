@@ -30,9 +30,15 @@ function MemberDashboard() {
         </div>
       </div>
       <div className="flex-1 w-full max-w-7xl mx-auto">
-        <MyKanbanBoard role={false} projectId={projects[0].projectId!} onAddTask={() => {
-          setSpecificProject({ projectId: selectedProjectId! });
-        }} />
+        {projects && projects.length > 0 ? (
+          <MyKanbanBoard role={false} projectId={projects[0].projectId!} onAddTask={() => {
+            setSpecificProject({ projectId: selectedProjectId! });
+          }} />
+        ) : (
+          <div className="flex items-center justify-center p-8 mt-4 text-muted-foreground bg-card rounded-lg border">
+            No projects found.
+          </div>
+        )}
       </div>
     </div>
   )
