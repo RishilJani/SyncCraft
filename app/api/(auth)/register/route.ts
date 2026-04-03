@@ -9,8 +9,6 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
         const salt = process.env.SALT ? Number.parseInt(process.env.SALT) : 10;
         const hashedPassword = bcrypt.hashSync(body.password, salt);
-        console.log("hash = ", hashedPassword);
-        
 
         const user = await prisma.users.create({
             data: {
@@ -23,10 +21,10 @@ export async function POST(request: NextRequest) {
         });
         await putUserCookie(user);
 
-        return MyResponse(false,"Added Successfully", user, {status : 200});
-    } catch (err : any) {
+        return MyResponse(false, "Added Successfully", user, { status: 200 });
+    } catch (err: any) {
         console.error("Error creating user:", err);
         return ErrorResponse(err);
-        
+
     }
 }

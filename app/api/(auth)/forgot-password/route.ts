@@ -51,11 +51,6 @@ export async function POST(request: NextRequest) {
             html: `<p>You requested a password reset. Please click the following link to reset your password: <a href="${resetUrl}">Reset Password</a></p><p>This link is valid for 15 minutes.</p>`,
         });
 
-        console.log("Message sent: %s", info.messageId);
-        // Preview only available when sending through an Ethereal account
-        console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-        console.log("Reset URL: %s", resetUrl);
-
         return MyResponse(false, "Reset link sent.", null, { status: 200 });
     } catch (err) {
         console.error('Error at forgot-password/POST:', err);
