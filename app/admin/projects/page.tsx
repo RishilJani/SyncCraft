@@ -28,10 +28,12 @@ function ProjectsList() {
     }
 
     const filteredProjects = allProjects.filter((project) => {
-        const matchesSearch = project.projectName.toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesDescSearch = project.description ?? "".toLowerCase().includes(searchQuery.toLowerCase());
-        const matchesFilter = activeFilter === "All" || (project.status ?? Status.Todo).toLowerCase() === activeFilter.toLowerCase();
-        return (matchesSearch || matchesDescSearch) && matchesFilter;
+        const matchesNameSearch = project.projectName.toLowerCase().includes(searchQuery.toLowerCase());
+        const matchesDescSearch = (project.description ?? "").toLowerCase().includes(searchQuery.toLowerCase());
+        console.log("matchesNameSearch = ", matchesNameSearch, " matchesDESCSearch = ", matchesDescSearch);
+
+        const matchesFilter = (activeFilter === "All") || (project.status ?? Status.Todo).toLowerCase() === activeFilter.toLowerCase();
+        return (matchesNameSearch || matchesDescSearch) && matchesFilter;
     });
 
     return (
