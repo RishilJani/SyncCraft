@@ -4,6 +4,8 @@ A modern **web-based project management application** built with **Next.js** tha
 
 This project focuses on **speed, security, and real-time collaboration**, making it ideal for small to medium-sized teams who want a clean and efficient workflow.
 
+🔗 https://sync-craft.vercel.app/
+
 ---
 
 ## 🚀 Tech Stack
