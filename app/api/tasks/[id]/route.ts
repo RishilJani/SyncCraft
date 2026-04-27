@@ -18,8 +18,7 @@ export async function GET(
         }
         return MyResponse(false, "Task Found", task, { status: 200 });
     } catch (err) {
-        console.log('Some Error Occured at api/tasks/[id]/GET');
-        console.log(err);
+        console.error('Some Error Occured at api/tasks/[id]/GET= ', err);
         return ErrorResponse(err);
     }
 }
@@ -61,8 +60,7 @@ export async function PUT(
 
         return MyResponse(false, "Task Updated Successfully", task, { status: 200 });
     } catch (err) {
-        console.log('Some Error Occured at api/tasks/[id]/PATCH');
-        console.log(err);
+        console.error('Some Error Occured at api/tasks/[id]/PATCH = ', err);
         return ErrorResponse(err);
     }
 }
@@ -86,8 +84,7 @@ export async function DELETE(
 
         return MyResponse(false, "Task Deleted Successfully", { deleted: true }, { status: 200 });
     } catch (err) {
-        console.log('Some Error Occured at api/tasks/[id]/DELETE');
-        console.log(err);
+        console.error('Some Error Occured at api/tasks/[id]/DELETE = ', err);
         return ErrorResponse(err);
     }
 }

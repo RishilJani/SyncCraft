@@ -21,7 +21,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
             email: user?.email,
             role: user?.role,
             createdAt: user?.createdAt,
-            points : points._sum.points ?? 0
+            points: points._sum.points ?? 0
         }
 
         return MyResponse(false, "User found", res, { status: 200 });
@@ -56,7 +56,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
 
         return MyResponse(false, "User updated successfully", res, { status: 200 });
     } catch (error) {
-        console.log("Error updating user:", error);
+        console.error("Error updating user:", error);
         return ErrorResponse(error);
     }
 }

@@ -133,8 +133,7 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
                 setSpecificProject({ projectId: project.projectId! });
             }
         } catch (err) {
-            console.log('Some Error Occured at Custom_KanBan');
-            console.log(err)
+            console.error('Some Error Occured at Custom_KanBan', err)
         }
     }
 
@@ -151,8 +150,7 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
                 setSpecificProject({ projectId: project.projectId! });
             }
         } catch (err) {
-            console.log('Error deleting task');
-            console.log(err);
+            console.error('Error deleting task', err);
         } finally {
             setTaskToDelete(null);
             setIsDeleteHovered(false);
@@ -175,8 +173,7 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
                 setSpecificProject({ projectId: project.projectId! });
             }
         } catch (err) {
-            console.log('Error updating task due date');
-            console.log(err);
+            console.error('Error updating task due date', err);
         } finally {
             setModifiedTaskDateData(null);
         }
@@ -373,10 +370,10 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
 
                     {role && (
                         <div className="w-full mt-8 px-4 pb-8">
-                            <ProjectProgress 
-                                tasks={columns.flatMap(col => col.cards)} 
-                                projectStartDate={project.createdAt ? new Date(project.createdAt) : undefined} 
-                                projectEndDate={project.dueDate ? new Date(project.dueDate) : (project.completionDate ? new Date(project.completionDate) : undefined)} 
+                            <ProjectProgress
+                                tasks={columns.flatMap(col => col.cards)}
+                                projectStartDate={project.createdAt ? new Date(project.createdAt) : undefined}
+                                projectEndDate={project.dueDate ? new Date(project.dueDate) : (project.completionDate ? new Date(project.completionDate) : undefined)}
                                 onTaskDateChange={handleTaskDateChange}
                                 rollbackCounter={rollbackCounter}
                             />
@@ -441,7 +438,7 @@ export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: bo
                 />
             )}
 
-            <TaskDueDateDialog 
+            <TaskDueDateDialog
                 open={!!modifiedTaskDateData}
                 onOpenChange={handleDialogClose}
                 onConfirm={confirmDueDateChange}

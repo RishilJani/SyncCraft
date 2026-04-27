@@ -1,30 +1,30 @@
-import { putUserCookie } from "@/app/actions/users/userFunctions";
-import { ErrorResponse, MyResponse } from "@/app/(utils)/utils";
-import { prisma } from "@/lib/prisma";
-import bcrypt from "bcryptjs";
-import { NextRequest } from "next/server";
+// import { putUserCookie } from "@/app/actions/users/userFunctions";
+// import { ErrorResponse, MyResponse } from "@/app/(utils)/utils";
+// import { prisma } from "@/lib/prisma";
+// import bcrypt from "bcryptjs";
+// import { NextRequest } from "next/server";
 
-export async function POST(request: NextRequest) {
-    try {
-        const body = await request.json();
-        const salt = process.env.SALT ? Number.parseInt(process.env.SALT) : 10;
-        const hashedPassword = bcrypt.hashSync(body.password, salt);
+// export async function POST(request: NextRequest) {
+//     try {
+//         const body = await request.json();
+//         const salt = process.env.SALT ? Number.parseInt(process.env.SALT) : 10;
+//         const hashedPassword = bcrypt.hashSync(body.password, salt);
 
-        const user = await prisma.users.create({
-            data: {
-                userName: body.userName,
-                passwordHash: hashedPassword,
-                email: body.email,
-                createdAt: new Date(),
-                role: body.role,
-            }
-        });
-        await putUserCookie(user);
+//         const user = await prisma.users.create({
+//             data: {
+//                 userName: body.userName,
+//                 passwordHash: hashedPassword,
+//                 email: body.email,
+//                 createdAt: new Date(),
+//                 role: body.role,
+//             }
+//         });
+//         await putUserCookie(user);
 
-        return MyResponse(false, "Added Successfully", user, { status: 200 });
-    } catch (err: any) {
-        console.error("Error creating user:", err);
-        return ErrorResponse(err);
+//         return MyResponse(false, "Added Successfully", user, { status: 200 });
+//     } catch (err: any) {
+//         console.error("Error creating user:", err);
+//         return ErrorResponse(err);
 
-    }
-}
+//     }
+// }

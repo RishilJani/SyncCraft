@@ -17,8 +17,7 @@ export async function GET(request: Request) {
         });
         return MyResponse(false, "Tasks Found", tasks, { status: 200 });
     } catch (err) {
-        console.log('Some Error Occured at api/tasks/GET');
-        console.log(err);
+        console.error('Some Error Occured at api/tasks/GET = ', err);
         return ErrorResponse(err);
     }
 }
@@ -46,8 +45,7 @@ export async function POST(request: Request) {
 
         return MyResponse(false, "Task Created Successfully", task, { status: 201 });
     } catch (err) {
-        console.log('Some Error Occured at api/tasks/POST');
-        console.log(err);
+        console.error('Some Error Occured at api/tasks/POST= ', err);
         return ErrorResponse(err);
     }
 }

@@ -40,3 +40,10 @@ export type Project = {
     members?: User[] | undefined,
     tasks?: Task[]
 }
+
+export type Errors = {
+    name?: String,
+    email?: String,
+    password?: String,
+    credentials?: String,
+};

@@ -79,8 +79,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         return MyResponse(false, "Project Found", project, { status: 200 });
     } catch (err) {
 
-        console.log('Some Error Occured at api/projects/ Get by ID');
-        console.log(err)
+        console.error('Some Error Occured at api/projects/ Get by ID', err)
         return ErrorResponse(err);
     }
 }
@@ -133,8 +132,7 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         revalidatePath("/admin/projects");
         return MyResponse(false, "Project Updated Successfully", project, { status: 200 });
     } catch (err) {
-        console.log('Some Error Occured at api/projects/PUT');
-        console.log(err)
+        console.error('Some Error Occured at api/projects/PUT', err);
         return ErrorResponse(err);
     }
 }
@@ -183,8 +181,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
         return MyResponse(false, "Project Deleted Succuessfully", { deleted: true }, { status: 200 });
     } catch (err) {
 
-        console.log('Some Error Occured at api/projects/DELETE');
-        console.log(err)
+        console.error('Some Error Occured at api/projects/DELETE', err)
         return ErrorResponse(err);
     }
 

@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { ArrowLeft, Mail, Search } from "lucide-react";
+import { ArrowLeft, Mail, Search, User as UserIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -10,12 +10,15 @@ import { User } from "@/app/(types)/myTypes";
 import { role_enum } from "@/app/generated/prisma/enums";
 import { useRouter } from "next/navigation";
 import CustomLoader from "@/components/custom_loader";
+import AddUserDialog from "@/components/dialogs/addUserDialog";
 
 export default function EmployeesPage() {
     const [searchQuery, setSearchQuery] = useState("");
     const [filter, setFilter] = useState("All");
+    const [open, setOpen] = useState(false);
     const [employees, setEmployee] = useState<any>([]);
     const [loading, setLoading] = useState(false);
+    const [dialogKey, setDialogKey] = useState(0);
     const router = useRouter();
     useEffect(() => {
         setLoading(true);
@@ -38,7 +41,10 @@ export default function EmployeesPage() {
     const handleClick = (id: number) => {
         router.push("/admin/employees/" + id);
     }
-
+    const handleClose = () => {
+        setOpen(!open);
+        setDialogKey(dialogKey + 1);
+    }
     const filteredEmployees = employees.filter((employee: User) => {
         const matchesSearch = employee.userName!.toLowerCase().includes(searchQuery.toLowerCase()) ||
             employee.email!.toLowerCase().includes(searchQuery.toLowerCase());
@@ -58,6 +64,14 @@ export default function EmployeesPage() {
                         </Link>
                     </Button>
                     <h1 className="text-3xl font-bold tracking-tight">Employees</h1>
+                </div>
+                <div className='flex justify-end'>
+                    <AddUserDialog open={open} setOpen={handleClose}>
+                        <Button className="gap-2 text-sm">
+                            <UserIcon className="h-5 w-5" />
+                            Add Employee
+                        </Button>
+                    </AddUserDialog>
                 </div>
             </div>
 

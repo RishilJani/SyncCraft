@@ -37,7 +37,7 @@ export default function EditUserDialog({ user, onSuccess, children }: EditUserDi
             const res = await fetch(`/api/user/${user.userId}`, {
                 method: "PUT",
                 headers: myHeaders,
-                body: JSON.stringify({ userName, email , role}),
+                body: JSON.stringify({ userName, email, role }),
             });
             const data = await res.json();
             if (!data.error) {
@@ -47,7 +47,7 @@ export default function EditUserDialog({ user, onSuccess, children }: EditUserDi
                 alert(data.message);
             }
         } catch (error) {
-            console.log("Failed to update user:", error);
+            console.error("Failed to update user:", error);
             alert("An error occurred while updating the profile.");
         } finally {
             setLoading(false);
@@ -68,11 +68,11 @@ export default function EditUserDialog({ user, onSuccess, children }: EditUserDi
                         </DialogDescription> */}
                     </DialogHeader>
 
-                    <hr className="mx-6 border-dashed"/>
+                    <hr className="mx-6 border-dashed" />
                     <form className="p-6 pt-4 space-y-4" onSubmit={handleUpdate}>
                         <div className="space-y-2">
                             <Label htmlFor="name" className="text-sm font-medium"> Name </Label>
-                            <Input id="name" value={userName} onChange={(e) => setUserName(e.target.value)} required/>
+                            <Input id="name" value={userName} onChange={(e) => setUserName(e.target.value)} required />
                         </div>
                         {/* <div className="space-y-2">
                             <Label htmlFor="name" className="text-sm font-medium"> Password </Label>
@@ -81,22 +81,22 @@ export default function EditUserDialog({ user, onSuccess, children }: EditUserDi
 
                         <div className="space-y-2">
                             <Label htmlFor="email" className="text-sm font-medium"> Email </Label>
-                            <Input id="email" value={email} onChange={(e) => setEmail(e.target.value)} className="col-span-3" required/>
+                            <Input id="email" value={email} onChange={(e) => setEmail(e.target.value)} className="col-span-3" required />
                         </div>
 
                         <div className="space-y-2">
                             <Label className="text-sm font-medium">Assign To</Label>
-                                <Select onValueChange={(e) => setRole(e as role_enum)} value={role}>
-                                    <SelectTrigger>
-                                        <SelectValue placeholder="Select Member" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        {[
-                                            <SelectItem key={1} value={role_enum.manager}>Manager</SelectItem>,
-                                            <SelectItem key={2} value={role_enum.member}>Member</SelectItem>
-                                        ]}
-                                    </SelectContent>
-                                </Select>
+                            <Select onValueChange={(e) => setRole(e as role_enum)} value={role}>
+                                <SelectTrigger>
+                                    <SelectValue placeholder="Select Member" />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    {[
+                                        <SelectItem key={1} value={role_enum.manager}>Manager</SelectItem>,
+                                        <SelectItem key={2} value={role_enum.member}>Member</SelectItem>
+                                    ]}
+                                </SelectContent>
+                            </Select>
                         </div>
 
                         <div className="pt-2">

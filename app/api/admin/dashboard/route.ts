@@ -86,8 +86,7 @@ export async function GET(request: Request) {
         return MyResponse(false, "Dashboard Data fetched", dashboardData, { status: 200 });
 
     } catch (err) {
-        console.log('Error at api/admin/dashboard/GET');
-        console.log(err);
+        console.error("Error at api/admin/dashboard/GET = ", err);
         return ErrorResponse(err);
     }
 }

@@ -7,10 +7,10 @@ import { Label } from "@radix-ui/react-label";
 import Link from "next/link";
 import { redirect, RedirectType } from "next/navigation";
 import React, { useState } from "react";
-import { Errors } from "../register/page";
 import CustomLoader from "@/components/custom_loader";
 import { myHeaders } from "@/app/(utils)/utils";
 import { useMyContext } from "@/app/(utils)/myContext";
+import { Errors } from "@/app/(types)/myTypes";
 
 function LoginPage() {
     const { refreshData } = useMyContext();
@@ -81,7 +81,7 @@ function LoginPage() {
                             <div className="space-y-2">
                                 <Label htmlFor="pwd" className="text-title text-sm"> Password </Label>
                                 <PasswordInput required name="pwd" id="pwd" className="input sz-md variant-mixed" value={password} autoComplete='current-password' onChange={(e) => { setPassword(e.target.value); }} />
-                                <Link href="/forgot-password" replace={true} className="text-sm text-sky-600">Forget Password ?</Link>
+                                <Link href="/forgot-password" replace={true} className="text-sm text-sky-600 px-2">Forget Password ?</Link>
                                 {errors.password && <p className='text-red-500 text-sm'>{errors.password}</p>}
                             </div>
 
@@ -89,14 +89,6 @@ function LoginPage() {
                         </div>
                     </div>
 
-                    <div className="bg-muted rounded-lg border p-3">
-                        <p className="text-accent-foreground text-center text-sm">
-                            Don't have an account ?
-                            <Button asChild variant="link" className="px-2">
-                                <Link href="/register" replace={true}>Sign up</Link>
-                            </Button>
-                        </p>
-                    </div>
                 </form>
             </section>
         </>
@@ -106,3 +98,13 @@ function LoginPage() {
 }
 
 export default LoginPage;
+
+
+{/* <div className="bg-muted rounded-lg border p-3">
+                        <p className="text-accent-foreground text-center text-sm">
+                            Don't have an account ?
+                            <Button asChild variant="link" className="px-2">
+                                <Link href="/register" replace={true}>Sign up</Link>
+                            </Button>
+                        </p>
+                    </div> */}

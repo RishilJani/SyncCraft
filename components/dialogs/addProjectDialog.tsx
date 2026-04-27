@@ -25,7 +25,6 @@ export default function AddProjectDialog({
     setOpen
 }: { children: React.ReactNode, open: boolean, setOpen: Function }) {
 
-    const router = useRouter();
     const userContext = useMyContext();
 
     const [title, setTitle] = useState("");

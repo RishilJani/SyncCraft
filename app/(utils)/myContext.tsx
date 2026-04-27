@@ -59,8 +59,7 @@ export function MyContextProvider({ children }: { children: ReactNode }) {
             setProjects(prevProjects => prevProjects.map(e => e.projectId == res.data.projectId ? res.data : e));
 
         } catch (err) {
-            console.log('Some Error Occured at myContextProvider');
-            console.log(err)
+            console.error(err);
         }
 
     }

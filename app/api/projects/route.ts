@@ -4,54 +4,52 @@ import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
 export async function GET() {
-    try{
+    try {
         const projects = await prisma.projects.findMany();
-        return MyResponse(false,"Projects Found", projects, {status : 200});
-    }catch(err){
-        console.log('Some Error Occured at api/projets/GET');
-        console.log(err)
+        return MyResponse(false, "Projects Found", projects, { status: 200 });
+    } catch (err) {
+        console.error('Some Error Occured at api/projets/GET', err);
         return ErrorResponse(err);
     }
 }
 
-export async function POST(request : Request) {
-    const { projectName, description,  createdBy,  dueDate ,managerId,memberIds } = await request.json();
+export async function POST(request: Request) {
+    const { projectName, description, createdBy, dueDate, managerId, memberIds } = await request.json();
     const createdAt = new Date();
-    try{
+    try {
         const project = await prisma.projects.create({
             data: {
-                projectName : projectName,
-                description : description,
-                createdBy :createdBy,
-                createdAt : createdAt,
-                dueDate : dueDate,
+                projectName: projectName,
+                description: description,
+                createdBy: createdBy,
+                createdAt: createdAt,
+                dueDate: dueDate,
                 status: Status.Todo,
             }
         });
         const userProject = await prisma.user_projects.create({
-            data:{
+            data: {
                 userid: managerId,
                 projectid: project.projectId
             }
         });
 
-        memberIds.forEach(async (id : number)=>{
+        memberIds.forEach(async (id: number) => {
             await prisma.user_projects.create({
-                data:{
+                data: {
                     userid: id,
-                    projectid : project.projectId
+                    projectid: project.projectId
                 }
             });
         });
-    
+
         revalidatePath("/admin/projects");
-        return MyResponse(false,"Project Added Successfully" , project , {status : 200});
+        return MyResponse(false, "Project Added Successfully", project, { status: 200 });
 
-    }catch(err){
+    } catch (err) {
 
-        console.log('Some Error Occured at api/projects/POST');
-        console.log(err)
+        console.error('Some Error Occured at api/projects/POST', err);
         return ErrorResponse(err);
     }
-    
+
 }

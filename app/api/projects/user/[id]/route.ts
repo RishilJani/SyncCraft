@@ -119,8 +119,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         return MyResponse(false, "Projects Found", projects, { status: 200 });
 
     } catch (err) {
-        console.log('Some Error Occured at api/projects/user/[id] Get by ID');
-        console.log(err);
+        console.error('Some Error Occured at api/projects/user/[id] Get by ID', err);
         return ErrorResponse(err);
     }
 }
