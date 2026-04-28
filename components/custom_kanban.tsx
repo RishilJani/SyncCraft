@@ -24,6 +24,7 @@ import { useMyContext } from "@/app/(utils)/myContext";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 import ProjectProgress from "@/components/project_progress";
+import { statusColors } from "@/app/(utils)/utils";
 
 type KanbanTask = Task & { id: number };
 
@@ -34,11 +35,6 @@ type Column = {
     status: Status;
 };
 
-const statusColors = {
-    [Status.Todo]: "bg-blue-500/10 border-blue-500/20",
-    [Status.Pending]: "bg-yellow-500/10 border-yellow-500/20",
-    [Status.Completed]: "bg-green-500/10 border-green-500/20",
-};
 
 export default function MyKanbanBoard({ role, projectId, onAddTask }: { role: boolean, projectId: number, onAddTask?: any }) {
     const { projects, setSpecificProject } = useMyContext();

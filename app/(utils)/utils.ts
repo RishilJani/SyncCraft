@@ -1,3 +1,4 @@
+import { Status } from '../(types)/myTypes';
 import { AlertDialog } from '../../components/ui/alert-dialog';
 
 export function MyResponse(error: boolean, message: string, data: any, { status = 200 }: { status: number }) {
@@ -15,4 +16,15 @@ export function formateDate(date: Date | null | undefined) {
     }
     const formatedDate = (new Date(date)).toLocaleDateString("en-GB");
     return formatedDate;
+}
+
+export const statusColors = {
+    [Status.Todo]: "bg-blue-500/10 border-blue-500/20",
+    [Status.Pending]: "bg-yellow-500/10 border-yellow-500/20",
+    [Status.Completed]: "bg-green-500/10 border-green-500/20",
+};
+export const statusTextColors = {
+    [Status.Todo]: "text-blue-500/90",
+    [Status.Pending]: "text-yellow-500/90",
+    [Status.Completed]: "text-green-500/90",
 }

@@ -39,7 +39,7 @@ export default function AdminDashboard() {
             if (!userData?.user?.userId) return;
             try {
                 setLoading(true);
-                const res = await fetch(`/api/admin/dashboard?userId=${userData.user.userId}`, { cache: 'no-store' });
+                const res = await fetch(`/api/admin/dashboard?userId=${userData.user.userId}?org=${userData.user.organization}`, { cache: 'no-store' });
                 const json = await res.json();
                 if (json && !json.error) {
                     setData(json.data);

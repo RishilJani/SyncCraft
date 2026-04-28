@@ -32,8 +32,7 @@ export function MyContextProvider({ children }: { children: ReactNode }) {
                 setUser(userData.data);
 
                 if (userData.data.userId) {
-                    const projectsRes = await fetch(`/api/projects/user/${userData.data.userId}`, { cache: 'no-store' });
-                    const projectsData = await projectsRes.json();
+                    const projectsData = await (await fetch(`/api/projects/user/${userData.data.userId}`, { cache: 'no-store' })).json();
                     if (projectsData && !projectsData.error) {
                         setProjects(projectsData.data);
                     }

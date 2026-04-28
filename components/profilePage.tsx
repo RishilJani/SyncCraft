@@ -61,7 +61,7 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
     const { user: currentUser, loading: globalLoading, setLoading: setGlobalLoading, refreshData } = useMyContext();
     const [profileUser, setProfileUser] = useState<User | null>(null);
     const router = useRouter();
-    const [isDeleting , setIsDeleting] = useState(false);
+    const [isDeleting, setIsDeleting] = useState(false);
 
     const handleLogout = async () => {
         await logout();
@@ -89,29 +89,29 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
         router.back();
     };
 
-    const handleDelete = async () => { 
-        try{
-            var res = await (await fetch('/api/user/' + id,{
+    const handleDelete = async () => {
+        try {
+            var res = await (await fetch('/api/user/' + id, {
                 method: "DELETE",
                 headers: myHeaders
-            }) ).json(); 
+            })).json();
 
             console.log("Res = ", res);
-            if(!res.error){
+            if (!res.error) {
                 setIsDeleting(false);
                 await refreshData();
                 router.replace("/admin/employees");
                 return;
-            }else{
+            } else {
 
             }
-        }catch(err){
-        
+        } catch (err) {
+
             console.log('Some Error Occured at ');
             console.log(err)
         }
-        
-    } 
+
+    }
 
     if (globalLoading) {
         return null; // Global loader handles initial state
@@ -131,7 +131,7 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
                 <CardHeader className="relative pb-0">
                     <div className="flex justify-between items-center mb-6">
                         <Button variant="outline" size="icon" onClick={handleBack}>
-                            <ArrowLeft className="h-5 w-5" />
+                            <ArrowLeft className="h-6 w-6" />
                         </Button>
                         <div className="flex gap-2">
                             {viewerRole == role_enum.admin && (
@@ -220,9 +220,7 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
                         }
                     </div>
                 </CardContent>
-                <CardFooter className="bg-muted/50 p-4 text-center text-xs text-muted-foreground">
-                    Profile ID: {profileUser.userId}
-                </CardFooter>
+
             </Card>
         </div>
     );

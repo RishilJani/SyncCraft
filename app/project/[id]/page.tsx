@@ -90,10 +90,10 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
 
                     {/* Header Section */}
                     <div className="flex items-center gap-4">
-                        <Button variant="outline" size="icon" asChild>
-                            <Link href="/admin/projects">
-                                <ArrowLeft className="h-5 w-5" />
-                            </Link>
+                        <Button variant="outline" size="icon" asChild onClick={handleBack}>
+                            <div>
+                                <ArrowLeft className="h-6 w-6" />
+                            </div>
                         </Button>
                         <div className="flex-1">
                             <div className="flex items-center gap-3">

@@ -40,6 +40,7 @@ export async function POST(request: Request) {
                 email: body.email,
                 createdAt: new Date(),
                 role: body.role,
+                organization: body.organization
             }
         });
         await putUserCookie(user);

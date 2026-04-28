@@ -10,6 +10,9 @@ const USER_NAME = "userName";
 const EMAIL = "email";
 const ROLE = "role";
 const CREATED_AT = "createdAt";
+const ORGANIZATION = "organization";
+
+const DEFAULT_ORGANIZATION = "demo";
 
 
 export async function logout() {
@@ -43,6 +46,7 @@ export async function getUserCookie() {
             email: cookieStore.get(EMAIL)?.value,
             role: cookieStore.get(ROLE)?.value as role_enum,
             createdAt: cookieStore.get(CREATED_AT)?.value ? new Date(cookieStore.get(CREATED_AT)?.value!) : undefined,
+            organization: cookieStore.get(ORGANIZATION)?.value ?? DEFAULT_ORGANIZATION
         };
 
         return user;
@@ -66,6 +70,7 @@ export async function putUserCookie(user: any) {
     cookieStore.set(USER_NAME, user.userName, options);
     cookieStore.set(EMAIL, user.email, options);
     cookieStore.set(ROLE, user.role, options);
+    cookieStore.set(ORGANIZATION, user.organization, options);
     if (user.createdAt) {
         cookieStore.set(CREATED_AT, user.createdAt.toString(), options);
     }

@@ -19,7 +19,7 @@ export default function AddUserDialog({
     onSubmit
 }: { children: React.ReactNode, open: boolean, setOpen: Function, onSubmit?: Function }) {
 
-    const { refreshData, user } = useMyContext();
+    const {  user } = useMyContext();
     const [userName, setUserName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");

@@ -1,6 +1,7 @@
-import { Status, User } from "@/app/(types)/myTypes";
+import { Status, User, Project, Task } from "@/app/(types)/myTypes";
 import { ErrorResponse, MyResponse } from "@/app/(utils)/utils";
 import { prisma } from "@/lib/prisma";
+import { role_enum } from "@/app/generated/prisma/enums";
 
 export async function GET(request: Request, { params }: { params: Promise<{ id: string }> }) {
     try {
@@ -10,18 +11,41 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
                 userId: uid
             }
         });
+
+        if (!user) {
+            return MyResponse(true, "User not found", null, { status: 404 });
+        }
+
         const points = await prisma.tasks.aggregate({
             _sum: { points: true },
             where: { AND: { status: Status.Completed, assignedto: uid } }
         });
 
+        let projects: Project[] | undefined = undefined;
+        let tasks: Task[] | undefined = undefined;
+
+        if (user.role === role_enum.manager) {
+            const user_projects = await prisma.user_projects.findMany({
+                where: { userid: uid },
+                include: { Projects: true }
+            });
+            projects = user_projects.map(up => up.Projects).filter(p => p !== null) as Project[];
+        } else if (user.role === role_enum.member) {
+            tasks = await prisma.tasks.findMany({
+                where: { assignedto: uid },
+                orderBy: { createdAt: 'desc' }
+            }) as unknown as Task[];
+        }
+
         const res: User = {
-            userId: user?.userId,
-            userName: user?.userName,
-            email: user?.email,
-            role: user?.role,
-            createdAt: user?.createdAt,
-            points: points._sum.points ?? 0
+            userId: user.userId,
+            userName: user.userName,
+            email: user.email,
+            role: user.role,
+            createdAt: user.createdAt,
+            points: points._sum.points ?? 0,
+            projects: projects,
+            tasks: tasks
         }
 
         return MyResponse(false, "User found", res, { status: 200 });
@@ -30,6 +54,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         return ErrorResponse(error);
     }
 }
+
 
 export async function PUT(request: Request, { params }: { params: Promise<{ id: string }> }) {
     try {

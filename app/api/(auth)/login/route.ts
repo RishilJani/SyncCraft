@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
         if (!user) {
             return MyResponse(true, "User not found", null, { status: 404 });
         }
-        const salt = process.env.SALT ? Number.parseInt(process.env.SALT) : 10;
+        // const salt = process.env.SALT ? Number.parseInt(process.env.SALT) : 10;
         const isMatch = await bcrypt.compare(body.password, user.passwordHash);
         if (!isMatch) {
             return MyResponse(true, "Credentials not matched", null, { status: 401 });

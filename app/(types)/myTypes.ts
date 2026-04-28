@@ -11,6 +11,8 @@ export type User = {
     role?: role_enum,
     points?: number,
     organization?: string,
+    projects?: Project[],
+    tasks?: Task[],
 }
 
 export type Task = {
