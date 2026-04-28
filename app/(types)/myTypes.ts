@@ -7,9 +7,10 @@ export type User = {
     userName: string | undefined,
     email?: string | undefined,
     passwordHash?: string | undefined,
-    createdAt?: Date | null, 
+    createdAt?: Date | null,
     role?: role_enum,
     points?: number,
+    organization?: string,
 }
 
 export type Task = {
@@ -22,7 +23,7 @@ export type Task = {
     completionDate?: Date | null;
     points?: number;
     status: Status;
-    projectId? : number 
+    projectId?: number
     priority: Priority;
 };
 
@@ -46,4 +47,5 @@ export type Errors = {
     email?: String,
     password?: String,
     credentials?: String,
+    organization?: String,
 };

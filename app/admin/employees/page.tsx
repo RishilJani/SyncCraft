@@ -20,9 +20,10 @@ export default function EmployeesPage() {
     const [loading, setLoading] = useState(false);
     const [dialogKey, setDialogKey] = useState(0);
     const router = useRouter();
-    useEffect(() => {
+
+    function loadData() {
         setLoading(true);
-        fetch("/api/admin/emoloyess")
+        fetch("/api/admin/employees")
             .then((res) => res.json())
             .then((data) => {
                 setEmployee(data);
@@ -32,6 +33,10 @@ export default function EmployeesPage() {
                 console.error("Failed to fetch employees:", err);
                 setLoading(false);
             });
+    }
+
+    useEffect(() => {
+        loadData();
     }, []);
 
     if (loading) {
@@ -66,7 +71,7 @@ export default function EmployeesPage() {
                     <h1 className="text-3xl font-bold tracking-tight">Employees</h1>
                 </div>
                 <div className='flex justify-end'>
-                    <AddUserDialog open={open} setOpen={handleClose}>
+                    <AddUserDialog open={open} setOpen={handleClose} onSubmit={loadData}>
                         <Button className="gap-2 text-sm">
                             <UserIcon className="h-5 w-5" />
                             Add Employee

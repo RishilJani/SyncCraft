@@ -15,15 +15,17 @@ import { myHeaders } from "@/app/(utils)/utils";
 export default function AddUserDialog({
     children,
     open,
-    setOpen
-}: { children: React.ReactNode, open: boolean, setOpen: Function }) {
+    setOpen,
+    onSubmit
+}: { children: React.ReactNode, open: boolean, setOpen: Function, onSubmit?: Function }) {
 
-    const { refreshData, loading, setLoading } = useMyContext();
+    const { refreshData, user } = useMyContext();
     const [userName, setUserName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [role, setRole] = useState<role_enum>(role_enum.manager);
     const [errors, setErrors] = useState<Errors>({});
+    const [loading, setLoading] = useState(false);
 
     const validateForm = () => {
         const newError: Errors = {};
@@ -64,16 +66,21 @@ export default function AddUserDialog({
                     password: password,
                     email: email,
                     role: role,
+                    organization: user?.organization,
                 };
-                var res = await (await fetch("/api/admin/employess", {
+                var res = await (await fetch("/api/admin/employees", {
                     method: "POST",
                     headers: myHeaders,
                     body: JSON.stringify(obj)
                 })).json();
 
                 if (!res.error) {
-                    await refreshData();
-                    setOpen();
+                    if (onSubmit)
+                        await onSubmit();
+                    setOpen(false);
+                } else {
+                    console.log('Some Error Occured at addUserDialog');
+                    console.log(res.message);
                 }
             }
         } catch (err) {
@@ -90,7 +97,6 @@ export default function AddUserDialog({
     }
 
     if (loading) { return (<CustomLoader message="Just a minute" />); }
-    console.log("Err= ", errors);
 
     return (
         <>

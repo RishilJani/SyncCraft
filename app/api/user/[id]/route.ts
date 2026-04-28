@@ -60,3 +60,31 @@ export async function PUT(request: Request, { params }: { params: Promise<{ id: 
         return ErrorResponse(error);
     }
 }
+
+export async function DELETE(request: Request, { params }: { params: Promise<{ id: string }> }) {
+    try {
+        const uid = Number((await params).id);
+
+        const res = await prisma.user_projects.findMany({
+            where: {
+                userid: uid
+            },
+        });
+        if (res.length == 0) {
+            const result = await prisma.users.delete({
+                where: {
+                    userId: uid
+                }
+            });
+            return MyResponse(false, "Delete Succesfull", { id: uid }, { status: 200 });
+        }
+
+        return MyResponse(true, "User is assigned to one or more project/tasks", res , {status : 400});
+    } catch (err) {
+
+        console.log('Some Error Occured at delete /api/user/id');
+        console.log(err)
+        return ErrorResponse(err);
+    }
+
+}

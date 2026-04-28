@@ -42,7 +42,7 @@ export default function EditProjectForm({
     const [loading, setLoading] = useState(false);
     useEffect(() => {
         setLoading(true);
-        fetch("/api/admin/emoloyess")
+        fetch("/api/admin/employees")
             .then((res) => res.json())
             .then((data) => {
                 setManagers(data.filter((user: User) => user.role === role_enum.manager));

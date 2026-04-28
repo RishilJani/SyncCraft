@@ -15,11 +15,11 @@ import { Separator } from "@/components/ui/separator";
 import {
     Mail,
     Calendar,
-    Briefcase,
     Trophy,
     LogOut,
     ArrowLeft,
     Pencil,
+    Trash2,
 } from "lucide-react";
 import {
     Dialog,
@@ -37,6 +37,8 @@ import { User } from "@/app/(types)/myTypes";
 import { useMyContext } from "@/app/(utils)/myContext";
 import EditUserDialog from "./dialogs/editUserDialog";
 import { logout } from "@/app/actions/users/userFunctions";
+import { DeleteDialog } from "./dialogs/DeleteDialog";
+import { myHeaders } from "@/app/(utils)/utils";
 
 // Data fetching function for a specific user ID
 const fetchUserData = async (id: string | number) => {
@@ -58,8 +60,8 @@ const fetchUserData = async (id: string | number) => {
 export default function UserProfilePage({ id, viewerRole }: { id: string | number; viewerRole?: role_enum; }) {
     const { user: currentUser, loading: globalLoading, setLoading: setGlobalLoading, refreshData } = useMyContext();
     const [profileUser, setProfileUser] = useState<User | null>(null);
-    // const [localLoading, setLocalLoading] = useState(true);
     const router = useRouter();
+    const [isDeleting , setIsDeleting] = useState(false);
 
     const handleLogout = async () => {
         await logout();
@@ -87,6 +89,30 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
         router.back();
     };
 
+    const handleDelete = async () => { 
+        try{
+            var res = await (await fetch('/api/user/' + id,{
+                method: "DELETE",
+                headers: myHeaders
+            }) ).json(); 
+
+            console.log("Res = ", res);
+            if(!res.error){
+                setIsDeleting(false);
+                await refreshData();
+                router.replace("/admin/employees");
+                return;
+            }else{
+
+            }
+        }catch(err){
+        
+            console.log('Some Error Occured at ');
+            console.log(err)
+        }
+        
+    } 
+
     if (globalLoading) {
         return null; // Global loader handles initial state
     }
@@ -109,14 +135,27 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
                         </Button>
                         <div className="flex gap-2">
                             {viewerRole == role_enum.admin && (
-                                <EditUserDialog user={profileUser} onSuccess={() => { refreshData(); loadData(); }} >
-                                    <Button variant="outline" size="sm" className="gap-2">
-                                        <Pencil className="h-5 w-5" />
-                                        Edit
+                                <>
+                                    <Button variant="destructive" size="sm" className="gap-2" onClick={() => setIsDeleting(true)}>
+                                        <Trash2 className="h-5 w-5" />
+                                        Delete
                                     </Button>
-                                </EditUserDialog>
+                                    <DeleteDialog
+                                        open={isDeleting}
+                                        onOpenChange={setIsDeleting}
+                                        onConfirm={handleDelete}
+                                        title="Delete User"
+                                        description={`Are you sure you want to delete ${profileUser.userName}? This action cannot be undone.`}
+                                    />
+                                    <EditUserDialog user={profileUser} onSuccess={() => { refreshData(); loadData(); }} >
+                                        <Button variant="outline" size="sm" className="gap-2">
+                                            <Pencil className="h-5 w-5" />
+                                            Edit
+                                        </Button>
+                                    </EditUserDialog>
+                                </>
                             )}
-                            <MyDialog />
+                            <LogOutDialog />
                         </div>
                     </div>
                     <div className="flex flex-col items-center gap-4 md:flex-row md:items-start md:justify-between">
@@ -188,7 +227,7 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
         </div>
     );
 
-    function MyDialog() {
+    function LogOutDialog() {
         return (
             <Dialog>
                 <DialogTrigger asChild>
@@ -216,4 +255,6 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
                 </DialogContent>
             </Dialog>);
     }
+
+
 }

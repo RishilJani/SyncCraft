@@ -13,10 +13,11 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { User } from "@/app/(types)/myTypes";
+import { Errors, User } from "@/app/(types)/myTypes";
 import { myHeaders } from "@/app/(utils)/utils";
 import { role_enum } from "@/app/generated/prisma/enums";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";
+import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 
 interface EditUserDialogProps {
     user: User;
@@ -30,6 +31,23 @@ export default function EditUserDialog({ user, onSuccess, children }: EditUserDi
     const [email, setEmail] = useState(user.email || "");
     const [role, setRole] = useState<role_enum>(user.role!);
     const [loading, setLoading] = useState(false);
+    const [errors, setErrors] = useState<Errors>({});
+
+    const validateForm = () => {
+        const newError: Errors = {};
+        if (!userName.trim())
+            newError.name = "Name is Required";
+
+        if (!email.trim())
+            newError.email = "Email is Required";
+        else if (!/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(email))
+            newError.email = "Invalid email format";
+
+        console.log("newError = ", newError);
+
+        setErrors(newError);
+        return Object.keys(newError).length == 0;
+    }
 
     const handleUpdate = async () => {
         setLoading(true);
@@ -73,18 +91,16 @@ export default function EditUserDialog({ user, onSuccess, children }: EditUserDi
                         <div className="space-y-2">
                             <Label htmlFor="name" className="text-sm font-medium"> Name </Label>
                             <Input id="name" value={userName} onChange={(e) => setUserName(e.target.value)} required />
+                            {errors.name && <p className='text-red-500 text-sm'>{errors.name}</p>}
                         </div>
-                        {/* <div className="space-y-2">
-                            <Label htmlFor="name" className="text-sm font-medium"> Password </Label>
-                            <Input id="password" type="password" value="********" readOnly/>
-                        </div> */}
 
                         <div className="space-y-2">
                             <Label htmlFor="email" className="text-sm font-medium"> Email </Label>
                             <Input id="email" value={email} onChange={(e) => setEmail(e.target.value)} className="col-span-3" required />
+                            {errors.email && <p className='text-red-500 text-sm'>{errors.email}</p>}
                         </div>
 
-                        <div className="space-y-2">
+                        {/* <div className="space-y-2">
                             <Label className="text-sm font-medium">Assign To</Label>
                             <Select onValueChange={(e) => setRole(e as role_enum)} value={role}>
                                 <SelectTrigger>
@@ -97,6 +113,23 @@ export default function EditUserDialog({ user, onSuccess, children }: EditUserDi
                                     ]}
                                 </SelectContent>
                             </Select>
+                        </div> */}
+                        <div className="space-y-2 my-3">
+                            <Label className="text-title text-sm"> Role </Label>
+                            <RadioGroup value={role} onValueChange={(value) => setRole(value as role_enum)} className="flex flex-row justify-center space-x-4">
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value={role_enum.admin} id="r-admin" />
+                                    <Label htmlFor="r-admin">Admin</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value={role_enum.manager} id="r-manager" />
+                                    <Label htmlFor="r-manager">Manager</Label>
+                                </div>
+                                <div className="flex items-center space-x-2">
+                                    <RadioGroupItem value={role_enum.member} id="r-member" />
+                                    <Label htmlFor="r-member">Member</Label>
+                                </div>
+                            </RadioGroup>
                         </div>
 
                         <div className="pt-2">

@@ -52,6 +52,7 @@ model Users {
   passwordHash  String          @db.VarChar
   createdAt     DateTime?       @default(now()) @db.Timestamptz(6)
   role          role_enum       @default(member)
+  organization  String          @default("demo")
   Projects      Projects[]
   TaskComments  TaskComments[]
   TaskHistory   TaskHistory[]
