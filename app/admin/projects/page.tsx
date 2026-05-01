@@ -54,7 +54,7 @@ function ProjectsList() {
                     </AddProjectDialog>
                 </div>
             </div>
-
+            
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mt-4">
                 <div className="relative w-full sm:max-w-sm">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -77,7 +77,9 @@ function ProjectsList() {
 
             {
                 userContext.projects.length == 0
-                    ? <> Not any projects yet </>
+                    ? <div className='col-span-full text-center py-12 text-muted-foreground'>
+                        Not any projects yet
+                    </div>
                     :
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3 mt-6">
                         {filteredProjects.map((project) => (

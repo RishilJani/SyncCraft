@@ -20,7 +20,6 @@ function SignUp() {
     const [email, setEmail] = useState("");
     const [organization, setOrganization] = useState("");
     const [password, setPassword] = useState("");
-    const [role, setRole] = useState<role_enum>(role_enum.manager);
     const [errors, setErrors] = useState<Errors>({});
     const [isLoading, setIsLoading] = useState(false);
 
@@ -47,9 +46,9 @@ function SignUp() {
             newError.password = "Password must contain at least one special character";
 
 
-        if(!organization.trim())
+        if (!organization.trim())
             newError.organization = "Organization is Required";
-        
+
         setErrors(newError);
         return Object.keys(newError).length == 0;
     }
@@ -57,7 +56,7 @@ function SignUp() {
         e.preventDefault();
         setIsLoading(true);
         if (validateForm()) {
-            const data = { userName, password, email, role };
+            const data = { userName, password, email, role : role_enum.admin };
 
             setIsLoading(true);
             var res = await (await fetch("/api/register", {
@@ -124,17 +123,8 @@ function SignUp() {
                             </div>
 
                             <div className="space-y-2">
-                                <Label className="text-title text-sm"> Role </Label>
-                                <RadioGroup value={role} onValueChange={(value) => setRole(value as role_enum)} className="flex flex-row justify-center space-x-4">
-                                    <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value={role_enum.manager} id="r-manager" />
-                                        <Label htmlFor="r-manager">Manager</Label>
-                                    </div>
-                                    <div className="flex items-center space-x-2">
-                                        <RadioGroupItem value={role_enum.member} id="r-member" />
-                                        <Label htmlFor="r-member">Member</Label>
-                                    </div>
-                                </RadioGroup>
+                                <Label className="text-title text-sm"> Organization </Label>
+                                <Input required name="org" id="org"  value={organization} autoComplete='current-orgnization' onChange={(e) => { setOrganization(e.target.value); }} />
                             </div>
 
                             <Button className="w-full" onClick={(e) => { handleSubmit(e); }}>Sign Up</Button>
@@ -142,7 +132,7 @@ function SignUp() {
                     </div>
 
                     <div className="bg-muted rounded-lg border p-3">
-                        <p className="text-accent-foreground text-center text-sm">
+                        <p className="text-center text-sm">
                             Already have an account ?
                             <Button asChild variant="link" className="px-2">
                                 <Link href="/login" replace={true}>Login</Link>

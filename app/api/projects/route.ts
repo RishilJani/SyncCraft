@@ -3,9 +3,23 @@ import { ErrorResponse, MyResponse } from "@/app/(utils)/utils";
 import { prisma } from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
-export async function GET() {
+export async function GET(request: Request) {
     try {
-        const projects = await prisma.projects.findMany();
+        const { searchParams } = new URL(request.url);
+        const organization = searchParams.get("org");
+        if (organization == null) {
+            return ErrorResponse("Organization Required");
+        }
+        const projects = await prisma.projects.findMany(
+            {
+                include: { Users: true },
+                where: {
+                    Users: {
+                        organization: organization
+                    }
+                }
+            }
+        );
         return MyResponse(false, "Projects Found", projects, { status: 200 });
     } catch (err) {
         console.error('Some Error Occured at api/projets/GET', err);

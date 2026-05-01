@@ -11,8 +11,10 @@ import { role_enum } from "@/app/generated/prisma/enums";
 import { useRouter } from "next/navigation";
 import CustomLoader from "@/components/custom_loader";
 import AddUserDialog from "@/components/dialogs/addUserDialog";
+import { useMyContext } from "@/app/(utils)/myContext";
 
 export default function EmployeesPage() {
+    const { user } = useMyContext();
     const [searchQuery, setSearchQuery] = useState("");
     const [filter, setFilter] = useState("All");
     const [open, setOpen] = useState(false);
@@ -23,7 +25,7 @@ export default function EmployeesPage() {
 
     function loadData() {
         setLoading(true);
-        fetch("/api/admin/employees")
+        fetch(`/api/admin/employees?org=${user?.organization}`)
             .then((res) => res.json())
             .then((data) => {
                 setEmployee(data);

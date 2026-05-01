@@ -39,7 +39,7 @@ export default function AddProjectDialog({
     useEffect(() => {
         try {
             setLoading(true);
-            fetch("/api/admin/employees")
+            fetch(`/api/admin/employees?org=${userContext.user?.organization}`)
                 .then((res) => res.json())
                 .then((data) => {
                     setManagers(data.filter((user: User) => user.role === role_enum.manager));
@@ -122,7 +122,7 @@ export default function AddProjectDialog({
 
                                     <div className="space-y-2">
                                         <Label htmlFor="description" className="block text-sm font-medium">Description</Label>
-                                        <Textarea id="description" placeholder="Project goals and scope..." value={description} onChange={(e) => setDescription(e.target.value)} className="min-h-25" required />
+                                        <Textarea id="description" placeholder="e.g. Project goals and scope..." value={description} onChange={(e) => setDescription(e.target.value)} className="min-h-25 bg-background rounded-md border border-input px-3 py-2" required />
                                     </div>
 
                                     <div className="grid grid-cols-2 gap-4">
@@ -135,7 +135,7 @@ export default function AddProjectDialog({
                                                     </Button>
                                                 </PopoverTrigger>
                                                 <PopoverContent className="w-auto p-0" align="start">
-                                                    <Calendar hidden={{ before: new Date() }} mode="single" selected={dueDate} onSelect={setDueDate} autoFocus />
+                                                    <Calendar hidden={{ from: new Date(), }} mode="single" selected={dueDate} onSelect={setDueDate} autoFocus />
                                                 </PopoverContent>
                                             </Popover>
                                         </div>
@@ -143,12 +143,12 @@ export default function AddProjectDialog({
                                         <div className="space-y-2">
                                             <Label className="block text-sm font-medium">Project Manager</Label>
                                             <Select onValueChange={setManager} required>
-                                                <SelectTrigger>
+                                                <SelectTrigger className="bg-background rounded-md border border-input">
                                                     <SelectValue placeholder="Select Manager" />
                                                 </SelectTrigger>
                                                 <SelectContent>
                                                     {managers.map((m) => (
-                                                        <SelectItem key={m.userId} value={Number(m.userId) + ""}>{m.userName}</SelectItem>
+                                                        <SelectItem key={m.userId} value={Number(m.userId) + ""} className="pt-3">{m.userName}</SelectItem>
                                                     ))}
                                                 </SelectContent>
                                             </Select>
@@ -158,12 +158,17 @@ export default function AddProjectDialog({
                                     <div className="space-y-2">
                                         <Label className="block text-sm font-medium">Team Members</Label>
                                         <Select onValueChange={addMember}>
-                                            <SelectTrigger>
+                                            <SelectTrigger className="bg-background">
                                                 <SelectValue placeholder="Add Team Member" />
                                             </SelectTrigger>
                                             <SelectContent>
                                                 {members.map((m) => (
-                                                    <SelectItem key={m.userId} value={Number(m.userId) + ""} disabled={selectedMembers.includes(Number(m.userId))}>{m.userName}</SelectItem>
+                                                    <SelectItem
+                                                        key={m.userId}
+                                                        value={Number(m.userId) + ""}
+                                                        disabled={selectedMembers.includes(Number(m.userId))}
+                                                        className="pt-3"
+                                                    > {m.userName} </SelectItem>
                                                 ))}
                                             </SelectContent>
                                         </Select>

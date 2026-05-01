@@ -7,7 +7,7 @@ import { CheckSquare, Calendar, Flag } from 'lucide-react';
 import { formateDate, statusColors, statusTextColors } from "@/app/(utils)/utils";
 import { User } from '@/app/(types)/myTypes';
 
-async function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
+async function MemberProfilePage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
 
     // Fetch user data from the API
@@ -70,5 +70,5 @@ async function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
     );
 }
 
-export default ProfilePage;
+export default MemberProfilePage;
 

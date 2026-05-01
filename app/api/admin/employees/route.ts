@@ -5,13 +5,25 @@ import { putUserCookie } from "@/app/actions/users/userFunctions";
 import { ErrorResponse, MyResponse } from "@/app/(utils)/utils";
 import bcrypt from "bcryptjs";
 
-export async function GET() {
+export async function GET(request: Request) {
+    const { searchParams } = new URL(request.url);
+    const organization = searchParams.get("org");
+
+    if (organization == null) {
+        return ErrorResponse("Orgenization Required");
+    }
     try {
         const users = await prisma.users.findMany({
             where: {
-                role: {
-                    in: [role_enum.manager, role_enum.member]
-                }
+                AND: [
+                    {
+                        role: { in: [role_enum.manager, role_enum.member] },
+                    },
+                    {
+                        organization: organization
+                    }
+                ]
+
             },
             select: {
                 userId: true,

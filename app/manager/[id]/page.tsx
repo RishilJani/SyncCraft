@@ -5,11 +5,11 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Folder } from 'lucide-react';
 import { Status, User } from '@/app/(types)/myTypes';
-import { statusColors } from '@/app/(utils)/utils';
+import { statusColors, statusTextColors } from '@/app/(utils)/utils';
 
 
 
-async function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
+async function ManagerProfilePage({ params }: { params: Promise<{ id: string }> }) {
     const id = (await params).id;
 
     const response = await fetch(`${process.env.PUBLIC_APP_URL || 'http://localhost:3000'}/api/user/${id}`, {
@@ -41,7 +41,7 @@ async function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
                                                 <h3 className="font-semibold group-hover:text-primary transition-colors truncate">{project.projectName}</h3>
                                                 <p className="text-sm text-muted-foreground line-clamp-1">{project.description}</p>
                                             </div>
-                                            <Badge variant="secondary" className={`capitalize ${statusColors[project.status!]}`}>{project.status}</Badge>
+                                            <Badge variant="secondary" className={`capitalize ${statusColors[project.status!]} ${statusTextColors[project.status!]}`}>{project.status}</Badge>
                                         </div>
                                     </Link>
                                 ))}
@@ -59,5 +59,5 @@ async function ProfilePage({ params }: { params: Promise<{ id: string }> }) {
     );
 }
 
-export default ProfilePage
+export default ManagerProfilePage
 
