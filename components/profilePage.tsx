@@ -33,12 +33,14 @@ import {
 } from "@/components/ui/dialog";
 import { useRouter } from "next/navigation";
 import { role_enum } from "@/app/generated/prisma/enums";
-import { User } from "@/app/(types)/myTypes";
+import { Project, Task, User } from "@/app/(types)/myTypes";
 import { useMyContext } from "@/app/(utils)/myContext";
 import EditUserDialog from "./dialogs/editUserDialog";
 import { logout } from "@/app/actions/users/userFunctions";
 import { DeleteDialog } from "./dialogs/DeleteDialog";
 import { myHeaders } from "@/app/(utils)/utils";
+import { ManagerProjectList } from "@/app/manager/[id]/page";
+import { MemberTaskList } from "@/app/member/[id]/page";
 
 // Data fetching function for a specific user ID
 const fetchUserData = async (id: string | number) => {
@@ -57,11 +59,47 @@ const fetchUserData = async (id: string | number) => {
     }
 };
 
+const fetchProjectData = async (id: string | number) => {
+    try {
+
+        const response = await fetch(`/api/user/${id}`, {
+            cache: 'no-store'
+        });
+        const result = await response.json();
+        const user: User | null = result.data;
+        const projects = user?.projects == undefined ? [] : user.projects;
+        return projects;
+    } catch (err) {
+
+        console.log('Some Error Occured at ');
+        console.log(err)
+    }
+}
+
+
+const fetchTaskData = async (id: string | number) => {
+    try {
+        const response = await fetch(`/api/user/${id}`, {
+            cache: 'no-store'
+        });
+        const result = await response.json();
+        const user: User | null = result.data;
+        const tasks = user?.tasks == undefined ? [] : user.tasks;
+        return tasks;
+    } catch (err) {
+        console.log('Some Error Occured at fetchTaskData');
+        console.log(err)
+    }
+}
+
+
 export default function UserProfilePage({ id, viewerRole }: { id: string | number; viewerRole?: role_enum; }) {
     const { user: currentUser, loading: globalLoading, setLoading: setGlobalLoading, refreshData } = useMyContext();
     const [profileUser, setProfileUser] = useState<User | null>(null);
     const router = useRouter();
     const [isDeleting, setIsDeleting] = useState(false);
+    const [projects, setProjects] = useState<Project[] | undefined>();
+    const [tasks, setTasks] = useState<Task[] | undefined>();
 
     const handleLogout = async () => {
         await logout();
@@ -74,6 +112,15 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
         try {
             const data = await fetchUserData(id);
             setProfileUser(data);
+            if (data) {
+                if (data.role == role_enum.manager) {
+                    const pr = await fetchProjectData(id);
+                    setProjects(pr);
+                } else if (data.role == role_enum.member) {
+                    const tr = await fetchTaskData(id);
+                    setTasks(tr);
+                }
+            }
         } catch (error) {
             console.error("Failed to load user data", error);
         } finally {
@@ -125,104 +172,112 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
         );
     }
 
+
     return (
-        <div className="container mx-auto max-w-3xl py-10">
-            <Card className="w-full shadow-lg">
-                <CardHeader className="relative pb-0">
-                    <div className="flex justify-between items-center mb-6">
-                        <Button variant="outline" size="icon" onClick={handleBack}>
-                            <ArrowLeft className="h-6 w-6" />
-                        </Button>
-                        <div className="flex gap-2">
-                            {viewerRole == role_enum.admin && (
-                                <>
-                                    <Button variant="destructive" size="sm" className="gap-2" onClick={() => setIsDeleting(true)}>
-                                        <Trash2 className="h-5 w-5" />
-                                        Delete
-                                    </Button>
-                                    <DeleteDialog
-                                        open={isDeleting}
-                                        onOpenChange={setIsDeleting}
-                                        onConfirm={handleDelete}
-                                        title="Delete User"
-                                        description={`Are you sure you want to delete ${profileUser.userName}? This action cannot be undone.`}
-                                    />
-                                    <EditUserDialog user={profileUser} onSuccess={() => { refreshData(); loadData(); }} >
-                                        <Button variant="outline" size="sm" className="gap-2">
-                                            <Pencil className="h-5 w-5" />
-                                            Edit
-                                        </Button>
-                                    </EditUserDialog>
-                                </>
-                            )}
-                            <LogOutDialog />
-                        </div>
-                    </div>
-                    <div className="flex flex-col items-center gap-4 md:flex-row md:items-start md:justify-between">
-                        <div className="flex flex-col items-center gap-4 md:flex-row">
-                            <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 text-4xl font-bold text-primary ring-4 ring-background">
-                                {profileUser.userName!.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)}
-                            </div>
-                            <div className="text-center md:text-left">
-                                <CardTitle className="text-2xl font-bold">{profileUser.userName}</CardTitle>
-                                <CardDescription className="text-md flex items-center justify-center gap-2 md:justify-start">
-                                    <Mail className="h-4 w-4" /> {profileUser.email}
-                                </CardDescription>
-                                <div className="mt-2 flex justify-center gap-2 md:justify-start">
-                                    <Badge
-                                        variant={
-                                            profileUser.role === role_enum.admin
-                                                ? "destructive"
-                                                : profileUser.role === "manager"
-                                                    ? "default"
-                                                    : "secondary"
-                                        } className="capitalize" >
-                                        {profileUser.role}
-                                    </Badge>
+        <>
+            <div className="flex flex-col gap-6 pb-10">
+                <div className="container mx-auto max-w-3xl py-10">
+                    <Card className="w-full shadow-lg">
+                        <CardHeader className="relative pb-0">
+                            <div className="flex justify-between items-center mb-6">
+                                <Button variant="outline" size="icon" onClick={handleBack}>
+                                    <ArrowLeft className="h-6 w-6" />
+                                </Button>
+                                <div className="flex gap-2">
+                                    {viewerRole == role_enum.admin && (
+                                        <>
+                                            <Button variant="destructive" size="sm" className="gap-2" onClick={() => setIsDeleting(true)}>
+                                                <Trash2 className="h-5 w-5" />
+                                                Delete
+                                            </Button>
+                                            <DeleteDialog
+                                                open={isDeleting}
+                                                onOpenChange={setIsDeleting}
+                                                onConfirm={handleDelete}
+                                                title="Delete User"
+                                                description={`Are you sure you want to delete ${profileUser.userName}? This action cannot be undone.`}
+                                            />
+                                            <EditUserDialog user={profileUser} onSuccess={() => { refreshData(); loadData(); }} >
+                                                <Button variant="outline" size="sm" className="gap-2">
+                                                    <Pencil className="h-5 w-5" />
+                                                    Edit
+                                                </Button>
+                                            </EditUserDialog>
+                                        </>
+                                    )}
+                                    <LogOutDialog />
                                 </div>
                             </div>
-                        </div>
-                    </div>
-                </CardHeader>
-                <CardContent className="mt-6 grid gap-6">
-                    <Separator />
-                    <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
-                        <div className="flex items-start gap-3 rounded-lg border p-4">
-                            <div className="rounded-md bg-blue-100 p-2 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400">
-                                <Calendar className="h-5 w-5" />
+                            <div className="flex flex-col items-center gap-4 md:flex-row md:items-start md:justify-between">
+                                <div className="flex flex-col items-center gap-4 md:flex-row">
+                                    <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 text-4xl font-bold text-primary ring-4 ring-background">
+                                        {profileUser.userName!.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2)}
+                                    </div>
+                                    <div className="text-center md:text-left">
+                                        <CardTitle className="text-2xl font-bold">{profileUser.userName}</CardTitle>
+                                        <CardDescription className="text-md flex items-center justify-center gap-2 md:justify-start">
+                                            <Mail className="h-4 w-4" /> {profileUser.email}
+                                        </CardDescription>
+                                        <div className="mt-2 flex justify-center gap-2 md:justify-start">
+                                            <Badge
+                                                variant={
+                                                    profileUser.role === role_enum.admin
+                                                        ? "destructive"
+                                                        : profileUser.role === "manager"
+                                                            ? "default"
+                                                            : "secondary"
+                                                } className="capitalize" >
+                                                {profileUser.role}
+                                            </Badge>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
-                            <div>
-                                <p className="text-sm font-medium text-muted-foreground">
-                                    Joined
-                                </p>
-                                <p className="font-medium">
-                                    {new Date(profileUser.createdAt!).toLocaleDateString(undefined, {
-                                        year: "numeric",
-                                        month: "long",
-                                        day: "numeric",
-                                    })}
-                                </p>
-                            </div>
-                        </div>
+                        </CardHeader>
+                        <CardContent className="mt-6 grid gap-6">
+                            <Separator />
+                            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                <div className="flex items-start gap-3 rounded-lg border p-4">
+                                    <div className="rounded-md bg-blue-100 p-2 text-blue-600 dark:bg-blue-900/20 dark:text-blue-400">
+                                        <Calendar className="h-5 w-5" />
+                                    </div>
+                                    <div>
+                                        <p className="text-sm font-medium text-muted-foreground">
+                                            Joined
+                                        </p>
+                                        <p className="font-medium">
+                                            {new Date(profileUser.createdAt!).toLocaleDateString(undefined, {
+                                                year: "numeric",
+                                                month: "long",
+                                                day: "numeric",
+                                            })}
+                                        </p>
+                                    </div>
+                                </div>
 
-                        {profileUser.role != role_enum.admin &&
-                            <div className="flex items-start gap-3 rounded-lg border p-4">
-                                <div className="rounded-md bg-yellow-100 p-2 text-yellow-600 dark:bg-yellow-900/20 dark:text-yellow-400">
-                                    <Trophy className="h-5 w-5" />
-                                </div>
-                                <div>
-                                    <p className="text-sm font-medium text-muted-foreground">
-                                        Gained Points
-                                    </p>
-                                    <p className="font-medium">{profileUser.points} pts</p>
-                                </div>
+                                {profileUser.role != role_enum.admin &&
+                                    <div className="flex items-start gap-3 rounded-lg border p-4">
+                                        <div className="rounded-md bg-yellow-100 p-2 text-yellow-600 dark:bg-yellow-900/20 dark:text-yellow-400">
+                                            <Trophy className="h-5 w-5" />
+                                        </div>
+                                        <div>
+                                            <p className="text-sm font-medium text-muted-foreground">
+                                                Gained Points
+                                            </p>
+                                            <p className="font-medium">{profileUser.points} pts</p>
+                                        </div>
+                                    </div>
+                                }
                             </div>
-                        }
-                    </div>
-                </CardContent>
+                        </CardContent>
 
-            </Card>
-        </div>
+                    </Card>
+                </div>
+
+                {profileUser.role == role_enum.manager && <ManagerProjectList projects={projects!} />}
+                {profileUser.role == role_enum.member && <MemberTaskList tasks={tasks ?? []} />}
+            </div>
+        </>
     );
 
     function LogOutDialog() {
@@ -253,6 +308,4 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
                 </DialogContent>
             </Dialog>);
     }
-
-
 }

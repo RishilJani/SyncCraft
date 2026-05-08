@@ -5,11 +5,11 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { CheckSquare, Calendar, Flag } from 'lucide-react';
 import { formateDate, statusColors, statusTextColors } from "@/app/(utils)/utils";
-import { User } from '@/app/(types)/myTypes';
+import { Task, User } from '@/app/(types)/myTypes';
+import { useEffect, useState } from 'react';
 
 async function MemberProfilePage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
-
     // Fetch user data from the API
     const response = await fetch(`${process.env.PUBLIC_APP_URL || 'http://localhost:3000'}/api/user/${id}`, {
         cache: 'no-store'
@@ -17,11 +17,17 @@ async function MemberProfilePage({ params }: { params: Promise<{ id: string }> }
     const result = await response.json();
     const user: User | null = result.data;
     const tasks = user?.tasks || [];
-
     return (
         <div className="flex flex-col gap-1 pb-10">
             <UserProfilePage id={id} viewerRole={role_enum.member} />
+            <MemberTaskList tasks={tasks} />
+        </div>
+    );
+}
+function MemberTaskList({ tasks }: { tasks: Task[] | [] }) {
 
+    return (
+        <>
             <div className="container mx-auto max-w-3xl px-4 md:px-0">
                 <Card className="shadow-md border-primary/10">
                     <CardHeader className="bg-muted/30">
@@ -66,9 +72,8 @@ async function MemberProfilePage({ params }: { params: Promise<{ id: string }> }
                     </CardContent>
                 </Card>
             </div>
-        </div>
+        </>
     );
 }
-
 export default MemberProfilePage;
-
+export { MemberTaskList };

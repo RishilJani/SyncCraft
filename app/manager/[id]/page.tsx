@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Folder } from 'lucide-react';
-import { Status, User } from '@/app/(types)/myTypes';
+import { Project, Status, User } from '@/app/(types)/myTypes';
 import { statusColors, statusTextColors } from '@/app/(utils)/utils';
 
 
@@ -22,6 +22,13 @@ async function ManagerProfilePage({ params }: { params: Promise<{ id: string }> 
     return (
         <div className="flex flex-col gap-6 pb-10">
             <UserProfilePage id={id} viewerRole={role_enum.manager} />
+            <ManagerProjectList projects={projects} />
+        </div>
+    );
+}
+function ManagerProjectList({ projects }: { projects: Project[] }) {
+    return (
+        <>
 
             <div className="container mx-auto max-w-3xl px-4 md:px-0">
                 <Card className="shadow-md border-primary/10">
@@ -55,9 +62,9 @@ async function ManagerProfilePage({ params }: { params: Promise<{ id: string }> 
                     </CardContent>
                 </Card>
             </div>
-        </div>
+        </>
     );
 }
 
 export default ManagerProfilePage
-
+export { ManagerProjectList };
