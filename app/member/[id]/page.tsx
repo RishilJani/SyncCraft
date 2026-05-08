@@ -6,7 +6,6 @@ import { Badge } from '@/components/ui/badge';
 import { CheckSquare, Calendar, Flag } from 'lucide-react';
 import { formateDate, statusColors, statusTextColors } from "@/app/(utils)/utils";
 import { Task, User } from '@/app/(types)/myTypes';
-import { useEffect, useState } from 'react';
 
 async function MemberProfilePage({ params }: { params: Promise<{ id: string }> }) {
     const { id } = await params;
