@@ -1,4 +1,4 @@
-import { Status, User, Project, Task } from "@/app/(types)/myTypes";
+import { Status, User, Project, Task } from "@/app/(utils)/myTypes";
 import { ErrorResponse, MyResponse } from "@/app/(utils)/utils";
 import { prisma } from "@/lib/prisma";
 import { role_enum } from "@/app/generated/prisma/enums";
@@ -104,7 +104,7 @@ export async function DELETE(request: Request, { params }: { params: Promise<{ i
             return MyResponse(false, "Delete Succesfull", { id: uid }, { status: 200 });
         }
 
-        return MyResponse(true, "User is assigned to one or more project/tasks", res , {status : 400});
+        return MyResponse(true, "User is assigned to one or more project/tasks", res, { status: 400 });
     } catch (err) {
 
         console.log('Some Error Occured at delete /api/user/id');

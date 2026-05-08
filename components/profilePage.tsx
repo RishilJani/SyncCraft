@@ -33,7 +33,7 @@ import {
 } from "@/components/ui/dialog";
 import { useRouter } from "next/navigation";
 import { role_enum } from "@/app/generated/prisma/enums";
-import { Project, Task, User } from "@/app/(types)/myTypes";
+import { Project, Task, User } from "@/app/(utils)/myTypes";
 import { useMyContext } from "@/app/(utils)/myContext";
 import EditUserDialog from "./dialogs/editUserDialog";
 import { logout } from "@/app/actions/users/userFunctions";

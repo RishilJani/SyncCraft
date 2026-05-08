@@ -13,7 +13,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Errors, User } from "@/app/(types)/myTypes";
+import { Errors, User } from "@/app/(utils)/myTypes";
 import { myHeaders } from "@/app/(utils)/utils";
 import { role_enum } from "@/app/generated/prisma/enums";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../ui/select";

@@ -10,7 +10,7 @@ import React, { useState } from "react";
 import CustomLoader from "@/components/custom_loader";
 import { myHeaders } from "@/app/(utils)/utils";
 import { useMyContext } from "@/app/(utils)/myContext";
-import { Errors } from "@/app/(types)/myTypes";
+import { Errors } from "@/app/(utils)/myTypes";
 
 function LoginPage() {
     const { refreshData } = useMyContext();

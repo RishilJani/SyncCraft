@@ -1,5 +1,5 @@
 import { prisma } from "../../lib/prisma";
-import { Status } from "@/app/(types)/myTypes";
+import { Status } from "@/app/(utils)/myTypes";
 
 export async function updateProjectStatusBasedOnTasks(projectId: number) {
     if (!projectId) return;

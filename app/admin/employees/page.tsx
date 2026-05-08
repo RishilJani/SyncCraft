@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
-import { User } from "@/app/(types)/myTypes";
+import { User } from "@/app/(utils)/myTypes";
 import { role_enum } from "@/app/generated/prisma/enums";
 import { useRouter } from "next/navigation";
 import CustomLoader from "@/components/custom_loader";

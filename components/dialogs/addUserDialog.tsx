@@ -5,7 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { role_enum } from "@/app/generated/prisma/enums";
-import { Errors } from "@/app/(types)/myTypes";
+import { Errors } from "@/app/(utils)/myTypes";
 import { PasswordInput } from "../ui/password-input";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Button } from "../ui/button";
@@ -19,7 +19,7 @@ export default function AddUserDialog({
     onSubmit
 }: { children: React.ReactNode, open: boolean, setOpen: Function, onSubmit?: Function }) {
 
-    const {  user } = useMyContext();
+    const { user } = useMyContext();
     const [userName, setUserName] = useState("");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");

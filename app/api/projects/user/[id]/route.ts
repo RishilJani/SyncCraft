@@ -1,4 +1,4 @@
-import { Priority, Project, Status, Task, User } from "@/app/(types)/myTypes";
+import { Priority, Project, Status, Task, User } from "@/app/(utils)/myTypes";
 import { role_enum } from "@/app/generated/prisma/enums";
 import { ErrorResponse, MyResponse } from "@/app/(utils)/utils";
 import { prisma } from "@/lib/prisma";

@@ -6,7 +6,7 @@ import { Input } from '@/components/ui/input';
 import Link from 'next/link';
 import { ArrowLeft, Plus, Search } from 'lucide-react';
 import { useState } from 'react'
-import { Status } from '@/app/(types)/myTypes';
+import { Status } from '@/app/(utils)/myTypes';
 import { useMyContext } from '@/app/(utils)/myContext';
 import AddProjectDialog from '@/components/dialogs/addProjectDialog';
 const filters = ["All", "Completed", "Pending", "Todo"];
@@ -54,7 +54,7 @@ function ProjectsList() {
                     </AddProjectDialog>
                 </div>
             </div>
-            
+
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-between mt-4">
                 <div className="relative w-full sm:max-w-sm">
                     <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />

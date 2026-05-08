@@ -4,7 +4,7 @@ import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Folder } from 'lucide-react';
-import { Project, Status, User } from '@/app/(types)/myTypes';
+import { Project, Status, User } from '@/app/(utils)/myTypes';
 import { statusColors, statusTextColors } from '@/app/(utils)/utils';
 
 

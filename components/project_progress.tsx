@@ -1,6 +1,6 @@
 "use client"
 
-import { Task, Status } from "@/app/(types)/myTypes";
+import { Task, Status } from "@/app/(utils)/myTypes";
 import { cn } from "@/lib/utils";
 import { CalendarDays } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -122,15 +122,15 @@ export default function ProjectProgress({ tasks, projectStartDate, projectEndDat
               <GanttFeatureList>
                 <GanttFeatureListGroup>
                   {features.map(feature => (
-                    <GanttFeatureItem 
-                      key={feature.id} 
+                    <GanttFeatureItem
+                      key={feature.id}
                       {...feature}
                       onMove={onTaskDateChange ? (id, dragStart, dragEnd) => {
-                          if (dragEnd) {
-                              const correctedDueDate = new Date(dragEnd);
-                              correctedDueDate.setDate(correctedDueDate.getDate() - 1);
-                              onTaskDateChange(Number(id), correctedDueDate);
-                          }
+                        if (dragEnd) {
+                          const correctedDueDate = new Date(dragEnd);
+                          correctedDueDate.setDate(correctedDueDate.getDate() - 1);
+                          onTaskDateChange(Number(id), correctedDueDate);
+                        }
                       } : undefined}
                     >
                       <p className="flex-1 truncate text-xs font-medium pl-1">{feature.name}</p>

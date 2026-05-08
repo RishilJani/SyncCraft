@@ -1,4 +1,4 @@
-import { Status } from "@/app/(types)/myTypes";
+import { Status } from "@/app/(utils)/myTypes";
 import { ErrorResponse, MyResponse } from "@/app/(utils)/utils";
 import { prisma } from "@/lib/prisma";
 import { updateProjectStatusBasedOnTasks } from "@/app/(utils)/projectUtils";

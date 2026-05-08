@@ -1,4 +1,4 @@
-import { Task, User, Priority } from "@/app/(types)/myTypes";
+import { Task, User, Priority } from "@/app/(utils)/myTypes";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Coins, Users, AlignLeft, CheckCircle2, CalendarClock, CalendarCheck } from "lucide-react";

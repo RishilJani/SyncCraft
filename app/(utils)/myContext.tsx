@@ -1,7 +1,8 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode, useEffect } from "react";
-import { Project, User } from "../(types)/myTypes";
+import { Project, User } from "./myTypes";
+import { usePathname } from "next/navigation";
 
 interface UserContextType {
     user: User | null;
@@ -19,8 +20,8 @@ const MyContext = createContext<UserContextType | undefined>(undefined);
 export function MyContextProvider({ children }: { children: ReactNode }) {
     const [user, setUser] = useState<User | null>(null);
     const [projects, setProjects] = useState<Project[]>([]);
-    const [loading, setLoading] = useState(true);
-
+    const [loading, setLoading] = useState(false);
+    const pathname = usePathname();
 
     const refreshData = async () => {
         setLoading(true);
@@ -64,7 +65,11 @@ export function MyContextProvider({ children }: { children: ReactNode }) {
     }
 
     useEffect(() => {
-        refreshData();
+        const isAuth = pathname == '/login' || pathname == '/register'
+        setLoading(false);
+        if (!isAuth) {
+            refreshData();
+        }
     }, []);
 
     return (

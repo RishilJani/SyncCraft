@@ -15,7 +15,7 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { ClipboardList, Users, Pencil, Coins, Trash2 } from "lucide-react";
 import { useEffect, useState } from "react";
-import { Task, Status, Priority, Project } from "@/app/(types)/myTypes";
+import { Task, Status, Priority, Project } from "@/app/(utils)/myTypes";
 import TaskDialog from "./dialogs/taskDialog";
 import TaskDetailDialog from "./dialogs/taskDetail";
 import TaskDueDateDialog from "./dialogs/taskDueDateDialog";

@@ -1,6 +1,6 @@
 "use client";
 
-import { User } from "@/app/(types)/myTypes";
+import { User } from "@/app/(utils)/myTypes";
 import { useMyContext } from "@/app/(utils)/myContext";
 import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "../ui/dialog";

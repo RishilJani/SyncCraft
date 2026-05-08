@@ -11,7 +11,7 @@ import { Separator } from "@/components/ui/separator";
 import { useEffect, useState } from "react";
 import { role_enum } from "@/app/generated/prisma/enums";
 import EditProjectForm from "../../../components/dialogs/editProjectDialog";
-import { Status } from "@/app/(types)/myTypes";
+import { Status } from "@/app/(utils)/myTypes";
 import { useMyContext } from "@/app/(utils)/myContext";
 import { formateDate } from "@/app/(utils)/utils";
 import {

@@ -1,7 +1,7 @@
 "use server"
 
 import { cookies } from "next/headers";
-import { User } from "../../(types)/myTypes";
+import { User } from "../../(utils)/myTypes";
 import { role_enum } from "../../generated/prisma/enums";
 
 // Cookie consts
@@ -24,15 +24,6 @@ export async function logout() {
     cookie.delete(CREATED_AT);
 }
 
-export async function getUser() {
-    try {
-        const user = await getUserCookie();
-        return user;
-    } catch (err) {
-        console.error("Error getting current user:", err);
-        return null;
-    }
-}
 
 export async function getUserCookie() {
     try {

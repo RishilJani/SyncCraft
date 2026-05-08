@@ -70,9 +70,9 @@ export default function ForgotPasswordPage() {
                     </div>
 
                     <div className="bg-muted rounded-b-lg border-t p-3">
-                        <p className="text-accent-foreground text-center text-sm">
+                        <p className="text-center text-sm">
                             Remember your password?
-                            <Button asChild variant="link" className="px-2">
+                            <Button asChild variant="link" className="px-2 text-accent-foreground">
                                 <Link href="/login" replace={true}>Log in</Link>
                             </Button>
                         </p>

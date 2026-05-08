@@ -12,7 +12,7 @@ import CustomLoader from '@/components/custom_loader';
 import { role_enum } from '@/app/generated/prisma/enums';
 
 import { useMyContext } from '@/app/(utils)/myContext';
-import { Errors } from '@/app/(types)/myTypes';
+import { Errors } from '@/app/(utils)/myTypes';
 
 function SignUp() {
     const { refreshData } = useMyContext();
@@ -56,7 +56,7 @@ function SignUp() {
         e.preventDefault();
         setIsLoading(true);
         if (validateForm()) {
-            const data = { userName, password, email, role : role_enum.admin };
+            const data = { userName, password, email, role: role_enum.admin };
 
             setIsLoading(true);
             var res = await (await fetch("/api/register", {
@@ -124,7 +124,7 @@ function SignUp() {
 
                             <div className="space-y-2">
                                 <Label className="text-title text-sm"> Organization </Label>
-                                <Input required name="org" id="org"  value={organization} autoComplete='current-orgnization' onChange={(e) => { setOrganization(e.target.value); }} />
+                                <Input required name="org" id="org" value={organization} autoComplete='current-orgnization' onChange={(e) => { setOrganization(e.target.value); }} />
                             </div>
 
                             <Button className="w-full" onClick={(e) => { handleSubmit(e); }}>Sign Up</Button>
