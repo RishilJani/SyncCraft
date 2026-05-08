@@ -1,61 +1,46 @@
+import { Status } from "@/app/(utils)/myTypes";
 import { ErrorResponse, MyResponse } from "@/app/(utils)/utils";
+import { role_enum, status_enum } from "@/app/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(request: Request) {
     try {
         const { searchParams } = new URL(request.url);
-        const userId = searchParams.get("userId");
+        const organization = searchParams.get("org") ?? "demo";
 
-        if (!userId) {
-            return MyResponse(true, "User ID is required", null, { status: 400 });
-        }
-
-        const adminId = Number(userId);
-
-        const adminProjects = await prisma.projects.findMany({
-            where: { createdBy: adminId },
-            select: { projectId: true }
-        });
-        const projectIds = adminProjects.map(p => p.projectId);
-
-        const totalProjects = adminProjects.length;
-
-        const activeProjects = await prisma.projects.count({
+        const organizationProjects = await prisma.projects.findMany({
             where: {
-                createdBy: adminId,
-                status: {
-                    in: ["todo", "pending"]
+                Users: {
+                    organization: organization
                 }
             }
         });
 
-        const completedProjects = await prisma.projects.count({
+        const activeProjects = organizationProjects.filter((e) => {
+            return e.status == Status.Todo || e.status == Status.Pending;
+        }).length;
+
+
+        const totalEmployees = await prisma.users.count({
             where: {
-                createdBy: adminId,
-                status: "completed"
-            }
-        });
-
-        const uniqueEmployees = await prisma.user_projects.findMany({
-            where: { projectid: { in: projectIds } },
-            distinct: ['userid'],
-            select: { userid: true }
-        });
-        const totalEmployees = uniqueEmployees.length;
-
-        // Get counts grouped by status for charts
-        const projectStatusDistributionData = await prisma.projects.groupBy({
-            by: ['status'],
-            where: { createdBy: adminId },
-            _count: {
-                status: true,
+                AND: [
+                    { organization: organization },
+                    { role: { in: [role_enum.manager, role_enum.member] } }
+                ]
             },
         });
 
-        const projectStatusDistribution = projectStatusDistributionData.map(item => ({
-            name: item.status.charAt(0).toUpperCase() + item.status.slice(1),
-            value: item._count.status
-        }));
+        // Get counts grouped by status for charts
+        var projectStatusDistribution = [{ name: "Completed", value: 0 }, { name: "Pending", value: 0 }, { name: "Todo", value: 0 }];
+        const _ = organizationProjects.forEach((item) => {
+            if (item.status == Status.Completed) projectStatusDistribution[0].value++;
+            else if (item.status == Status.Pending) projectStatusDistribution[1].value++;
+            else if (item.status == Status.Todo) projectStatusDistribution[2].value++;
+        });
+
+        const projectIds = organizationProjects.map((e) => e.projectId);
+        const totalProjects = organizationProjects.length;
+        const completedProjects = totalProjects - activeProjects;
 
         // Similarly, counting priorities for another chart
         let taskPriorityDistribution: { name: string; value: number }[] = [];

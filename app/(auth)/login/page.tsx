@@ -74,7 +74,7 @@ function LoginPage() {
                         <div className="space-y-5">
                             <div className="space-y-2">
                                 <Label htmlFor="userName" className="block text-sm"> User Name </Label>
-                                <Input type="text" required name="userName" id="userName" value={userName} onChange={(e) => { setUserName(e.target.value); }} />
+                                <Input type="text" required name="userName" id="userName" value={userName} onChange={(e) => { setUserName(e.target.value); }} autoComplete="username" />
                                 {errors.name && <p className='text-red-500 text-sm'>{errors.name}</p>}
                             </div>
 
