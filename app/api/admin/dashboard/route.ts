@@ -1,6 +1,6 @@
 import { Status } from "@/app/(utils)/myTypes";
 import { ErrorResponse, MyResponse } from "@/app/(utils)/utils";
-import { role_enum, status_enum } from "@/app/generated/prisma/enums";
+import { role_enum } from "@/app/generated/prisma/enums";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(request: Request) {

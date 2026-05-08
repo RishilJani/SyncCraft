@@ -45,9 +45,6 @@ export default function EmployeesPage() {
         return (<CustomLoader />);
     }
 
-    const handleClick = (id: number) => {
-        router.push("/admin/employees/" + id);
-    }
     const handleClose = () => {
         setOpen(!open);
         setDialogKey(dialogKey + 1);
@@ -108,22 +105,28 @@ export default function EmployeesPage() {
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                 {filteredEmployees.length > 0 ? (
                     filteredEmployees.map((employee: User) => (
-                        <Card key={employee.userId} className="hover:shadow-lg transition-all duration-300 border-border/50" onClick={(e) => { handleClick(employee.userId!) }}>
-                            <CardHeader className="flex flex-row items-center gap-4 pb-2">
-                                <div className="flex flex-col">
-                                    <CardTitle className="text-lg">{employee.userName}</CardTitle>
-                                    <CardDescription className="flex items-center gap-2">
-                                        <span className="text-sm text-muted-foreground">{employee.role}</span>
-                                    </CardDescription>
-                                </div>
-                            </CardHeader>
-                            <CardContent className="grid gap-2.5 text-sm text-muted-foreground mt-2">
-                                <div className="flex items-center gap-2">
-                                    <Mail className="h-4 w-4 opacity-70" />
-                                    <span className="truncate">{employee.email}</span>
-                                </div>
-                            </CardContent>
-                        </Card>
+
+                        <Link key={employee.userId} href={"/employees/" + employee.userId}>
+                            <Card className="hover:shadow-lg transition-all duration-300 border-border/50 overflow-hidden cursor-pointer" >
+                                <CardHeader className="flex flex-row items-center gap-4 pb-2">
+                                    <div className="h-12 w-12 rounded-full bg-primary/10 flex items-center justify-center text-primary shrink-0 font-bold text-xl uppercase">
+                                        {employee.userName?.charAt(0) || "U"}
+                                    </div>
+                                    <div className="flex flex-col min-w-0">
+                                        <CardTitle className="text-lg truncate">{employee.userName}</CardTitle>
+                                        <CardDescription className="flex items-center gap-2 uppercase text-[10px] font-bold tracking-wider">
+                                            <span className="text-muted-foreground">{employee.role}</span>
+                                        </CardDescription>
+                                    </div>
+                                </CardHeader>
+                                <CardContent className="grid gap-2.5 text-sm text-muted-foreground mt-4">
+                                    <div className="flex items-center gap-2">
+                                        <Mail className="h-4 w-4 opacity-70" />
+                                        <span className="truncate">{employee.email}</span>
+                                    </div>
+                                </CardContent>
+                            </Card>
+                        </Link>
                     ))
                 ) : (
                     <div className="col-span-full text-center py-12 text-muted-foreground">
