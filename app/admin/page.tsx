@@ -4,19 +4,8 @@ import { Button } from "@/components/ui/button";
 import { Users, User, Kanban, CheckCircle, Activity } from "lucide-react";
 import { useMyContext } from "../(utils)/myContext";
 import { useEffect, useState } from "react";
-import {
-    BarChart,
-    Bar,
-    XAxis,
-    YAxis,
-    CartesianGrid,
-    Tooltip,
-    Legend,
-    ResponsiveContainer,
-    PieChart,
-    Pie,
-    Cell,
-} from "recharts";
+import DashboardCharts from "./DashboardCharts";
+
 
 interface DashboardData {
     totalProjects: number;
@@ -54,6 +43,17 @@ export default function AdminDashboard() {
         fetchDashboardData();
     }, [userData?.user?.userId]);
 
+    if (loading) {
+        return (
+            <>
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                    {[...Array(4)].map((_, i) => (
+                        <div key={i} className="rounded-xl border bg-card text-card-foreground shadow h-32 animate-pulse" />
+                    ))}
+                </div>
+            </>
+        );
+    }
     return (
         <div className="space-y-6 pb-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -79,13 +79,7 @@ export default function AdminDashboard() {
                 </div>
             </div>
 
-            {loading ? (
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                    {[...Array(4)].map((_, i) => (
-                        <div key={i} className="rounded-xl border bg-card text-card-foreground shadow h-32 animate-pulse" />
-                    ))}
-                </div>
-            ) : data ? (
+            {data ? (
                 <>
                     {/* Stat Cards */}
                     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
@@ -120,61 +114,67 @@ export default function AdminDashboard() {
                     </div>
 
                     {/* Charts */}
-                    <div className="grid gap-4 grid-cols-1 lg:grid-cols-2 mt-6">
-                        {/* Status Distribution - Bar Chart */}
-                        <div className="rounded-xl border bg-card text-card-foreground shadow col-span-1 p-6">
-                            <h3 className="font-semibold leading-none tracking-tight mb-6">Project Status Distribution</h3>
-                            <div className="h-[300px] w-full">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <BarChart
-                                        data={data.projectStatusDistribution}
-                                        margin={{
-                                            top: 5,
-                                            right: 30,
-                                            left: 20,
-                                            bottom: 5,
-                                        }} >
-                                        <CartesianGrid strokeDasharray="4 4" opacity={0.75} />
-                                        <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} />
-                                        <YAxis fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
-                                        <Tooltip cursor={{ fill: 'var(--muted)' }} contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)' }} />
-                                        <Legend />
-                                        <Bar dataKey="value" name="Projects" fill="#3b82f6" radius={[4, 4, 0, 0]} />
-                                    </BarChart>
-                                </ResponsiveContainer>
-                            </div>
-                        </div>
-
-                        {/* Task Priority Distribution - Pie Chart */}
-                        <div className="rounded-xl border bg-card text-card-foreground shadow col-span-1 p-6">
-                            <h3 className="font-semibold leading-none tracking-tight mb-6">Task Priority Distribution</h3>
-                            <div className="h-[300px] w-full">
-                                <ResponsiveContainer width="100%" height="100%">
-                                    <PieChart>
-                                        <Pie
-                                            data={data.taskPriorityDistribution}
-                                            cx="50%"
-                                            cy="50%"
-                                            innerRadius={60}
-                                            outerRadius={100}
-                                            paddingAngle={5}
-                                            dataKey="value"
-                                            label={({ name, percent }) => `${name} ${(percent! * 100).toFixed(0)}%`}
-                                            labelLine={false}
-                                        >
-                                            {data.taskPriorityDistribution.map((entry, index) => (
-                                                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                                            ))}
-                                        </Pie>
-                                        <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)' }} />
-                                        <Legend />
-                                    </PieChart>
-                                </ResponsiveContainer>
-                            </div>
-                        </div>
-                    </div>
+                    <DashboardCharts data={data} COLORS={COLORS} />
                 </>
             ) : null}
         </div>
     );
 }
+/*
+<div className="grid gap-4 grid-cols-1 lg:grid-cols-2 mt-6">
+                        <div className="min-w-0 min-h-0 rounded-xl border bg-card text-card-foreground shadow col-span-1 p-6">
+                            <h3 className="font-semibold leading-none tracking-tight mb-6">Project Status Distribution</h3>
+                            <div className="h-[300px] w-full">
+                                {isMounted && (
+                                    <ResponsiveContainer width="100%" height="100%" >
+                                        <BarChart
+                                            data={data.projectStatusDistribution}
+                                            margin={{
+                                                top: 5,
+                                                right: 30,
+                                                left: 20,
+                                                bottom: 5,
+                                            }} >
+                                            <CartesianGrid strokeDasharray="4 4" opacity={0.75} />
+                                            <XAxis dataKey="name" fontSize={12} tickLine={false} axisLine={false} />
+                                            <YAxis fontSize={12} tickLine={false} axisLine={false} allowDecimals={false} />
+                                            <Tooltip cursor={{ fill: 'var(--muted)' }} contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)' }} />
+                                            <Legend />
+                                            <Bar dataKey="value" name="Projects" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+                                        </BarChart>
+                                    </ResponsiveContainer>
+                                )}
+                            </div>
+                        </div>
+
+                        <div className="min-w-0 min-h-0 rounded-xl border bg-card text-card-foreground shadow col-span-1 p-6">
+                            <h3 className="font-semibold leading-none tracking-tight mb-6">Task Priority Distribution</h3>
+                            <div className="h-[300px] w-full">
+                                {isMounted && (
+                                    <ResponsiveContainer width="100%" height="100%" >
+                                        <PieChart>
+                                            <Pie
+                                                data={data.taskPriorityDistribution}
+                                                cx="50%"
+                                                cy="50%"
+                                                innerRadius={60}
+                                                outerRadius={100}
+                                                paddingAngle={5}
+                                                dataKey="value"
+                                                label={({ name, percent }) => `${name} ${(percent! * 100).toFixed(0)}%`}
+                                                labelLine={false}
+                                            >
+                                                {data.taskPriorityDistribution.map((entry, index) => (
+                                                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                                                ))}
+                                            </Pie>
+                                            <Tooltip contentStyle={{ borderRadius: '8px', border: '1px solid var(--border)' }} />
+                                            <Legend />
+                                        </PieChart>
+                                    </ResponsiveContainer>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+
+*/
