@@ -13,7 +13,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         }
         const curUser = await prisma.users.findUnique({
             where: { userId: userId },
-            select: { role: true, userId: true, }
+            select: { role: true, userId: true, organization: true }
         });
         if (!curUser) {
             return ErrorResponse("User not found");
@@ -24,7 +24,9 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
         if (curUser.role === role_enum.admin) {
             fetchedProjects = await prisma.projects.findMany({
                 where: {
-                    createdBy: userId,
+                    Users: {
+                        organization: curUser.organization
+                    }
                 },
                 include: {
                     user_projects: {
@@ -76,6 +78,7 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
                     email: pup.Users.email,
                     role: pup.Users.role,
                     createdAt: pup.Users.createdAt,
+                    organization: pup.Users.organization
                 };
 
                 if (pup.Users.role === role_enum.manager) {

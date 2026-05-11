@@ -11,6 +11,7 @@ import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
 import { Button } from "../ui/button";
 import { useMyContext } from "@/app/(utils)/myContext";
 import { myHeaders } from "@/app/(utils)/utils";
+import { DialogDescription } from "@radix-ui/react-dialog";
 
 export default function AddUserDialog({
     children,
@@ -92,8 +93,8 @@ export default function AddUserDialog({
 
     }
 
-    const handleOpenChange = () => {
-        setOpen();
+    const handleOpenChange = (val: boolean) => {
+        setOpen(val);
     }
 
     if (loading) { return (<CustomLoader message="Just a minute" />); }
@@ -109,38 +110,27 @@ export default function AddUserDialog({
                     <div>
                         <DialogHeader className="p-6 pb-2">
                             <DialogTitle className="text-2xl font-bold text-center mt-2"> Add Employee </DialogTitle>
-                            <p className="text-md text-center text-muted-foreground"> Enter employee details below </p>
+                            <DialogDescription className="text-md text-center text-muted-foreground"> Enter employee details below </DialogDescription>
                         </DialogHeader>
 
-                        <form onSubmit={handleSubmit} className="m-auto max-h-fit w-full max-w-lg rounded-[calc(var(--radius)+.125rem)] p-1 pb-5 ">
+                        <form onSubmit={handleSubmit} className="bg-card m-auto h-fit w-full max-w-lg rounded-[calc(var(--radius)+.125rem)] p-1 border ">
                             <div className="p-8 pb-6">
                                 <div className="space-y-5">
                                     <div className="space-y-2">
-                                        <Label htmlFor="userName" className="block text-sm"> User Name </Label>
-                                        <Input
-                                            type="text" required
-                                            name="userName"
-                                            id="userName"
-                                            value={userName}
-                                            onChange={(e) => { setUserName(e.target.value); }} />
+                                        <Label htmlFor="userName" className="block text-sm font-medium"> User Name </Label>
+                                        <Input id="userName" placeholder="Enter username" type="text" required name="userName" value={userName} onChange={(e) => { setUserName(e.target.value); }} />
                                         {errors.name && <p className='text-red-500 text-sm'>{errors.name}</p>}
                                     </div>
 
                                     <div className="space-y-2">
-                                        <Label htmlFor="email" className="block text-sm"> Email</Label>
-                                        <Input
-                                            type="email" required
-                                            name="email"
-                                            id="email"
-                                            value={email}
-                                            onChange={(e) => { setEmail(e.target.value); }} />
+                                        <Label htmlFor="email" className="block text-sm font-medium"> Email</Label>
+                                        <Input id="email" type="email" required placeholder="Enter email" name="email" value={email} onChange={(e) => { setEmail(e.target.value); }} />
                                         {errors.email && <p className='text-red-500 text-sm'>{errors.email}</p>}
                                     </div>
 
                                     <div className="space-y-2">
-
-                                        <Label htmlFor="pwd" className="text-title text-sm"> Password </Label>
-                                        <PasswordInput required name="pwd" id="pwd" className="input sz-md variant-mixed" value={password} autoComplete='current-password' onChange={(e) => { setPassword(e.target.value); }} />
+                                        <Label htmlFor="pwd" className="block text-sm font-medium"> Password </Label>
+                                        <PasswordInput placeholder="Enter the password" required name="pwd" id="pwd" className="input sz-md variant-mixed" value={password} autoComplete='current-password' onChange={(e) => { setPassword(e.target.value); }} />
                                         {errors.password && <p className='text-red-500 text-sm'>{errors.password}</p>}
                                     </div>
 
@@ -162,10 +152,15 @@ export default function AddUserDialog({
                                 </div>
 
                                 <div className="pt-2 mt-5">
-                                    <Button type="submit" className="w-full text-lg">Add Employee</Button>
+                                    <Button type="submit" className="w-full text-lg" disabled={loading}>Add Employee</Button>
                                 </div>
                             </div>
                         </form>
+                        <div className="bg-muted border-t p-3 mt-3">
+                            <p className="text-center text-sm">
+                                <Button variant="link" onClick={() => handleOpenChange(false)} className="px-2 text-[15px] text-muted-foreground"> Cancel</Button>
+                            </p>
+                        </div>
                     </div>
                 </DialogContent>
             </Dialog>

@@ -31,6 +31,7 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
     const { user: currentUser, loading: globalLoading, projects, setSpecificProject } = myContext;
     const router = useRouter();
     const [projectId, setProjectId] = useState<number | null>(null);
+    const [open, setOpen] = useState(false);
 
     useEffect(() => {
         params.then((val) => {
@@ -104,9 +105,7 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
                         {currentUser?.role == role_enum.admin &&
                             <div className="flex justify-end">
                                 <div className="flex items-end gap-2 mx-2">
-                                    <EditProjectForm data={project} onEdit={() => {
-                                        setSpecificProject({ projectId: projectId });
-                                    }}>
+                                    <EditProjectForm data={project} open={open} setOpen={setOpen}>
                                         <Button variant="outline" size="sm" className="gap-2">
                                             <Edit className="h-5 w-5" />
                                             Edit Project

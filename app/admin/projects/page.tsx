@@ -46,7 +46,7 @@ function ProjectsList() {
                     <h1 className="text-3xl font-bold tracking-tight">Projects</h1>
                 </div>
                 <div className='flex justify-end'>
-                    <AddProjectDialog open={open} setOpen={handleClose}>
+                    <AddProjectDialog open={open} setOpen={handleClose} data={null}>
                         <Button className="gap-2">
                             <Plus className="h-5 w-5" />
                             Add Project
@@ -118,14 +118,14 @@ function ProjectsList() {
 function StatusBadge({ status }: { status: string }) {
     const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
         completed: "default",
-        pending: "secondary",
+        pending: "default",
         todo: "outline",
     };
 
     let colorClass = "";
     const normalizedStatus = status.toLowerCase();
     if (normalizedStatus === "completed") colorClass = "bg-green-500 hover:bg-green-600 border-transparent";
-    if (normalizedStatus === "pending") colorClass = "bg-blue-500 hover:bg-blue-600 text-white border-transparent";
+    if (normalizedStatus === "pending") colorClass = "bg-blue-500 text-white border-transparent";
     if (normalizedStatus === "todo") colorClass = "text-orange-600 border-orange-200 bg-orange-50";
 
     return (

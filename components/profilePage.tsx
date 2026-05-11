@@ -143,7 +143,6 @@ export default function UserProfilePage({ id, viewerRole }: { id: string | numbe
                 headers: myHeaders
             })).json();
 
-            console.log("Res = ", res);
             if (!res.error) {
                 setIsDeleting(false);
                 await refreshData();

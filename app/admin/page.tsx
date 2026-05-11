@@ -43,17 +43,6 @@ export default function AdminDashboard() {
         fetchDashboardData();
     }, [userData?.user?.userId]);
 
-    if (loading) {
-        return (
-            <>
-                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                    {[...Array(4)].map((_, i) => (
-                        <div key={i} className="rounded-xl border bg-card text-card-foreground shadow h-32 animate-pulse" />
-                    ))}
-                </div>
-            </>
-        );
-    }
     return (
         <div className="space-y-6 pb-8">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -79,44 +68,50 @@ export default function AdminDashboard() {
                 </div>
             </div>
 
-            {data ? (
-                <>
-                    {/* Stat Cards */}
-                    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-                        <div className="group rounded-xl border bg-card text-card-foreground shadow p-6 flex flex-col justify-between transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] hover:border-blue-600/50 cursor-default">
-                            <div className="flex items-center justify-between space-x-2">
-                                <h3 className="tracking-tight text-sm font-medium">Total Projects</h3>
-                                <Kanban className="h-4 w-4 text-muted-foreground transition-colors duration-300 group-hover:text-blue-600" />
+            {loading ?
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                    {[...Array(4)].map((_, i) => (
+                        <div key={i} className="rounded-xl border bg-card text-card-foreground shadow h-32 animate-pulse" />
+                    ))}
+                </div> : data ? (
+                    <>
+                        {/* Stat Cards */}
+                        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+                            <div className="group rounded-xl border bg-card text-card-foreground shadow p-6 flex flex-col justify-between transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(59,130,246,0.3)] hover:border-blue-600/50 cursor-default">
+                                <div className="flex items-center justify-between space-x-2">
+                                    <h3 className="tracking-tight text-sm font-medium">Total Projects</h3>
+                                    <Kanban className="h-4 w-4 text-muted-foreground transition-colors duration-300 group-hover:text-blue-600" />
+                                </div>
+                                <div className="text-2xl font-bold">{data.totalProjects}</div>
                             </div>
-                            <div className="text-2xl font-bold">{data.totalProjects}</div>
-                        </div>
-                        <div className="group rounded-xl border bg-card text-card-foreground shadow p-6 flex flex-col justify-between transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:border-violet-600/50 cursor-default">
-                            <div className="flex items-center justify-between space-x-2">
-                                <h3 className="tracking-tight text-sm font-medium">Active Projects</h3>
-                                <Activity className="h-4 w-4 text-muted-foreground transition-colors duration-300 group-hover:text-violet-600" />
+                            <div className="group rounded-xl border bg-card text-card-foreground shadow p-6 flex flex-col justify-between transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] hover:border-violet-600/50 cursor-default">
+                                <div className="flex items-center justify-between space-x-2">
+                                    <h3 className="tracking-tight text-sm font-medium">Active Projects</h3>
+                                    <Activity className="h-4 w-4 text-muted-foreground transition-colors duration-300 group-hover:text-violet-600" />
+                                </div>
+                                <div className="text-2xl font-bold">{data.activeProjects}</div>
                             </div>
-                            <div className="text-2xl font-bold">{data.activeProjects}</div>
-                        </div>
-                        <div className="group rounded-xl border bg-card text-card-foreground shadow p-6 flex flex-col justify-between transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(139,92,246,0.3)] hover:border-emerald-600/50 cursor-default">
-                            <div className="flex items-center justify-between space-x-2">
-                                <h3 className="tracking-tight text-sm font-medium">Completed Projects</h3>
-                                <CheckCircle className="h-4 w-4 text-muted-foreground transition-colors duration-300 group-hover:text-emerald-600" />
+                            <div className="group rounded-xl border bg-card text-card-foreground shadow p-6 flex flex-col justify-between transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(139,92,246,0.3)] hover:border-emerald-600/50 cursor-default">
+                                <div className="flex items-center justify-between space-x-2">
+                                    <h3 className="tracking-tight text-sm font-medium">Completed Projects</h3>
+                                    <CheckCircle className="h-4 w-4 text-muted-foreground transition-colors duration-300 group-hover:text-emerald-600" />
+                                </div>
+                                <div className="text-2xl font-bold">{data.completedProjects}</div>
                             </div>
-                            <div className="text-2xl font-bold">{data.completedProjects}</div>
-                        </div>
-                        <div className="group rounded-xl border bg-card text-card-foreground shadow p-6 flex flex-col justify-between transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:border-amber-600/50 cursor-default">
-                            <div className="flex items-center justify-between space-x-2">
-                                <h3 className="tracking-tight text-sm font-medium">Total Employees</h3>
-                                <Users className="h-4 w-4 text-muted-foreground transition-colors duration-300 group-hover:text-amber-600" />
+                            <div className="group rounded-xl border bg-card text-card-foreground shadow p-6 flex flex-col justify-between transition-all duration-300 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-[0_0_20px_rgba(245,158,11,0.3)] hover:border-amber-600/50 cursor-default">
+                                <div className="flex items-center justify-between space-x-2">
+                                    <h3 className="tracking-tight text-sm font-medium">Total Employees</h3>
+                                    <Users className="h-4 w-4 text-muted-foreground transition-colors duration-300 group-hover:text-amber-600" />
+                                </div>
+                                <div className="text-2xl font-bold">{data.totalEmployees}</div>
                             </div>
-                            <div className="text-2xl font-bold">{data.totalEmployees}</div>
                         </div>
-                    </div>
 
-                    {/* Charts */}
-                    <DashboardCharts data={data} COLORS={COLORS} />
-                </>
-            ) : null}
+                        {/* Charts */}
+                        <DashboardCharts data={data} COLORS={COLORS} />
+                    </>
+                ) : null
+            }
         </div>
     );
 }

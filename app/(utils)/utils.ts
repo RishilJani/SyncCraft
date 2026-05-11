@@ -1,5 +1,4 @@
 import { Status } from './myTypes';
-import { AlertDialog } from '../../components/ui/alert-dialog';
 
 export function MyResponse(error: boolean, message: string, data: any, { status = 200 }: { status: number }) {
     return Response.json({ error, data, message }, { status: status });
