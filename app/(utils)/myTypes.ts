@@ -25,7 +25,7 @@ export type Task = {
     completionDate?: Date | null;
     points?: number;
     status: Status;
-    projectId?: number
+    projectId?: number;
     priority: Priority;
 };
 

@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ArrowLeft, Calendar, Flag, CheckCircle2, NotepadText, Edit, Trash2 } from "lucide-react";
 import MyKanbanBoard from "@/components/custom_kanban";
@@ -13,7 +12,7 @@ import { role_enum } from "@/app/generated/prisma/enums";
 import EditProjectForm from "../../../components/dialogs/editProjectDialog";
 import { Status } from "@/app/(utils)/myTypes";
 import { useMyContext } from "@/app/(utils)/myContext";
-import { formateDate } from "@/app/(utils)/utils";
+import { formateDate, StatusBadge } from "@/app/(utils)/utils";
 import {
     AlertDialog,
     AlertDialogAction,
@@ -99,7 +98,7 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
                         <div className="flex-1">
                             <div className="flex items-center gap-3">
                                 <h1 className="text-3xl font-bold">{project.projectName}</h1>
-                                <StatusBadge status={project.status ?? Status.Todo} className="text-md" />
+                                <StatusBadge status={project.status ?? Status.Todo} />
                             </div>
                         </div>
                         {currentUser?.role == role_enum.admin &&
@@ -203,30 +202,3 @@ export default function ProjectDetail({ params }: { params: Promise<{ id: string
         </>
     );
 }
-
-function StatusBadge({ status, className }: { status: Status; className?: string }) {
-    const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
-        Completed: "default",
-        Running: "secondary",
-        Upcoming: "outline",
-        "Done": "default",
-        "In Progress": "secondary",
-        "Todo": "outline"
-    };
-
-    let colorClass = "";
-    // Project Status Colors
-    if (status == Status.Completed) colorClass = "bg-green-500 hover:bg-green-600 border-transparent";
-    if (status == Status.Pending) colorClass = "bg-blue-500 hover:bg-blue-600 text-white border-transparent";
-    if (status == Status.Todo) colorClass = "text-orange-600 border-orange-200 bg-orange-50";
-
-    return (
-        <Badge variant={variants[status] || "outline"} className={colorClass + " " + className}>
-            {status}
-        </Badge>
-    );
-}
-
-
-
-

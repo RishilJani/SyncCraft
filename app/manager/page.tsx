@@ -4,10 +4,9 @@ import { User, ClipboardList, Calendar, Users } from "lucide-react";
 import Link from "next/link";
 import { useMyContext } from "../(utils)/myContext";
 import { Card, CardTitle, CardDescription } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Status } from "@/app/(utils)/myTypes";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
-import { statusColors } from "../(utils)/utils";
+import { StatusBadge } from "../(utils)/utils";
 
 export default function ManageDashboard() {
   const { user, projects } = useMyContext();
@@ -83,21 +82,3 @@ export default function ManageDashboard() {
   );
 }
 
-function StatusBadge({ status }: { status: Status }) {
-  const variants: Record<string, "default" | "secondary" | "outline"> = {
-    Completed: "default",
-    Todo: "outline",
-    Pending: "secondary",
-  };
-
-  let colorClass = "";
-  if (status === Status.Completed) colorClass = "text-green-600 border-green-600 bg-green-50";
-  else if (status === Status.Pending) colorClass = "text-blue-600 border-blue-600 bg-blue-50";
-  else if (status === Status.Todo) colorClass = "text-orange-600 border-orange-200 bg-orange-50";
-
-  return (
-    <Badge variant={"outline"} className={`${colorClass} px-2 py-0.5 rounded-full text-[12px] tracking-wider font-bold`}>
-      {status}
-    </Badge>
-  );
-}

@@ -99,7 +99,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
                 points: e.points,
                 priority: e.priority as Priority,
                 status: e.status as Status,
+                projectId : e.projectId
             }));
+            console.log("ProjectTasks", projectTasks[0]);
+            
 
             const project: Project = {
                 projectId: projectInfo.projectId,

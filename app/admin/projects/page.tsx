@@ -9,6 +9,7 @@ import { useState } from 'react'
 import { Status } from '@/app/(utils)/myTypes';
 import { useMyContext } from '@/app/(utils)/myContext';
 import AddProjectDialog from '@/components/dialogs/addProjectDialog';
+import { StatusBadge } from '@/app/(utils)/utils';
 const filters = ["All", "Completed", "Pending", "Todo"];
 
 function ProjectsList() {
@@ -115,25 +116,7 @@ function ProjectsList() {
     );
 }
 
-function StatusBadge({ status }: { status: string }) {
-    const variants: Record<string, "default" | "secondary" | "destructive" | "outline"> = {
-        completed: "default",
-        pending: "default",
-        todo: "outline",
-    };
 
-    let colorClass = "";
-    const normalizedStatus = status.toLowerCase();
-    if (normalizedStatus === "completed") colorClass = "bg-green-500 hover:bg-green-600 border-transparent";
-    if (normalizedStatus === "pending") colorClass = "bg-blue-500 text-white border-transparent";
-    if (normalizedStatus === "todo") colorClass = "text-orange-600 border-orange-200 bg-orange-50";
-
-    return (
-        <Badge variant={variants[normalizedStatus] || "outline"} className={colorClass}>
-            {status}
-        </Badge>
-    );
-}
 
 
 export default ProjectsList;
