@@ -1,3 +1,4 @@
+'use client';
 import { role_enum } from '@/app/generated/prisma/enums';
 import UserProfilePage from '@/components/profilePage'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
@@ -5,17 +6,38 @@ import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { CheckSquare, Calendar, Flag } from 'lucide-react';
 import { formateDate, statusColors, statusTextColors } from "@/app/(utils)/utils";
-import { Task, User } from '@/app/(utils)/myTypes';
+import { Task } from '@/app/(utils)/myTypes';
+import { useMyContext } from '@/app/(utils)/myContext';
+import { useEffect, useState, useTransition } from 'react';
+import CustomLoader from '@/components/custom_loader';
 
-async function MemberProfilePage({ params }: { params: Promise<{ id: string }> }) {
-    const { id } = await params;
-    // Fetch user data from the API
-    const response = await fetch(`${process.env.PUBLIC_APP_URL || 'http://localhost:3000'}/api/user/${id}`, {
-        cache: 'no-store'
-    });
-    const result = await response.json();
-    const user: User | null = result.data;
-    const tasks = user?.tasks || [];
+function MemberProfilePage({ params }: { params: Promise<{ id: string }> }) {
+    const { user, projects } = useMyContext();
+    const tasks = [
+        ...new Map(
+            projects
+                .flatMap(pr => pr.tasks ?? [])
+                .filter(tsk => tsk.assignedTo === user?.userId)
+                .map(task => [task.taskId, task])
+        ).values()
+    ];
+    const [id, setId] = useState<number | string>();
+    const [pending, startTransition] = useTransition();
+
+    async function loadData() {
+        startTransition(async () => {
+            const tempId = (await params).id;
+            setId(tempId);
+        });
+    }
+
+    useEffect(() => {
+        loadData();
+    }, []);
+    if (pending || !id) {
+        return (<> <CustomLoader message='Just a minute....' /> </>);
+    }
+
     return (
         <div className="flex flex-col gap-1 pb-10">
             <UserProfilePage id={id} viewerRole={role_enum.member} />
@@ -23,6 +45,7 @@ async function MemberProfilePage({ params }: { params: Promise<{ id: string }> }
         </div>
     );
 }
+
 function MemberTaskList({ tasks }: { tasks: Task[] | [] }) {
 
     return (
@@ -39,7 +62,7 @@ function MemberTaskList({ tasks }: { tasks: Task[] | [] }) {
                         {tasks.length > 0 ? (
                             <div className="space-y-4">
                                 {tasks.map((task) => (
-                                    <Link key={task.taskId} href={`/project/${task.projectId}`} className="block group">
+                                    <Link key={task.taskId + ""} href={`/project/${task.projectId}`} className="block group">
                                         <div className="flex flex-col md:flex-row md:items-center justify-between p-4 rounded-lg border bg-card hover:border-primary/30 hover:bg-muted/50 transition-all gap-4 shadow-sm">
                                             <div className="flex-1 min-w-0">
                                                 <h3 className="font-semibold group-hover:text-primary transition-colors truncate">{task.title}</h3>

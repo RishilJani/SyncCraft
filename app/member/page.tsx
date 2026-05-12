@@ -11,11 +11,23 @@ import { StatusBadge } from '../(utils)/utils';
 function MemberDashboard() {
   const { user, projects } = useMyContext();
 
-  var tasks = projects.flatMap(pr => {
-    return pr.tasks?.filter(tsk => tsk.assignedTo == user?.userId) ?? [];
-  });
-  console.log("Tasks = ", tasks);
-
+  const tasks = [
+    ...new Map(
+      projects
+        .flatMap((pr) => {
+          if (!pr.tasks) {
+            return [];
+          }
+          return pr.tasks.map((task) => {
+            return { ...task, projectName: pr.projectName };
+          });
+        })
+        .filter(tsk => {
+          return tsk.assignedTo === user?.userId;
+        })
+        .map(task => [task.taskId, task])
+    ).values()
+  ];
 
   return (
     <div className="flex min-h-screen w-full flex-col bg-muted/40 p-4 md:p-8">
@@ -40,7 +52,8 @@ function MemberDashboard() {
                 <div className="flex flex-col md:flex-row items-start md:items-center py-2 px-6 gap-4">
                   <Link href={`/project/${task.projectId}`} className="flex-1 min-w-0 group/details">
                     <div className="flex items-center gap-3 mb-1">
-                      <CardTitle className="text-xl font-bold group-hover/details:text-primary transition-colors truncate">
+                      <p className="text-lg font-bold group-hover/details:text-primary transition-colors truncate">{task.projectName} : </p>
+                      <CardTitle className="text-lg font-bold group-hover/details:text-primary transition-colors truncate">
                         {task.title}
                       </CardTitle>
                       <StatusBadge status={task.status as Status} />

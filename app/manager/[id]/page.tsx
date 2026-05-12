@@ -1,23 +1,37 @@
+"use clint";
 import { role_enum } from '@/app/generated/prisma/enums';
 import UserProfilePage from '@/components/profilePage'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Folder } from 'lucide-react';
-import { Project, Status, User } from '@/app/(utils)/myTypes';
+import { Project } from '@/app/(utils)/myTypes';
 import { statusColors, statusTextColors } from '@/app/(utils)/utils';
+import { useMyContext } from '@/app/(utils)/myContext';
+import { useEffect, useState } from 'react';
+import CustomLoader from '@/components/custom_loader';
 
+function ManagerProfilePage({ params }: { params: Promise<{ id: string }> }) {
+    const { projects, loading, setLoading } = useMyContext();
+    const [id, setId] = useState<number | string>();
 
+    async function loadData() {
+        setLoading(true);
+        try {
+            const tempId = (await params).id;
+            setId(tempId);
+        } finally {
+            setLoading(false);
+        }
+    }
 
-async function ManagerProfilePage({ params }: { params: Promise<{ id: string }> }) {
-    const id = (await params).id;
+    useEffect(() => {
+        loadData();
+    },[]);
 
-    const response = await fetch(`${process.env.PUBLIC_APP_URL || 'http://localhost:3000'}/api/user/${id}`, {
-        cache: 'no-store'
-    });
-    const result = await response.json();
-    const user: User | null = result.data;
-    const projects = user?.projects == undefined ? [] : user.projects;
+    if (loading || !id) {
+        return (<> <CustomLoader message='Just a minute....' /> </>);
+    }
 
     return (
         <div className="flex flex-col gap-6 pb-10">
@@ -26,6 +40,7 @@ async function ManagerProfilePage({ params }: { params: Promise<{ id: string }> 
         </div>
     );
 }
+
 function ManagerProjectList({ projects }: { projects: Project[] }) {
     return (
         <>
