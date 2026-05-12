@@ -1,4 +1,4 @@
-"use clint";
+"use client";
 import { role_enum } from '@/app/generated/prisma/enums';
 import UserProfilePage from '@/components/profilePage'
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
